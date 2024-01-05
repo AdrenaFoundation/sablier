@@ -18,5 +18,7 @@ no-log-ix-name = []
 cpi = ["no-entrypoint"]
 
 [dependencies]
-anchor-lang = "0.27.0"
-clockwork-anchor-gen = { version = "0.3.2", features = ["compat-program-result"] }
+anchor-lang = "0.29.0"
+clockwork-anchor-gen = { version = "0.3.2", features = [
+    "compat-program-result",
+] }

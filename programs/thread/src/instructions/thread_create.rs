@@ -58,7 +58,7 @@ pub fn handler(ctx: Context<ThreadCreate>, amount: u64, id: Vec<u8>, instruction
     let thread = &mut ctx.accounts.thread;
 
     // Initialize the thread
-    let bump = *ctx.bumps.get("thread").unwrap();
+    let bump = ctx.bumps.thread;
     thread.authority = authority.key();
     thread.bump = bump;
     thread.created_at = Clock::get().unwrap().into();
