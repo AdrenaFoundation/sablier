@@ -32,7 +32,7 @@ pub fn handler(ctx: Context<FeeCollect>, amount: u64, penalty: bool) -> Result<(
     }
 
     // Verify there are enough lamports to distribute at the end of the epoch.
-    let lamport_balance = fee.to_account_info().lamports();
+    let lamport_balance = fee.get_lamports();
     let data_len = 8 + fee.try_to_vec()?.len();
     let min_rent_balance = Rent::get().unwrap().minimum_balance(data_len);
 

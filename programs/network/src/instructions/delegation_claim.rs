@@ -31,16 +31,8 @@ pub fn handler(ctx: Context<DelegationClaim>, amount: u64) -> Result<()> {
     delegation.yield_balance = delegation.yield_balance.checked_sub(amount).unwrap();
 
     // Transfer commission to the worker.
-    **delegation.to_account_info().try_borrow_mut_lamports()? = delegation
-        .to_account_info()
-        .lamports()
-        .checked_sub(amount)
-        .unwrap();
-    **pay_to.to_account_info().try_borrow_mut_lamports()? = pay_to
-        .to_account_info()
-        .lamports()
-        .checked_add(amount)
-        .unwrap();
+    delegation.sub_lamports(amount)?;
+    pay_to.add_lamports(amount)?;
 
     Ok(())
 }
