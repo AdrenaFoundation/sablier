@@ -1,9 +1,8 @@
-use {crate::state::*, anchor_lang::prelude::*};
+use {crate::{constants::*, state::*}, anchor_lang::prelude::*};
 
 #[derive(Accounts)]
 #[instruction(settings: ConfigSettings)]
 pub struct ConfigUpdate<'info> {
-    #[account(mut)]
     pub admin: Signer<'info>,
 
     #[account(

@@ -3,6 +3,7 @@
 //! the amount of stake delgated to them. It also provides accounts for workers to collect fees
 //! and distribute those fees to delegators.
 
+pub mod constants;
 pub mod errors;
 pub mod state;
 

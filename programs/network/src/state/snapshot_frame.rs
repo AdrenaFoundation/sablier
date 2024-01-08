@@ -6,7 +6,7 @@ pub const SEED_SNAPSHOT_FRAME: &[u8] = b"snapshot_frame";
  * SnapshotFrame
  */
 #[account]
-#[derive(Debug)]
+#[derive(Debug, InitSpace)]
 pub struct SnapshotFrame {
     pub id: u64,
     pub snapshot: Pubkey,

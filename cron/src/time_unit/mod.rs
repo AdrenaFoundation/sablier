@@ -163,7 +163,7 @@ where
         //println!("ordinals_from_specifier for {} => {:?}", Self::name(), specifier);
         match *specifier {
             All => Ok(Self::supported_ordinals().clone()),
-            Point(ordinal) => Ok((&[ordinal]).iter().cloned().collect()),
+            Point(ordinal) => Ok(OrdinalSet::from([ordinal])),
             Range(start, end) => {
                 match (Self::validate_ordinal(start), Self::validate_ordinal(end)) {
                     (Ok(start), Ok(end)) if start <= end => Ok((start..end + 1).collect()),
@@ -207,14 +207,13 @@ where
                     specifier => Self::ordinals_from_specifier(specifier)?,
                 };
                 if *step == 0 {
-                    return Err(ErrorKind::Expression(format!("step cannot be 0")).into());
+                    return Err(ErrorKind::Expression("step cannot be 0".to_string()).into());
                 }
                 base_set.into_iter().step_by(*step as usize).collect()
             }
-            RootSpecifier::NamedPoint(ref name) => (&[Self::ordinal_from_name(name)?])
-                .iter()
-                .cloned()
-                .collect::<OrdinalSet>(),
+            RootSpecifier::NamedPoint(ref name) => {
+                OrdinalSet::from([Self::ordinal_from_name(name)?])
+            }
         };
         Ok(ordinals)
     }

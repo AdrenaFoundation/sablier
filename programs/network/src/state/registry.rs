@@ -10,7 +10,7 @@ pub const SEED_REGISTRY: &[u8] = b"registry";
 /// Registry
 
 #[account]
-#[derive(Debug)]
+#[derive(Debug, InitSpace)]
 pub struct Registry {
     pub current_epoch: u64,
     pub locked: bool,
@@ -46,7 +46,7 @@ impl RegistryAccount for Account<'_, Registry> {
 
     fn hash_nonce(&mut self) -> Result<()> {
         let mut hasher = DefaultHasher::new();
-        Clock::get().unwrap().slot.hash(&mut hasher);
+        Clock::get()?.slot.hash(&mut hasher);
         self.nonce.hash(&mut hasher);
         self.nonce = hasher.finish();
         Ok(())

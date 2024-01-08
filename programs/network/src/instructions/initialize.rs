@@ -1,8 +1,7 @@
 use {
-    crate::state::*,
-    anchor_lang::{prelude::*, solana_program::system_program},
+    crate::{constants::*, state::*},
+    anchor_lang::prelude::*,
     anchor_spl::token::Mint,
-    std::mem::size_of,
 };
 
 #[derive(Accounts)]
@@ -15,11 +14,10 @@ pub struct Initialize<'info> {
         seeds = [SEED_CONFIG],
         bump,
         payer = admin,
-        space = 8 + size_of::<Config>(),
+        space = 8 + Config::INIT_SPACE,
     )]
     pub config: Account<'info, Config>,
 
-    #[account()]
     pub mint: Account<'info, Mint>,
 
     #[account(
@@ -27,7 +25,7 @@ pub struct Initialize<'info> {
         seeds = [SEED_REGISTRY],
         bump,
         payer = admin,
-        space = 8 + size_of::<Registry>(),
+        space = 8 + Registry::INIT_SPACE,
     )]
     pub registry: Account<'info, Registry>,
 
@@ -35,15 +33,14 @@ pub struct Initialize<'info> {
         init,
         seeds = [
             SEED_SNAPSHOT,
-            (0 as u64).to_be_bytes().as_ref(),
+            0_u64.to_be_bytes().as_ref(),
         ],
         bump,
         payer = admin,
-        space = 8 + size_of::<Snapshot>(),
+        space = 8 + Snapshot::INIT_SPACE,
     )]
     pub snapshot: Account<'info, Snapshot>,
 
-    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 }
 

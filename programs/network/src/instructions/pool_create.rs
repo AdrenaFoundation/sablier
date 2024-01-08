@@ -1,6 +1,6 @@
 use {
     crate::{errors::*, state::*},
-    anchor_lang::{prelude::*,  solana_program::system_program},
+    anchor_lang::prelude::*,
     std::mem::size_of,
 };
 
@@ -38,7 +38,6 @@ pub struct PoolCreate<'info> {
     )]
     pub registry: Box<Account<'info, Registry>>,
 
-    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 }
 
@@ -51,7 +50,7 @@ pub fn handler(ctx: Context<PoolCreate>) -> Result<()> {
     pool.init(registry.total_pools)?;
 
     // Increment the registry's pool counter.
-    registry.total_pools = registry.total_pools.checked_add(1).unwrap();
+    registry.total_pools += 1;
 
     Ok(())
 }

@@ -2,8 +2,6 @@ use anchor_lang::{prelude::*, AnchorDeserialize};
 
 use super::Snapshot;
 
-pub const SEED_EPOCH: &[u8] = b"epoch";
-
 /**
  * Epoch
  */

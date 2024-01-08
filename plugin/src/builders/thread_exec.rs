@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
 use anchor_lang::{InstructionData, ToAccountMetas};
-use clockwork_thread_program::state::{VersionedThread, Trigger};
 use clockwork_network_program::state::Worker;
+use clockwork_thread_program::state::{Trigger, VersionedThread};
 use clockwork_utils::thread::PAYER_PUBKEY;
 use log::info;
 use solana_account_decoder::UiAccountEncoding;
@@ -222,16 +222,6 @@ fn build_kickoff_ix(
     // Build the instruction.
     let mut kickoff_ix = match thread {
         VersionedThread::V1(_) => Instruction {
-            program_id: clockwork_thread_program_v1::ID,
-            accounts: clockwork_thread_program_v1::accounts::ThreadKickoff {
-                signatory: signatory_pubkey,
-                thread: thread_pubkey,
-                worker: worker_pubkey,
-            }
-            .to_account_metas(Some(false)),
-            data: clockwork_thread_program_v1::instruction::ThreadKickoff {}.data(),
-        },
-        VersionedThread::V2(_) => Instruction {
             program_id: clockwork_thread_program::ID,
             accounts: clockwork_thread_program::accounts::ThreadKickoff {
                 signatory: signatory_pubkey,
@@ -278,19 +268,6 @@ fn build_exec_ix(
     // Build the instruction.
     let mut exec_ix = match thread {
         VersionedThread::V1(_) => Instruction {
-            program_id: clockwork_thread_program_v1::ID,
-            accounts: clockwork_thread_program_v1::accounts::ThreadExec {
-                fee: clockwork_network_program::state::Fee::pubkey(worker_pubkey),
-                penalty: clockwork_network_program::state::Penalty::pubkey(worker_pubkey),
-                pool: clockwork_network_program::state::Pool::pubkey(0),
-                signatory: signatory_pubkey,
-                thread: thread_pubkey,
-                worker: worker_pubkey,
-            }
-            .to_account_metas(Some(true)),
-            data: clockwork_thread_program_v1::instruction::ThreadExec {}.data(),
-        },
-        VersionedThread::V2(_) => Instruction {
             program_id: clockwork_thread_program::ID,
             accounts: clockwork_thread_program::accounts::ThreadExec {
                 fee: clockwork_network_program::state::Fee::pubkey(worker_pubkey),

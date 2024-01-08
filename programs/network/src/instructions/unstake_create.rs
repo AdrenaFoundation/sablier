@@ -1,7 +1,6 @@
 use {
-    crate::{errors::*, state::*}, 
-    anchor_lang::{prelude::*, solana_program::system_program},
-    std::mem::size_of
+    crate::{errors::*, state::*, constants::*}, 
+    anchor_lang::prelude::*,
 };
 
 #[derive(Accounts)]
@@ -30,7 +29,6 @@ pub struct UnstakeCreate<'info> {
     )]
     pub registry: Account<'info, Registry>,
 
-    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 
     #[account(
@@ -41,7 +39,7 @@ pub struct UnstakeCreate<'info> {
         ],
         bump,
         payer = authority,
-        space = 8 + size_of::<Unstake>(),
+        space = 8 + Unstake::INIT_SPACE,
     )]
     pub unstake: Account<'info, Unstake>,
 
@@ -58,13 +56,13 @@ pub fn handler(ctx: Context<UnstakeCreate>, amount: u64) -> Result<()> {
     let worker = &ctx.accounts.worker;
 
     // Validate the request is valid.
-    require!(amount.le(&delegation.stake_amount), ClockworkError::InvalidUnstakeAmount);
+    require!(amount <= delegation.stake_amount, ClockworkError::InvalidUnstakeAmount);
 
     // Initialize the unstake account.
     unstake.init(amount, authority.key(), delegation.key(), registry.total_unstakes, worker.key())?;
 
     // Increment the registry's unstake counter.
-    registry.total_unstakes = registry.total_unstakes.checked_add(1).unwrap();
+    registry.total_unstakes += 1;
 
     Ok(())
 }

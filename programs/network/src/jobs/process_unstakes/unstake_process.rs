@@ -2,11 +2,10 @@ use anchor_lang::{prelude::*, solana_program::instruction::Instruction, Instruct
 use anchor_spl::token::{transfer, Token, TokenAccount, Transfer};
 use clockwork_utils::thread::ThreadResponse;
 
-use crate::{errors::*, state::*};
+use crate::{constants::*, errors::*, state::*};
 
 #[derive(Accounts)]
 pub struct UnstakeProcess<'info> {
-    #[account()]
     pub authority: SystemAccount<'info>,
 
     #[account(
@@ -14,10 +13,10 @@ pub struct UnstakeProcess<'info> {
         associated_token::authority = delegation.authority,
         associated_token::mint = config.mint,
     )]
-    pub authority_tokens: Box<Account<'info, TokenAccount>>,
+    pub authority_tokens: Account<'info, TokenAccount>,
 
     #[account(address = Config::pubkey())]
-    pub config: Box<Account<'info, Config>>,
+    pub config: Account<'info, Config>,
 
     #[account(
         mut,
@@ -30,19 +29,18 @@ pub struct UnstakeProcess<'info> {
         has_one = authority,
         has_one = worker,
     )]
-    pub delegation: Box<Account<'info, Delegation>>,
+    pub delegation: Account<'info, Delegation>,
 
     #[account(
         mut,
         seeds = [SEED_REGISTRY],
         bump,
     )]
-    pub registry: Box<Account<'info, Registry>>,
+    pub registry: Account<'info, Registry>,
 
     #[account(address = config.epoch_thread)]
     pub thread: Signer<'info>,
 
-    #[account(address = anchor_spl::token::ID)]
     pub token_program: Program<'info, Token>,
 
     #[account(
@@ -55,7 +53,7 @@ pub struct UnstakeProcess<'info> {
         has_one = authority,
         has_one = delegation
     )]
-    pub unstake: Box<Account<'info, Unstake>>,
+    pub unstake: Account<'info, Unstake>,
 
     #[account(address = worker.pubkey())]
     pub worker: Account<'info, Worker>,
@@ -65,7 +63,7 @@ pub struct UnstakeProcess<'info> {
         associated_token::authority = worker,
         associated_token::mint = config.mint,
     )]
-    pub worker_tokens: Box<Account<'info, TokenAccount>>,
+    pub worker_tokens: Account<'info, TokenAccount>,
 }
 
 pub fn handler(ctx: Context<UnstakeProcess>) -> Result<ThreadResponse> {
@@ -83,7 +81,7 @@ pub fn handler(ctx: Context<UnstakeProcess>) -> Result<ThreadResponse> {
 
     // Verify the unstake amount is valid.
     require!(
-        unstake.amount.le(&delegation.stake_amount),
+        unstake.amount <= delegation.stake_amount,
         ClockworkError::InvalidUnstakeAmount
     );
 
@@ -102,39 +100,21 @@ pub fn handler(ctx: Context<UnstakeProcess>) -> Result<ThreadResponse> {
     )?;
 
     // Decrement the delegations locked stake balacne by the requested unstake amount.
-    delegation.stake_amount = delegation.stake_amount.checked_sub(unstake.amount).unwrap();
+    delegation.stake_amount -= unstake.amount;
 
     // Close the unstake account by transfering all lamports to the authority.
-    let balance = unstake.to_account_info().lamports();
-    **unstake.to_account_info().try_borrow_mut_lamports()? = unstake
-        .to_account_info()
-        .lamports()
-        .checked_sub(balance)
-        .unwrap();
-    **authority.to_account_info().try_borrow_mut_lamports()? = authority
-        .to_account_info()
-        .lamports()
-        .checked_add(balance)
-        .unwrap();
+    let balance = unstake.get_lamports();
+    unstake.sub_lamports(balance)?;
+    authority.add_lamports(balance)?;
 
     // If this is the last unstake, then reset the registry's unstake counter.
-    if unstake
-        .id
-        .checked_add(1)
-        .unwrap()
-        .eq(&registry.total_unstakes)
-    {
+    if (unstake.id + 1) == registry.total_unstakes {
         registry.total_unstakes = 0;
     }
 
     // Build next instruction for the thread.
-    let dynamic_instruction = if unstake
-        .id
-        .checked_add(1)
-        .unwrap()
-        .lt(&registry.total_unstakes)
-    {
-        let next_unstake_pubkey = Unstake::pubkey(unstake.id.checked_add(1).unwrap());
+    let dynamic_instruction = if (unstake.id + 1) < registry.total_unstakes {
+        let next_unstake_pubkey = Unstake::pubkey(unstake.id + 1);
         Some(
             Instruction {
                 program_id: crate::ID,

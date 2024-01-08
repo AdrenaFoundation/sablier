@@ -1,4 +1,7 @@
-use {crate::state::*, anchor_lang::prelude::*};
+use {
+    crate::{constants::*, state::*},
+    anchor_lang::prelude::*,
+};
 
 /// Accounts required by the `thread_delete` instruction.
 #[derive(Accounts)]
@@ -30,17 +33,9 @@ pub fn handler(ctx: Context<ThreadDelete>) -> Result<()> {
     let thread = &ctx.accounts.thread;
     let close_to = &ctx.accounts.close_to;
 
-    let thread_lamports = thread.to_account_info().lamports();
-    **thread.to_account_info().try_borrow_mut_lamports()? = thread
-        .to_account_info()
-        .lamports()
-        .checked_sub(thread_lamports)
-        .unwrap();
-    **close_to.to_account_info().try_borrow_mut_lamports()? = close_to
-        .to_account_info()
-        .lamports()
-        .checked_add(thread_lamports)
-        .unwrap();
+    let thread_lamports = thread.get_lamports();
+    thread.sub_lamports(thread_lamports)?;
+    close_to.add_lamports(thread_lamports)?;
 
     Ok(())
 }

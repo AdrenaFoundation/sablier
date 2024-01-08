@@ -1,13 +1,13 @@
 use anchor_lang::{prelude::*, AnchorDeserialize};
 
-pub const SEED_SNAPSHOT_ENTRY: &[u8] = b"snapshot_entry";
+use crate::constants::SEED_SNAPSHOT_ENTRY;
 
 /**
  * SnapshotEntry
  */
 
 #[account]
-#[derive(Debug)]
+#[derive(Debug, InitSpace)]
 pub struct SnapshotEntry {
     pub delegation: Pubkey,
     pub id: u64,

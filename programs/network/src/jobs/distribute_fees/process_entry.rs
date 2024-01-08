@@ -1,7 +1,7 @@
 use anchor_lang::{prelude::*, solana_program::instruction::Instruction, InstructionData};
 use clockwork_utils::thread::ThreadResponse;
 
-use crate::state::*;
+use crate::{constants::*, state::*};
 
 #[derive(Accounts)]
 pub struct DistributeFeesProcessEntry<'info> {
@@ -74,48 +74,25 @@ pub fn handler(ctx: Context<DistributeFeesProcessEntry>) -> Result<ThreadRespons
     let worker = &ctx.accounts.worker;
 
     // Calculate the balance of this particular delegation, based on the weight of its stake with this worker.
-    let distribution_balance = if snapshot_frame.stake_amount.gt(&0) {
-        fee.distributable_balance
-            .checked_mul(snapshot_entry.stake_amount)
-            .unwrap()
-            .checked_div(snapshot_frame.stake_amount)
-            .unwrap()
+    let distribution_balance = if snapshot_frame.stake_amount > 0 {
+        fee.distributable_balance * snapshot_entry.stake_amount / snapshot_frame.stake_amount
     } else {
         0
     };
 
     // Transfer yield to the worker.
-    **fee.to_account_info().try_borrow_mut_lamports()? = fee
-        .to_account_info()
-        .lamports()
-        .checked_sub(distribution_balance)
-        .unwrap();
-    **delegation.to_account_info().try_borrow_mut_lamports()? = delegation
-        .to_account_info()
-        .lamports()
-        .checked_add(distribution_balance)
-        .unwrap();
+    fee.sub_lamports(distribution_balance)?;
+    delegation.add_lamports(distribution_balance)?;
 
     // Increment the delegation's yield balance.
-    delegation.yield_balance = delegation
-        .yield_balance
-        .checked_add(distribution_balance)
-        .unwrap();
+    delegation.yield_balance += distribution_balance;
 
     // Build the next instruction for the thread.
-    let dynamic_instruction = if snapshot_entry
-        .id
-        .checked_add(1)
-        .unwrap()
-        .lt(&snapshot_frame.total_entries)
-    {
+    let dynamic_instruction = if (snapshot_entry.id + 1) < snapshot_frame.total_entries {
         // This frame has more entries. Move on to the next one.
-        let next_delegation_pubkey =
-            Delegation::pubkey(worker.key(), delegation.id.checked_add(1).unwrap());
-        let next_snapshot_entry_pubkey = SnapshotEntry::pubkey(
-            snapshot_frame.key(),
-            snapshot_entry.id.checked_add(1).unwrap(),
-        );
+        let next_delegation_pubkey = Delegation::pubkey(worker.key(), delegation.id + 1);
+        let next_snapshot_entry_pubkey =
+            SnapshotEntry::pubkey(snapshot_frame.key(), snapshot_entry.id + 1);
         Some(
             Instruction {
                 program_id: crate::ID,
@@ -135,16 +112,11 @@ pub fn handler(ctx: Context<DistributeFeesProcessEntry>) -> Result<ThreadRespons
             }
             .into(),
         )
-    } else if snapshot_frame
-        .id
-        .checked_add(1)
-        .unwrap()
-        .lt(&snapshot.total_frames)
-    {
+    } else if (snapshot_frame.id + 1) < snapshot.total_frames {
         // This frame has no more entries. Move on to the next worker.
-        let next_worker_pubkey = Worker::pubkey(worker.id.checked_add(1).unwrap());
+        let next_worker_pubkey = Worker::pubkey(worker.id + 1);
         let next_snapshot_frame_pubkey =
-            SnapshotFrame::pubkey(snapshot.key(), snapshot_frame.id.checked_add(1).unwrap());
+            SnapshotFrame::pubkey(snapshot.key(), snapshot_frame.id + 1);
         Some(
             Instruction {
                 program_id: crate::ID,

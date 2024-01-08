@@ -1,14 +1,8 @@
-use std::mem::size_of;
-
-use anchor_lang::{
-    prelude::*,
-    solana_program::{instruction::Instruction, system_program},
-    InstructionData,
-};
+use anchor_lang::{prelude::*, solana_program::instruction::Instruction, InstructionData};
 use anchor_spl::associated_token::get_associated_token_address;
 use clockwork_utils::thread::{ThreadResponse, PAYER_PUBKEY};
 
-use crate::state::*;
+use crate::{constants::*, state::*};
 
 #[derive(Accounts)]
 pub struct TakeSnapshotCreateEntry<'info> {
@@ -46,7 +40,7 @@ pub struct TakeSnapshotCreateEntry<'info> {
         ],
         bump,
         payer = payer,
-        space = 8 + size_of::<SnapshotEntry>(),
+        space = 8 + SnapshotEntry::INIT_SPACE,
     )]
     pub snapshot_entry: Account<'info, SnapshotEntry>,
 
@@ -59,11 +53,10 @@ pub struct TakeSnapshotCreateEntry<'info> {
         ],
         bump,
         has_one = snapshot,
-        constraint = snapshot_frame.id.checked_add(1).unwrap().eq(&snapshot.total_frames),
+        constraint = (snapshot_frame.id + 1) == snapshot.total_frames,
     )]
     pub snapshot_frame: Box<Account<'info, SnapshotFrame>>,
 
-    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 
     #[account(address = config.epoch_thread)]
@@ -97,17 +90,14 @@ pub fn handler(ctx: Context<TakeSnapshotCreateEntry>) -> Result<ThreadResponse> 
     )?;
 
     // Update the snapshot frame.
-    snapshot_frame.total_entries = snapshot_frame.total_entries.checked_add(1).unwrap();
+    snapshot_frame.total_entries += 1;
 
     // Build the next instruction for the thread.
-    let dynamic_instruction = if snapshot_frame.total_entries.lt(&worker.total_delegations) {
+    let dynamic_instruction = if snapshot_frame.total_entries < worker.total_delegations {
         // Create a snapshot entry for the next delegation.
-        let next_delegation_pubkey =
-            Delegation::pubkey(worker.pubkey(), delegation.id.checked_add(1).unwrap());
-        let next_snapshot_entry_pubkey = SnapshotEntry::pubkey(
-            snapshot_frame.key(),
-            snapshot_entry.id.checked_add(1).unwrap(),
-        );
+        let next_delegation_pubkey = Delegation::pubkey(worker.pubkey(), delegation.id + 1);
+        let next_snapshot_entry_pubkey =
+            SnapshotEntry::pubkey(snapshot_frame.key(), snapshot_entry.id + 1);
         Some(
             Instruction {
                 program_id: crate::ID,
@@ -128,11 +118,11 @@ pub fn handler(ctx: Context<TakeSnapshotCreateEntry>) -> Result<ThreadResponse> 
             }
             .into(),
         )
-    } else if snapshot.total_frames.lt(&registry.total_workers) {
+    } else if snapshot.total_frames < registry.total_workers {
         // This frame has captured all its entries. Create a frame for the next worker.
         let next_snapshot_frame_pubkey =
-            SnapshotFrame::pubkey(snapshot.key(), snapshot_frame.id.checked_add(1).unwrap());
-        let next_worker_pubkey = Worker::pubkey(worker.id.checked_add(1).unwrap());
+            SnapshotFrame::pubkey(snapshot.key(), snapshot_frame.id + 1);
+        let next_worker_pubkey = Worker::pubkey(worker.id + 1);
         Some(
             Instruction {
                 program_id: crate::ID,

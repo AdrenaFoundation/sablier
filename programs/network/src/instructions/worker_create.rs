@@ -1,27 +1,24 @@
 use {
-    crate::{errors::*, state::*},
-    anchor_lang::{
-        prelude::*,
-        solana_program::{system_program, sysvar},
-    },
+    crate::{errors::*, state::*, constants::*},
+    anchor_lang::
+        prelude::*
+    ,
     anchor_spl::{
         associated_token::AssociatedToken,
         token::{Mint, Token, TokenAccount},
     },
-    std::mem::size_of,
 };
 
 
 #[derive(Accounts)]
 pub struct WorkerCreate<'info> {
-    #[account(address = anchor_spl::associated_token::ID)]
     pub associated_token_program: Program<'info, AssociatedToken>,
 
     #[account(mut)]
     pub authority: Signer<'info>,
 
     #[account(address = Config::pubkey())]
-    pub config: Box<Account<'info, Config>>,
+    pub config: Account<'info, Config>,
 
     #[account(
         init,
@@ -31,7 +28,7 @@ pub struct WorkerCreate<'info> {
         ],
         bump,
         payer = authority,
-        space = 8 + size_of::<Fee>(),
+        space = 8 + Fee::INIT_SPACE,
     )]
     pub fee: Account<'info, Fee>,
 
@@ -43,7 +40,7 @@ pub struct WorkerCreate<'info> {
         ],
         bump,
         payer = authority,
-        space = 8 + size_of::<Penalty>(),
+        space = 8 + Penalty::INIT_SPACE,
     )]
     pub penalty: Account<'info, Penalty>,
 
@@ -58,16 +55,11 @@ pub struct WorkerCreate<'info> {
     )]
     pub registry: Account<'info, Registry>,
 
-    #[account(address = sysvar::rent::ID)]
-    pub rent: Sysvar<'info, Rent>,
-
     #[account(constraint = signatory.key().ne(&authority.key()) @ ClockworkError::InvalidSignatory)]
     pub signatory: Signer<'info>,
 
-    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 
-    #[account(address = anchor_spl::token::ID)]
     pub token_program: Program<'info, Token>,
 
     #[account(
@@ -78,7 +70,7 @@ pub struct WorkerCreate<'info> {
         ],
         bump,
         payer = authority,
-        space = 8 + size_of::<Worker>(),
+        space = 8 + Worker::INIT_SPACE,
     )]
     pub worker: Account<'info, Worker>,
 
@@ -91,7 +83,7 @@ pub struct WorkerCreate<'info> {
     pub worker_tokens: Account<'info, TokenAccount>,
 
 }
-
+ 
 pub fn handler(ctx: Context<WorkerCreate>) -> Result<()> {
     // Get accounts
     let authority = &mut ctx.accounts.authority;
@@ -107,7 +99,7 @@ pub fn handler(ctx: Context<WorkerCreate>) -> Result<()> {
     penalty.init(worker.key())?;
 
     // Update the registry's worker counter.
-    registry.total_workers = registry.total_workers.checked_add(1).unwrap();
+    registry.total_workers += 1;
 
     Ok(())
 }

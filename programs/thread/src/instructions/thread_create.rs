@@ -2,22 +2,18 @@ use std::mem::size_of;
 
 use anchor_lang::{
     prelude::*,
-    solana_program::system_program,
     system_program::{transfer, Transfer}
 };
 use clockwork_utils::thread::{Trigger, SerializableInstruction};
 
-use crate::state::*;
+use crate::{state::*, constants::*};
 
-/// The minimum exec fee that may be set on a thread.
-const MINIMUM_FEE: u64 = 1000;
 
 /// Accounts required by the `thread_create` instruction.
 #[derive(Accounts)]
 #[instruction(amount: u64, id: Vec<u8>, instructions: Vec<SerializableInstruction>,  trigger: Trigger)]
 pub struct ThreadCreate<'info> {
     /// The authority (owner) of the thread.
-    #[account()]
     pub authority: Signer<'info>,
 
     /// The payer for account initializations. 
@@ -25,7 +21,6 @@ pub struct ThreadCreate<'info> {
     pub payer: Signer<'info>,
 
     /// The Solana system program.
-    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 
     /// The thread to be created.
@@ -61,9 +56,9 @@ pub fn handler(ctx: Context<ThreadCreate>, amount: u64, id: Vec<u8>, instruction
     let bump = ctx.bumps.thread;
     thread.authority = authority.key();
     thread.bump = bump;
-    thread.created_at = Clock::get().unwrap().into();
+    thread.created_at = Clock::get()?.into();
     thread.exec_context = None;
-    thread.fee = MINIMUM_FEE;
+    thread.fee = THREAD_MINIMUM_FEE;
     thread.id = id;
     thread.instructions = instructions;
     thread.name = String::new();

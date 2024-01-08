@@ -5,7 +5,7 @@ use anchor_spl::{
 };
 use clockwork_utils::thread::ThreadResponse;
 
-use crate::state::*;
+use crate::{constants::*, state::*};
 
 #[derive(Accounts)]
 pub struct StakeDelegationsProcessDelegation<'info> {
@@ -40,7 +40,6 @@ pub struct StakeDelegationsProcessDelegation<'info> {
     #[account(address = config.epoch_thread)]
     pub thread: Signer<'info>,
 
-    #[account(address = anchor_spl::token::ID)]
     pub token_program: Program<'info, Token>,
 
     #[account(address = worker.pubkey())]
@@ -87,18 +86,12 @@ pub fn handler(ctx: Context<StakeDelegationsProcessDelegation>) -> Result<Thread
     )?;
 
     // Update the delegation's stake amount.
-    delegation.stake_amount = delegation.stake_amount.checked_add(amount).unwrap();
+    delegation.stake_amount += amount;
 
     // Build next instruction for the thread.
-    let dynamic_instruction = if delegation
-        .id
-        .checked_add(1)
-        .unwrap()
-        .lt(&worker.total_delegations)
-    {
+    let dynamic_instruction = if (delegation.id + 1) < worker.total_delegations {
         // This worker has more delegations, continue locking their stake.
-        let next_delegation_pubkey =
-            Delegation::pubkey(worker.key(), delegation.id.checked_add(1).unwrap());
+        let next_delegation_pubkey = Delegation::pubkey(worker.key(), delegation.id + 1);
         Some(
             Instruction {
                 program_id: crate::ID,
@@ -120,12 +113,7 @@ pub fn handler(ctx: Context<StakeDelegationsProcessDelegation>) -> Result<Thread
             }
             .into(),
         )
-    } else if worker
-        .id
-        .checked_add(1)
-        .unwrap()
-        .lt(&registry.total_workers)
-    {
+    } else if (worker.id + 1) < registry.total_workers {
         // This worker has no more delegations, move on to the next worker.
         Some(
             Instruction {
@@ -134,7 +122,7 @@ pub fn handler(ctx: Context<StakeDelegationsProcessDelegation>) -> Result<Thread
                     config: config.key(),
                     registry: registry.key(),
                     thread: thread.key(),
-                    worker: Worker::pubkey(worker.id.checked_add(1).unwrap()),
+                    worker: Worker::pubkey(worker.id + 1),
                 }
                 .to_account_metas(Some(true)),
                 data: crate::instruction::StakeDelegationsProcessWorker {}.data(),

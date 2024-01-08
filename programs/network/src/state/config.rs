@@ -1,13 +1,13 @@
 use anchor_lang::{prelude::*, AnchorDeserialize};
 
-pub const SEED_CONFIG: &[u8] = b"config";
+use crate::constants::SEED_CONFIG;
 
 /**
  * Config
  */
 
 #[account]
-#[derive(Debug)]
+#[derive(Debug, InitSpace)]
 pub struct Config {
     pub admin: Pubkey,
     pub epoch_thread: Pubkey,

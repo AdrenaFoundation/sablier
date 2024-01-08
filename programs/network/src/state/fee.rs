@@ -1,10 +1,10 @@
 use anchor_lang::{prelude::*, AnchorDeserialize};
 
-pub const SEED_FEE: &[u8] = b"fee";
+use crate::constants::SEED_FEE;
 
 /// Escrows the lamport balance owed to a particular worker.
 #[account]
-#[derive(Debug)]
+#[derive(Debug, InitSpace)]
 pub struct Fee {
     /// The number of lamports that are distributable for this epoch period.
     pub distributable_balance: u64,

@@ -59,8 +59,8 @@ pub fn handler(ctx: Context<PoolRotate>) -> Result<()> {
 
     // Verify the pool has excess space or the worker can rotate in at this time.
     require!(
-        pool.workers.len().lt(&pool.size)
-            || is_rotation_window_open(&registry, &snapshot, &snapshot_frame).unwrap(),
+        pool.workers.len() < pool.size
+            || is_rotation_window_open(registry, snapshot, snapshot_frame).unwrap(),
         ClockworkError::PoolFull
     );
 
@@ -85,10 +85,6 @@ fn is_rotation_window_open(
     match registry.nonce.checked_rem(snapshot.total_stake) {
         None => Ok(false),
         Some(sample) => Ok(sample >= snapshot_frame.stake_offset
-            && sample
-                < snapshot_frame
-                    .stake_offset
-                    .checked_add(snapshot_frame.stake_amount)
-                    .unwrap()),
+            && sample < snapshot_frame.stake_offset + snapshot_frame.stake_amount),
     }
 }

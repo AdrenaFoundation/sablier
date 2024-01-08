@@ -46,7 +46,7 @@ pub fn handler(ctx: Context<DistributeFeesProcessSnapshot>) -> Result<ThreadResp
     let thread = &ctx.accounts.thread;
 
     Ok(ThreadResponse {
-        dynamic_instruction: if snapshot.total_frames.gt(&0) {
+        dynamic_instruction: if snapshot.total_frames > 0 {
             Some(
                 Instruction {
                     program_id: crate::ID,

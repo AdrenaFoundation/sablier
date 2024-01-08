@@ -6,7 +6,7 @@ pub const SEED_WORKER: &[u8] = b"worker";
 
 /// Worker
 #[account]
-#[derive(Debug)]
+#[derive(Debug, InitSpace)]
 pub struct Worker {
     /// The worker's authority (owner).
     pub authority: Pubkey,
@@ -61,7 +61,7 @@ impl WorkerAccount for Account<'_, Worker> {
 
     fn update(&mut self, settings: WorkerSettings) -> Result<()> {
         require!(
-            settings.commission_rate.ge(&0) && settings.commission_rate.le(&100),
+            settings.commission_rate > 0 && settings.commission_rate <= 100,
             ClockworkError::InvalidCommissionRate
         );
         self.commission_rate = settings.commission_rate;

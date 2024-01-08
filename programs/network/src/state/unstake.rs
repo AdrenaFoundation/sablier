@@ -4,7 +4,7 @@ pub const SEED_UNSTAKE: &[u8] = b"unstake";
 
 /// Unstake
 #[account]
-#[derive(Debug)]
+#[derive(Debug, InitSpace)]
 pub struct Unstake {
     pub amount: u64,
     pub authority: Pubkey,

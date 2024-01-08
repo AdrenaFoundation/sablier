@@ -1,10 +1,10 @@
 use anchor_lang::{prelude::*, AnchorDeserialize};
 
-pub const SEED_DELEGATION: &[u8] = b"delegation";
+use crate::constants::SEED_DELEGATION;
 
 /// An account to manage a token holder's stake delegation with a particiular a worker.
 #[account]
-#[derive(Debug)]
+#[derive(Debug, InitSpace)]
 pub struct Delegation {
     /// The authority of this delegation account.
     pub authority: Pubkey,

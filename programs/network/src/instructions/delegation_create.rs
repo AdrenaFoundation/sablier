@@ -1,21 +1,14 @@
 use {
-    crate::state::*,
-    anchor_lang::{
-        prelude::*,
-        solana_program::{system_program, sysvar},
-    },
+    crate::{constants::*, state::*},
+    anchor_lang::prelude::*,
     anchor_spl::{
         associated_token::AssociatedToken,
         token::{Mint, Token, TokenAccount},
     },
-    std::mem::size_of,
 };
 
 #[derive(Accounts)]
 pub struct DelegationCreate<'info> {
-    #[account(address = anchor_spl::associated_token::ID)]
-    pub associated_token_program: Program<'info, AssociatedToken>,
-
     #[account(mut)]
     pub authority: Signer<'info>,
 
@@ -31,7 +24,7 @@ pub struct DelegationCreate<'info> {
         ],
         bump,
         payer = authority,
-        space = 8 + size_of::<Delegation>(),
+        space = 8 + Delegation::INIT_SPACE,
     )]
     pub delegation: Account<'info, Delegation>,
 
@@ -46,15 +39,6 @@ pub struct DelegationCreate<'info> {
     #[account(address = config.mint)]
     pub mint: Account<'info, Mint>,
 
-    #[account(address = sysvar::rent::ID)]
-    pub rent: Sysvar<'info, Rent>,
-
-    #[account(address = system_program::ID)]
-    pub system_program: Program<'info, System>,
-
-    #[account(address = anchor_spl::token::ID)]
-    pub token_program: Program<'info, Token>,
-
     #[account(
         mut,
         seeds = [
@@ -64,6 +48,12 @@ pub struct DelegationCreate<'info> {
         bump
     )]
     pub worker: Account<'info, Worker>,
+
+    pub token_program: Program<'info, Token>,
+
+    pub associated_token_program: Program<'info, AssociatedToken>,
+
+    pub system_program: Program<'info, System>,
 }
 
 pub fn handler(ctx: Context<DelegationCreate>) -> Result<()> {
@@ -76,7 +66,7 @@ pub fn handler(ctx: Context<DelegationCreate>) -> Result<()> {
     delegation.init(authority.key(), worker.total_delegations, worker.key())?;
 
     // Increment the worker's total delegations counter.
-    worker.total_delegations = worker.total_delegations.checked_add(1).unwrap();
+    worker.total_delegations += 1;
 
     Ok(())
 }

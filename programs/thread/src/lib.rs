@@ -4,6 +4,7 @@
 #[macro_use]
 extern crate version;
 
+pub mod constants;
 pub mod errors;
 pub mod state;
 

@@ -212,7 +212,7 @@ async fn secret_revoke(req: web::Json<SignedRequest<SecretRevoke>>) -> impl Resp
     assert!(req.0.authenticate());
 
     // Create and validate filepaths.
-    let secrets_path = Path::new(SECRETS_PATH.into());
+    let secrets_path = Path::new(SECRETS_PATH);
     assert!(secrets_path.is_dir());
     let user_secrets_path = secrets_path.join(req.signer.to_string());
     let secret_path = user_secrets_path.join(format!("{}.txt", req.msg.name));
@@ -238,7 +238,7 @@ fn decrypt(keypair: &ElGamalKeypair, ciphertext: Vec<u8>) -> String {
     let plaintext_bytes: Vec<u8> = ciphertext
         .par_chunks(CIPHERTEXT_CHUNK_SIZE)
         .map(|i| {
-            let cx = ElGamalCiphertext::from_bytes(&i).unwrap();
+            let cx = ElGamalCiphertext::from_bytes(i).unwrap();
             let dx = keypair.secret().decrypt_u32(&cx).unwrap();
             dx.to_le_bytes()[0..PLAINTEXT_CHUNK_SIZE].to_vec()
         })
@@ -266,20 +266,19 @@ fn encrypt(keypair: &ElGamalKeypair, plaintext: String) -> Vec<u8> {
     bytes
         .chunks(PLAINTEXT_CHUNK_SIZE)
         .map(|i| i.try_into().unwrap())
-        .map(|s: [u8; PLAINTEXT_CHUNK_SIZE]| {
+        .flat_map(|s: [u8; PLAINTEXT_CHUNK_SIZE]| {
             keypair
                 .pubkey()
                 .encrypt(unsafe { std::mem::transmute::<[u8; PLAINTEXT_CHUNK_SIZE], u32>(s) })
                 .to_bytes()
                 .to_vec()
         })
-        .flatten()
         .collect()
 }
 
 async fn fetch_decrypted_secret(user: Pubkey, name: String) -> Option<String> {
     let keypair = &ElGamalKeypair::read_json_file(ENCRYPTION_KEYPAIR_PATH).unwrap();
-    let secret_filepath = Path::new(SECRETS_PATH.into())
+    let secret_filepath = Path::new(SECRETS_PATH)
         .join(user.to_string())
         .join(format!("{}.txt", name));
     if let Ok(filetext) = fs::read(secret_filepath) {
@@ -292,7 +291,7 @@ async fn fetch_decrypted_secret(user: Pubkey, name: String) -> Option<String> {
 }
 
 async fn fetch_secret(user: Pubkey, name: String) -> Option<Secret> {
-    let secret_filepath = Path::new(SECRETS_PATH.into())
+    let secret_filepath = Path::new(SECRETS_PATH)
         .join(user.to_string())
         .join(format!("{}.txt", name));
     if let Ok(filetext) = fs::read(secret_filepath) {
@@ -305,7 +304,7 @@ async fn fetch_secret(user: Pubkey, name: String) -> Option<Secret> {
 
 fn is_approved(delegate: Pubkey, user: Pubkey, secret_name: String) -> bool {
     // Read the list of current delegates.
-    let secret_delegates_path = Path::new(SECRETS_PATH.into())
+    let secret_delegates_path = Path::new(SECRETS_PATH)
         .join(user.to_string())
         .join(format!("{}.delegates", secret_name));
     let delegates = if secret_delegates_path.exists() {

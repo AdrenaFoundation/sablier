@@ -26,7 +26,7 @@ pub fn handler(ctx: Context<ProcessUnstakesJob>) -> Result<ThreadResponse> {
 
     // Return next instruction for thread.
     Ok(ThreadResponse {
-        dynamic_instruction: if registry.total_unstakes.gt(&0) {
+        dynamic_instruction: if registry.total_unstakes > 0 {
             Some(
                 Instruction {
                     program_id: crate::ID,

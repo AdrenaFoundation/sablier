@@ -40,14 +40,10 @@ pub fn handler(ctx: Context<DeleteSnapshotProcessSnapshot>) -> Result<ThreadResp
     let thread = &mut ctx.accounts.thread;
 
     // If this snapshot has no entries, then close immediately
-    if snapshot.total_frames.eq(&0) {
-        let snapshot_lamports = snapshot.to_account_info().lamports();
-        **snapshot.to_account_info().lamports.borrow_mut() = 0;
-        **thread.to_account_info().lamports.borrow_mut() = thread
-            .to_account_info()
-            .lamports()
-            .checked_add(snapshot_lamports)
-            .unwrap();
+    if snapshot.total_frames == 0 {
+        let snapshot_lamports = snapshot.get_lamports();
+        snapshot.sub_lamports(snapshot_lamports)?;
+        thread.add_lamports(snapshot_lamports)?;
     }
 
     // Build next instruction the thread.

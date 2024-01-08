@@ -1,9 +1,6 @@
 use anchor_lang::{
-    solana_program::{
-        instruction::Instruction,
-        system_program, sysvar,
-    },
-    AccountDeserialize, InstructionData, ToAccountMetas
+    solana_program::{instruction::Instruction, system_program, sysvar},
+    AccountDeserialize, InstructionData, ToAccountMetas,
 };
 use anchor_spl::{associated_token, associated_token::get_associated_token_address, token};
 use clockwork_network_program::state::{
@@ -101,13 +98,13 @@ pub fn create(client: &Client, signatory: Keypair, silent: bool) -> Result<(), C
             penalty: Penalty::pubkey(worker_pubkey),
             mint: config.mint,
             registry: Registry::pubkey(),
-            rent: sysvar::rent::ID,
             signatory: signatory.pubkey(),
             system_program: system_program::ID,
             token_program: token::ID,
             worker: worker_pubkey,
             worker_tokens: get_associated_token_address(&worker_pubkey, &config.mint),
-        }.to_account_metas(Some(false)),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::WorkerCreate {}.data(),
     };
     client
@@ -137,7 +134,8 @@ pub fn update(client: &Client, id: u64, signatory: Option<Keypair>) -> Result<()
             authority: client.payer_pubkey(),
             system_program: system_program::ID,
             worker: worker_pubkey,
-        }.to_account_metas(Some(false)),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::WorkerUpdate { settings }.data(),
     };
     client.send_and_confirm(&[ix], &[client.payer()]).unwrap();

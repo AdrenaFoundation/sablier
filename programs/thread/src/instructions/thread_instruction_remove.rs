@@ -1,11 +1,13 @@
-use {crate::state::*, anchor_lang::prelude::*};
+use {
+    crate::{constants::*, state::*},
+    anchor_lang::prelude::*,
+};
 
 /// Accounts required by the `thread_instruction_remove` instruction.
 #[derive(Accounts)]
 #[instruction(index: u64)]
 pub struct ThreadInstructionRemove<'info> {
     /// The authority (owner) of the thread.
-    #[account()]
     pub authority: Signer<'info>,
 
     /// The thread to be edited.
