@@ -32,7 +32,7 @@ pub fn handler(ctx: Context<PenaltyClaim>) -> Result<()> {
 
     // Calculate how  many lamports are
     let lamport_balance = penalty.get_lamports();
-    let data_len = 8 + penalty.try_to_vec()?.len();
+    let data_len = 8 + Penalty::INIT_SPACE;
     let min_rent_balance = Rent::get()?.minimum_balance(data_len);
     let claimable_balance = lamport_balance - min_rent_balance;
     require!(

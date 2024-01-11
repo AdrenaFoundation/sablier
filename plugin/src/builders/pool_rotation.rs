@@ -1,9 +1,6 @@
 use std::sync::Arc;
 
-use anchor_lang::{
-    solana_program::instruction::Instruction,
-    InstructionData, ToAccountMetas
-};
+use anchor_lang::{solana_program::instruction::Instruction, InstructionData, ToAccountMetas};
 use clockwork_network_program::state::{Config, Pool, Registry, Snapshot, SnapshotFrame, Worker};
 use log::info;
 use solana_client::nonblocking::rpc_client::RpcClient;
@@ -76,12 +73,13 @@ pub async fn build_pool_rotation_tx<'a>(
             snapshot: snapshot_pubkey,
             snapshot_frame: SnapshotFrame::pubkey(snapshot_pubkey, worker_id),
             worker: Worker::pubkey(worker_id),
-        }.to_account_metas(Some(false)),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::PoolRotate {}.data(),
     };
 
     // Build and sign tx.
     let mut tx = Transaction::new_with_payer(&[ix.clone()], Some(&keypair.pubkey()));
     tx.sign(&[keypair], client.get_latest_blockhash().await.unwrap());
-    return Some(tx);
+    Some(tx)
 }

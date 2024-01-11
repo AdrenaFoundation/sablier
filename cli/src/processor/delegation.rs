@@ -1,5 +1,5 @@
 use anchor_lang::{
-    solana_program::{instruction::Instruction, system_program, sysvar},
+    solana_program::{instruction::Instruction, system_program},
     AccountDeserialize, InstructionData, ToAccountMetas,
 };
 use clockwork_network_program::state::{Config, Delegation, Worker};

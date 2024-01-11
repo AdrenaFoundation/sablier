@@ -1,5 +1,5 @@
 use {
-    crate::{errors::*, state::*},
+    crate::{constants::*, errors::*, state::*},
     anchor_lang::prelude::*,
     std::mem::size_of,
 };
@@ -10,7 +10,7 @@ pub struct PoolCreate<'info> {
     pub admin: Signer<'info>,
 
     #[account(
-        address = Config::pubkey(), 
+        address = Config::pubkey(),
         has_one = admin
     )]
     pub config: Account<'info, Config>,

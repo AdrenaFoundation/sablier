@@ -4,8 +4,8 @@ use {
         prelude::*,
         system_program::{transfer, Transfer},
     },
+    clockwork_utils::account::AccountInfoExt,
     std::mem::size_of,
-    clockwork_utils::account::AccountInfoExt
 };
 
 #[derive(Accounts)]
@@ -14,7 +14,7 @@ pub struct PoolUpdate<'info> {
     pub admin: Signer<'info>,
 
     #[account(
-        address = Config::pubkey(), 
+        address = Config::pubkey(),
         has_one = admin
     )]
     pub config: Account<'info, Config>,
@@ -52,7 +52,7 @@ pub fn handler(ctx: Context<PoolUpdate>, settings: PoolSettings) -> Result<()> {
                     to: pool.to_account_info(),
                 },
             ),
-            minimum_rent - pool.get_lamports()
+            minimum_rent - pool.get_lamports(),
         )?;
     }
 

@@ -16,7 +16,7 @@ pub struct DistributeFeesProcessEntry<'info> {
             delegation.id.to_be_bytes().as_ref(),
         ],
         bump,
-        constraint = delegation.id.eq(&snapshot_entry.id),
+        constraint = delegation.id == snapshot_entry.id,
         has_one = worker,
     )]
     pub delegation: Account<'info, Delegation>,
@@ -37,7 +37,7 @@ pub struct DistributeFeesProcessEntry<'info> {
 
     #[account(
         address = snapshot.pubkey(),
-        constraint = registry.current_epoch.eq(&registry.current_epoch)
+        constraint = snapshot.id == registry.current_epoch
     )]
     pub snapshot: Account<'info, Snapshot>,
 

@@ -1,4 +1,7 @@
-use {crate::{constants::*, state::*}, anchor_lang::prelude::*};
+use {
+    crate::{constants::*, state::*},
+    anchor_lang::prelude::*,
+};
 
 #[derive(Accounts)]
 #[instruction(settings: ConfigSettings)]
@@ -6,9 +9,9 @@ pub struct ConfigUpdate<'info> {
     pub admin: Signer<'info>,
 
     #[account(
-        mut, 
+        mut,
         seeds = [SEED_CONFIG],
-        bump, 
+        bump,
         has_one = admin
     )]
     pub config: Account<'info, Config>,

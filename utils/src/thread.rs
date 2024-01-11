@@ -14,7 +14,7 @@ use static_pubkey::static_pubkey;
 pub static PAYER_PUBKEY: Pubkey = static_pubkey!("C1ockworkPayer11111111111111111111111111111");
 
 /// The clock object, representing a specific moment in time recorded by a Solana cluster.
-#[derive(AnchorDeserialize, AnchorSerialize, BorshSchema, Clone, Debug, PartialEq, InitSpace)]
+#[derive(AnchorDeserialize, AnchorSerialize, InitSpace, BorshSchema, Clone, Debug, PartialEq)]
 pub struct ClockData {
     /// The current slot.
     pub slot: u64,

@@ -1,8 +1,6 @@
 use anchor_lang::{prelude::*, AnchorDeserialize};
 
-use crate::errors::*;
-
-pub const SEED_WORKER: &[u8] = b"worker";
+use crate::{constants::SEED_WORKER, errors::*};
 
 /// Worker
 #[account]

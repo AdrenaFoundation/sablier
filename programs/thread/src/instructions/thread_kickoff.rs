@@ -106,7 +106,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
             skippable,
         } => {
             // Get the reference timestamp for calculating the thread's scheduled target timestamp.
-            let reference_timestamp = match thread.exec_context.clone() {
+            let reference_timestamp = match thread.exec_context {
                 None => thread.created_at.unix_timestamp,
                 Some(exec_context) => match exec_context.trigger_context {
                     TriggerContext::Cron { started_at } => started_at,

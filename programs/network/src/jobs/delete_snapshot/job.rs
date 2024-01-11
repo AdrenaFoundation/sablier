@@ -30,7 +30,7 @@ pub fn handler(ctx: Context<DeleteSnapshotJob>) -> Result<ThreadResponse> {
                 accounts: crate::accounts::DeleteSnapshotProcessSnapshot {
                     config: config.key(),
                     registry: registry.key(),
-                    snapshot: Snapshot::pubkey(registry.current_epoch.checked_sub(1).unwrap()),
+                    snapshot: Snapshot::pubkey(registry.current_epoch - 1),
                     thread: thread.key(),
                 }
                 .to_account_metas(Some(true)),

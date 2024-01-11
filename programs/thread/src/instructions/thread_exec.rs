@@ -148,7 +148,7 @@ pub fn handler(ctx: Context<ThreadExec>) -> Result<()> {
     if next_instruction.is_none() {
         if let Some(ix) = thread.instructions.get((exec_index + 1) as usize) {
             next_instruction = Some(ix.clone());
-            exec_index = exec_index + 1;
+            exec_index += 1;
         }
     }
 
@@ -196,7 +196,7 @@ pub fn handler(ctx: Context<ThreadExec>) -> Result<()> {
     if should_reimburse_transaction {
         signatory_reimbursement += TRANSACTION_BASE_FEE_REIMBURSEMENT;
     }
-    if signatory_reimbursement.gt(&0) {
+    if signatory_reimbursement > 0 {
         thread.sub_lamports(signatory_reimbursement)?;
         signatory.add_lamports(signatory_reimbursement)?;
     }

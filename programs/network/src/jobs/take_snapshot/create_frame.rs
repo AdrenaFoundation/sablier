@@ -2,7 +2,7 @@ use anchor_lang::{prelude::*, solana_program::instruction::Instruction, Instruct
 use anchor_spl::{associated_token::get_associated_token_address, token::TokenAccount};
 use clockwork_utils::thread::{ThreadResponse, PAYER_PUBKEY};
 
-use crate::state::*;
+use crate::{constants::*, state::*};
 
 #[derive(Accounts)]
 pub struct TakeSnapshotCreateFrame<'info> {

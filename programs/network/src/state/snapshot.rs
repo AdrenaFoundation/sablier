@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*, AnchorDeserialize};
 
-pub const SEED_SNAPSHOT: &[u8] = b"snapshot";
+use crate::constants::SEED_SNAPSHOT;
 
 /// Snapshot
 #[account]

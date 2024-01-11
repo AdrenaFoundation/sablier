@@ -5,6 +5,7 @@ use solana_geyser_plugin_interface::geyser_plugin_interface::Result as PluginRes
 use solana_program::pubkey::Pubkey;
 use tokio::sync::RwLock;
 
+#[derive(Default)]
 pub struct WebhookObserver {
     // The set of webhook that can be processed.
     pub webhooks: RwLock<HashSet<Pubkey>>,
@@ -12,9 +13,7 @@ pub struct WebhookObserver {
 
 impl WebhookObserver {
     pub fn new() -> Self {
-        Self {
-            webhooks: RwLock::new(HashSet::new()),
-        }
+        Self::default()
     }
 
     pub async fn observe_webhook(

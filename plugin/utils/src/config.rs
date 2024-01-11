@@ -1,8 +1,5 @@
 use {
-    serde::{
-        Serialize,
-        Deserialize
-    },
+    serde::{Deserialize, Serialize},
     solana_geyser_plugin_interface::geyser_plugin_interface::{
         GeyserPluginError, Result as PluginResult,
     },

@@ -2,7 +2,7 @@ use std::collections::VecDeque;
 
 use anchor_lang::{prelude::*, AnchorDeserialize};
 
-pub const SEED_POOL: &[u8] = b"pool";
+use crate::constants::SEED_POOL;
 
 const DEFAULT_POOL_SIZE: usize = 1;
 
@@ -22,6 +22,10 @@ impl Pool {
     pub fn pubkey(id: u64) -> Pubkey {
         Pubkey::find_program_address(&[SEED_POOL, id.to_be_bytes().as_ref()], &crate::ID).0
     }
+}
+
+impl Space for Pool {
+    const INIT_SPACE: usize = 8 + DEFAULT_POOL_SIZE + 32;
 }
 
 /**

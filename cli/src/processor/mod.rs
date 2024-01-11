@@ -16,10 +16,7 @@ use clap::ArgMatches;
 use solana_sdk::signature::read_keypair_file;
 
 use crate::{
-    client::Client,
-    cli::CliCommand,
-    config::CliConfig,
-    errors::CliError,
+    cli::CliCommand, client::Client, config::CliConfig, errors::CliError,
     processor::thread::parse_pubkey_from_id_or_address,
 };
 
@@ -27,13 +24,10 @@ pub fn process(matches: &ArgMatches) -> Result<(), CliError> {
     // Parse command and config
     let command = CliCommand::try_from(matches)?;
 
-    match command {
-        // Set solana config if using localnet command
-        CliCommand::Localnet { .. } => {
-            // TODO Verify the Solana CLI version is compatable with this build.
-            set_solana_config().map_err(|err| CliError::FailedLocalnet(err.to_string()))?
-        }
-        _ => {}
+    // Set solana config if using localnet command
+    if let CliCommand::Localnet { .. } = command {
+        // TODO Verify the Solana CLI version is compatable with this build.
+        set_solana_config().map_err(|err| CliError::FailedLocalnet(err.to_string()))?
     }
 
     let mut config = CliConfig::load();
@@ -136,7 +130,7 @@ pub fn process(matches: &ArgMatches) -> Result<(), CliError> {
 
 fn set_solana_config() -> Result<()> {
     let mut process = std::process::Command::new("solana")
-        .args(&["config", "set", "--url", "l"])
+        .args(["config", "set", "--url", "l"])
         .spawn()
         .expect("Failed to set solana config");
     process.wait()?;

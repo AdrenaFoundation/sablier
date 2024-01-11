@@ -1,9 +1,5 @@
 use anchor_lang::{
-    solana_program::{
-        instruction::Instruction,
-        pubkey::Pubkey,
-        system_program,
-    },
+    solana_program::{instruction::Instruction, pubkey::Pubkey, system_program},
     InstructionData, ToAccountMetas,
 };
 use clockwork_network_program::state::{Config, Pool, Registry, Snapshot};
@@ -22,7 +18,8 @@ pub fn initialize(client: &Client, mint: Pubkey) -> Result<(), CliError> {
             registry: Registry::pubkey(),
             snapshot: Snapshot::pubkey(0),
             system_program: system_program::ID,
-        }.to_account_metas(Some(false)),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::Initialize {}.data(),
     };
     let ix_b = Instruction {
@@ -34,7 +31,8 @@ pub fn initialize(client: &Client, mint: Pubkey) -> Result<(), CliError> {
             pool: Pool::pubkey(0),
             registry: Registry::pubkey(),
             system_program: system_program::ID,
-        }.to_account_metas(Some(false)),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::PoolCreate {}.data(),
     };
 

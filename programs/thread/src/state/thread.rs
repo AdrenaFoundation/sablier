@@ -75,7 +75,7 @@ impl ThreadAccount for Account<'_, Thread> {
 
     fn realloc_account(&mut self) -> Result<()> {
         // Realloc memory for the thread account
-        let data_len = vec![
+        let data_len = [
             8,
             size_of::<Thread>(),
             self.id.len(),
@@ -91,7 +91,7 @@ impl ThreadAccount for Account<'_, Thread> {
 }
 
 /// The execution context of a particular transaction thread.
-#[derive(AnchorDeserialize, AnchorSerialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(AnchorDeserialize, AnchorSerialize, InitSpace, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ExecContext {
     /// Index of the next instruction to be executed.
     pub exec_index: u64,
@@ -111,7 +111,7 @@ pub struct ExecContext {
 }
 
 /// The event which allowed a particular transaction thread to be triggered.
-#[derive(AnchorDeserialize, AnchorSerialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(AnchorDeserialize, AnchorSerialize, InitSpace, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TriggerContext {
     /// A running hash of the observed account data.
     Account {

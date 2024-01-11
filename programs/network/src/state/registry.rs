@@ -5,7 +5,7 @@ use std::{
 
 use anchor_lang::{prelude::*, AnchorDeserialize};
 
-pub const SEED_REGISTRY: &[u8] = b"registry";
+use crate::constants::SEED_REGISTRY;
 
 /// Registry
 

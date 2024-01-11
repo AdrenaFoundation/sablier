@@ -54,7 +54,7 @@ pub fn handler(ctx: Context<DistributeFeesProcessFrame>) -> Result<ThreadRespons
 
     // Calculate the fee account's usuable balance.
     let fee_lamport_balance = fee.get_lamports();
-    let fee_data_len = 8 + fee.try_to_vec()?.len();
+    let fee_data_len = 8 + Fee::INIT_SPACE;
     let fee_rent_balance = Rent::get()?.minimum_balance(fee_data_len);
     let fee_usable_balance = fee_lamport_balance - fee_rent_balance;
 

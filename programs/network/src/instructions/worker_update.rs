@@ -1,7 +1,5 @@
-use clockwork_utils::account::AccountInfoExt;
-
 use {
-    crate::state::*,
+    crate::{constants::*, state::*},
     anchor_lang::{
         prelude::*,
         system_program::{transfer, Transfer},
@@ -37,11 +35,8 @@ pub fn handler(ctx: Context<WorkerUpdate>, settings: WorkerSettings) -> Result<(
     // Update the worker
     worker.update(settings)?;
 
-    // Realloc memory for the worker account
-    let data_len = 8 + worker.try_to_vec()?.len();
-    worker.realloc(data_len, false)?;
-
     // If lamports are required to maintain rent-exemption, pay them
+    let data_len = 8 + Worker::INIT_SPACE;
     let minimum_rent = Rent::get()?.minimum_balance(data_len);
     let worker_lamports = worker.get_lamports();
     if minimum_rent > worker_lamports {

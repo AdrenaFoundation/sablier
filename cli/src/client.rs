@@ -1,8 +1,7 @@
 use anchor_lang::{prelude::Clock, AccountDeserialize};
 use clockwork_utils::ProgramLogsDeserializable;
 use solana_client::{
-    client_error, rpc_client::RpcClient,
-    rpc_response::RpcSimulateTransactionResult,
+    client_error, rpc_client::RpcClient, rpc_response::RpcSimulateTransactionResult,
 };
 use solana_sdk::{
     commitment_config::CommitmentConfig,
@@ -20,7 +19,6 @@ use std::{
     str::FromStr,
 };
 use thiserror::Error;
-
 
 #[derive(Debug, Error)]
 pub enum ClientError {
@@ -135,7 +133,6 @@ impl Client {
     }
 }
 
-
 impl Debug for Client {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "RPC client payer {}", self.payer_pubkey())
@@ -155,4 +152,3 @@ impl DerefMut for Client {
         &mut self.client
     }
 }
-

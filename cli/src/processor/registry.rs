@@ -1,7 +1,4 @@
-use anchor_lang::{
-    solana_program::instruction::Instruction,
-    InstructionData, ToAccountMetas
-};
+use anchor_lang::{solana_program::instruction::Instruction, InstructionData, ToAccountMetas};
 use clockwork_network_program::state::{Config, Registry, Snapshot};
 
 use crate::{client::Client, errors::CliError};
@@ -28,8 +25,9 @@ pub fn unlock(client: &Client) -> Result<(), CliError> {
         accounts: clockwork_network_program::accounts::RegistryUnlock {
             admin: client.payer_pubkey(),
             config: Config::pubkey(),
-            registry: Registry::pubkey()
-        }.to_account_metas(Some(false)),
+            registry: Registry::pubkey(),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::RegistryUnlock {}.data(),
     };
     client.send_and_confirm(&[ix], &[client.payer()]).unwrap();

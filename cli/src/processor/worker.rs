@@ -1,5 +1,5 @@
 use anchor_lang::{
-    solana_program::{instruction::Instruction, system_program, sysvar},
+    solana_program::{instruction::Instruction, system_program},
     AccountDeserialize, InstructionData, ToAccountMetas,
 };
 use anchor_spl::{associated_token, associated_token::get_associated_token_address, token};

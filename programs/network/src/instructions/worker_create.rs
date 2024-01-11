@@ -1,14 +1,11 @@
 use {
-    crate::{errors::*, state::*, constants::*},
-    anchor_lang::
-        prelude::*
-    ,
+    crate::{constants::*, errors::*, state::*},
+    anchor_lang::prelude::*,
     anchor_spl::{
         associated_token::AssociatedToken,
         token::{Mint, Token, TokenAccount},
     },
 };
-
 
 #[derive(Accounts)]
 pub struct WorkerCreate<'info> {
@@ -48,7 +45,7 @@ pub struct WorkerCreate<'info> {
     pub mint: Account<'info, Mint>,
 
     #[account(
-        mut, 
+        mut,
         seeds = [SEED_REGISTRY],
         bump,
         constraint = !registry.locked @ ClockworkError::RegistryLocked
@@ -81,9 +78,8 @@ pub struct WorkerCreate<'info> {
         associated_token::mint = mint,
     )]
     pub worker_tokens: Account<'info, TokenAccount>,
-
 }
- 
+
 pub fn handler(ctx: Context<WorkerCreate>) -> Result<()> {
     // Get accounts
     let authority = &mut ctx.accounts.authority;

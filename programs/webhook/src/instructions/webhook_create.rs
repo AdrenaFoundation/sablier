@@ -5,14 +5,17 @@ use anchor_lang::{
     system_program::{transfer, Transfer},
 };
 
-use crate::{state::{Relayer, HttpMethod, Webhook}, constants::{SEED_WEBHOOK, WEBHOOK_FEE}};
+use crate::{
+    constants::{SEED_WEBHOOK, WEBHOOK_FEE},
+    state::{HttpMethod, Relayer, Webhook},
+};
 
 #[derive(Accounts)]
 #[instruction(
     body: Vec<u8>,
     headers: HashMap<String, String>,
-    id: Vec<u8>, 
-    method: HttpMethod, 
+    id: Vec<u8>,
+    method: HttpMethod,
     url: String
 )]
 pub struct WebhookCreate<'info> {
