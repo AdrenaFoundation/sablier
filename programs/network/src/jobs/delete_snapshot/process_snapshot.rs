@@ -47,7 +47,7 @@ pub fn handler(ctx: Context<DeleteSnapshotProcessSnapshot>) -> Result<ThreadResp
     }
 
     // Build next instruction the thread.
-    let dynamic_instruction = if snapshot.total_frames.gt(&0) {
+    let dynamic_instruction = if snapshot.total_frames > 0 {
         // There are frames in this snapshot. Delete them.
         Some(
             Instruction {

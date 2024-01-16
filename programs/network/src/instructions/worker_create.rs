@@ -52,7 +52,7 @@ pub struct WorkerCreate<'info> {
     )]
     pub registry: Account<'info, Registry>,
 
-    #[account(constraint = signatory.key().ne(&authority.key()) @ ClockworkError::InvalidSignatory)]
+    #[account(constraint = signatory.key() != authority.key() @ ClockworkError::InvalidSignatory)]
     pub signatory: Signer<'info>,
 
     pub system_program: Program<'info, System>,

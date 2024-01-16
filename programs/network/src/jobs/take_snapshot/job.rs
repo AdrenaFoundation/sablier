@@ -36,7 +36,7 @@ pub fn handler(ctx: Context<TakeSnapshotJob>) -> Result<ThreadResponse> {
                     config: config.key(),
                     payer: PAYER_PUBKEY,
                     registry: registry.key(),
-                    snapshot: Snapshot::pubkey(registry.current_epoch.checked_add(1).unwrap()),
+                    snapshot: Snapshot::pubkey(registry.current_epoch + 1),
                     system_program: system_program::ID,
                     thread: thread.key(),
                 }

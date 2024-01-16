@@ -11,7 +11,7 @@ pub struct TakeSnapshotCreateEntry<'info> {
 
     #[account(
         address = delegation.pubkey(),
-        constraint = delegation.id.eq(&snapshot_frame.total_entries),
+        constraint = delegation.id == snapshot_frame.total_entries,
         has_one = worker,
     )]
     pub delegation: Box<Account<'info, Delegation>>,
@@ -27,7 +27,7 @@ pub struct TakeSnapshotCreateEntry<'info> {
 
     #[account(
         address = snapshot.pubkey(),
-        constraint = registry.current_epoch.checked_add(1).unwrap().eq(&snapshot.id)
+        constraint = (registry.current_epoch + 1) == snapshot.id
     )]
     pub snapshot: Box<Account<'info, Snapshot>>,
 
@@ -64,7 +64,7 @@ pub struct TakeSnapshotCreateEntry<'info> {
 
     #[account(
         address = worker.pubkey(),
-        constraint = worker.id.eq(&snapshot_frame.id),
+        constraint = worker.id == snapshot_frame.id,
     )]
     pub worker: Box<Account<'info, Worker>>,
 }

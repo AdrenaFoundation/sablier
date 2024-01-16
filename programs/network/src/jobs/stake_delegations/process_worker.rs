@@ -30,7 +30,7 @@ pub fn handler(ctx: Context<StakeDelegationsProcessWorker>) -> Result<ThreadResp
     let worker = &ctx.accounts.worker;
 
     // Build the next instruction for the thread.
-    let dynamic_instruction = if worker.total_delegations.gt(&0) {
+    let dynamic_instruction = if worker.total_delegations > 0 {
         // This worker has delegations. Stake their deposits.
         let delegation_pubkey = Delegation::pubkey(worker.key(), 0);
         Some(
@@ -54,12 +54,7 @@ pub fn handler(ctx: Context<StakeDelegationsProcessWorker>) -> Result<ThreadResp
             }
             .into(),
         )
-    } else if worker
-        .id
-        .checked_add(1)
-        .unwrap()
-        .lt(&registry.total_workers)
-    {
+    } else if (worker.id + 1) < registry.total_workers {
         // This worker has no delegations. Move on to the next worker.
         Some(
             Instruction {
@@ -68,7 +63,7 @@ pub fn handler(ctx: Context<StakeDelegationsProcessWorker>) -> Result<ThreadResp
                     config: config.key(),
                     registry: registry.key(),
                     thread: thread.key(),
-                    worker: Worker::pubkey(worker.id.checked_add(1).unwrap()),
+                    worker: Worker::pubkey(worker.id + 1),
                 }
                 .to_account_metas(Some(true)),
                 data: crate::instruction::StakeDelegationsProcessWorker {}.data(),

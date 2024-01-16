@@ -11,6 +11,7 @@ pub use clockwork_utils::thread::Equality;
 use crate::constants::{NEXT_INSTRUCTION_SIZE, SEED_THREAD};
 
 /// Tracks the current state of a transaction thread on Solana.
+// TODO Wait for the next version of Anchor to implement InitSpace macro
 #[account]
 #[derive(Debug)]
 pub struct Thread {

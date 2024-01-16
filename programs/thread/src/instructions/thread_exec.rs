@@ -176,12 +176,7 @@ pub fn handler(ctx: Context<ThreadExec>) -> Result<()> {
     thread.exec_context = Some(ExecContext {
         exec_index,
         execs_since_slot: if clock.slot == thread.exec_context.unwrap().last_exec_at {
-            thread
-                .exec_context
-                .unwrap()
-                .execs_since_slot
-                .checked_add(1)
-                .unwrap()
+            thread.exec_context.unwrap().execs_since_slot + 1
         } else {
             1
         },

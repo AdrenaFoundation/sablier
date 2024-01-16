@@ -24,7 +24,7 @@ pub struct DistributeFeesProcessFrame<'info> {
 
     #[account(
         address = snapshot.pubkey(),
-        constraint = snapshot.id.eq(&registry.current_epoch)
+        constraint = snapshot.id == registry.current_epoch
     )]
     pub snapshot: Account<'info, Snapshot>,
 
