@@ -1,9 +1,11 @@
-use {crate::state::*, anchor_lang::prelude::*};
+use {
+    crate::{constants::*, state::*},
+    anchor_lang::prelude::*,
+};
 
 #[derive(Accounts)]
 #[instruction(amount: u64)]
 pub struct DelegationClaim<'info> {
-    #[account()]
     pub authority: Signer<'info>,
 
     #[account(mut)]
@@ -28,7 +30,7 @@ pub fn handler(ctx: Context<DelegationClaim>, amount: u64) -> Result<()> {
     let delegation = &mut ctx.accounts.delegation;
 
     // Decrement the delegation's claimable balance.
-    delegation.yield_balance = delegation.yield_balance.checked_sub(amount).unwrap();
+    delegation.yield_balance -= amount;
 
     // Transfer commission to the worker.
     delegation.sub_lamports(amount)?;

@@ -1,10 +1,10 @@
 use anchor_lang::{prelude::*, AnchorDeserialize};
 
-pub const SEED_UNSTAKE: &[u8] = b"unstake";
+use crate::constants::SEED_UNSTAKE;
 
 /// Unstake
 #[account]
-#[derive(Debug)]
+#[derive(Debug, InitSpace)]
 pub struct Unstake {
     pub amount: u64,
     pub authority: Pubkey,

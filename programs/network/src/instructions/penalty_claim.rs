@@ -1,11 +1,11 @@
 use {
-    crate::{errors::*, state::*},
+    crate::{constants::*, errors::*, state::*},
     anchor_lang::prelude::*,
 };
 
 #[derive(Accounts)]
 pub struct PenaltyClaim<'info> {
-    #[account(mut, address = config.admin)]
+    #[account(address = config.admin)]
     pub admin: Signer<'info>,
 
     #[account(address = Config::pubkey())]
@@ -31,26 +31,18 @@ pub fn handler(ctx: Context<PenaltyClaim>) -> Result<()> {
     let pay_to = &mut ctx.accounts.pay_to;
 
     // Calculate how  many lamports are
-    let lamport_balance = penalty.to_account_info().lamports();
-    let data_len = 8 + penalty.try_to_vec()?.len();
-    let min_rent_balance = Rent::get().unwrap().minimum_balance(data_len);
-    let claimable_balance = lamport_balance.checked_sub(min_rent_balance).unwrap();
+    let lamport_balance = penalty.get_lamports();
+    let data_len = 8 + Penalty::INIT_SPACE;
+    let min_rent_balance = Rent::get()?.minimum_balance(data_len);
+    let claimable_balance = lamport_balance - min_rent_balance;
     require!(
-        claimable_balance.gt(&0),
+        claimable_balance > 0,
         ClockworkError::InsufficientPenaltyBalance
     );
 
     // Pay reimbursment for base transaction fee
-    **penalty.to_account_info().try_borrow_mut_lamports()? = penalty
-        .to_account_info()
-        .lamports()
-        .checked_sub(claimable_balance)
-        .unwrap();
-    **pay_to.to_account_info().try_borrow_mut_lamports()? = pay_to
-        .to_account_info()
-        .lamports()
-        .checked_add(claimable_balance)
-        .unwrap();
+    penalty.sub_lamports(claimable_balance)?;
+    pay_to.add_lamports(claimable_balance)?;
 
     Ok(())
 }

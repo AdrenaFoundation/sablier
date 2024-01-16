@@ -1,8 +1,7 @@
 use {
-    crate::state::*,
+    crate::{constants::*, state::*},
     anchor_lang::{
         prelude::*,
-        solana_program::system_program,
         system_program::{transfer, Transfer},
     },
 };
@@ -13,7 +12,6 @@ pub struct WorkerUpdate<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
-    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 
     #[account(
@@ -37,13 +35,11 @@ pub fn handler(ctx: Context<WorkerUpdate>, settings: WorkerSettings) -> Result<(
     // Update the worker
     worker.update(settings)?;
 
-    // Realloc memory for the worker account
-    let data_len = 8 + worker.try_to_vec()?.len();
-    worker.to_account_info().realloc(data_len, false)?;
-
     // If lamports are required to maintain rent-exemption, pay them
-    let minimum_rent = Rent::get().unwrap().minimum_balance(data_len);
-    if minimum_rent > worker.to_account_info().lamports() {
+    let data_len = 8 + Worker::INIT_SPACE;
+    let minimum_rent = Rent::get()?.minimum_balance(data_len);
+    let worker_lamports = worker.get_lamports();
+    if minimum_rent > worker_lamports {
         transfer(
             CpiContext::new(
                 system_program.to_account_info(),
@@ -52,9 +48,7 @@ pub fn handler(ctx: Context<WorkerUpdate>, settings: WorkerSettings) -> Result<(
                     to: worker.to_account_info(),
                 },
             ),
-            minimum_rent
-                .checked_sub(worker.to_account_info().lamports())
-                .unwrap(),
+            minimum_rent - worker_lamports,
         )?;
     }
 

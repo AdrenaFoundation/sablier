@@ -1,22 +1,14 @@
 #[allow(deprecated)]
 use {
     crate::{
-        client::Client,
-        config::CliConfig,
-        deps,
-        errors::CliError,
-        parser::ProgramInfo,
-        print::print_style,
-        print_status
-    },
-    anyhow::{
-        Context,
-        Result,
+        client::Client, config::CliConfig, deps, errors::CliError, parser::ProgramInfo,
+        print::print_style, print_status,
     },
     anchor_lang::{
         solana_program::{instruction::Instruction, system_program},
-        InstructionData, ToAccountMetas
+        InstructionData, ToAccountMetas,
     },
+    anyhow::{Context, Result},
     clap::crate_version,
     clockwork_network_program::state::{Config, ConfigSettings, Registry},
     clockwork_thread_program::state::{Thread, Trigger},
@@ -24,29 +16,16 @@ use {
         native_token::LAMPORTS_PER_SOL,
         program_pack::Pack,
         pubkey::Pubkey,
-        signature::{
-            read_keypair_file,
-            Keypair,
-            Signer,
-        },
+        signature::{read_keypair_file, Keypair, Signer},
         system_instruction,
     },
-    spl_associated_token_account::{
-        create_associated_token_account,
-        get_associated_token_address,
-    },
+    spl_associated_token_account::{create_associated_token_account, get_associated_token_address},
     spl_token::{
-        instruction::{
-            initialize_mint,
-            mint_to,
-        },
+        instruction::{initialize_mint, mint_to},
         state::Mint,
     },
     std::fs,
-    std::process::{
-        Child,
-        Command,
-    },
+    std::process::{Child, Command},
 };
 
 pub fn start(
@@ -178,7 +157,8 @@ fn create_threads(client: &Client, mint_pubkey: Pubkey) -> Result<()> {
             config: Config::pubkey(),
             registry: Registry::pubkey(),
             thread: epoch_thread_pubkey,
-        }.to_account_metas(Some(false)),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::DistributeFeesJob {}.data(),
     };
     let ix_a2 = Instruction {
@@ -187,7 +167,8 @@ fn create_threads(client: &Client, mint_pubkey: Pubkey) -> Result<()> {
             config: Config::pubkey(),
             registry: Registry::pubkey(),
             thread: epoch_thread_pubkey,
-        }.to_account_metas(Some(false)),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::ProcessUnstakesJob {}.data(),
     };
     let ix_a3 = Instruction {
@@ -196,7 +177,8 @@ fn create_threads(client: &Client, mint_pubkey: Pubkey) -> Result<()> {
             config: Config::pubkey(),
             registry: Registry::pubkey(),
             thread: epoch_thread_pubkey,
-        }.to_account_metas(Some(false)),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::StakeDelegationsJob {}.data(),
     };
     let ix_a4 = Instruction {
@@ -205,7 +187,8 @@ fn create_threads(client: &Client, mint_pubkey: Pubkey) -> Result<()> {
             config: Config::pubkey(),
             registry: Registry::pubkey(),
             thread: epoch_thread_pubkey,
-        }.to_account_metas(Some(false)),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::TakeSnapshotJob {}.data(),
     };
     let ix_a5 = Instruction {
@@ -214,7 +197,8 @@ fn create_threads(client: &Client, mint_pubkey: Pubkey) -> Result<()> {
             config: Config::pubkey(),
             registry: Registry::pubkey(),
             thread: epoch_thread_pubkey,
-        }.to_account_metas(Some(false)),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::IncrementEpoch {}.data(),
     };
     let ix_a6 = Instruction {
@@ -223,7 +207,8 @@ fn create_threads(client: &Client, mint_pubkey: Pubkey) -> Result<()> {
             config: Config::pubkey(),
             registry: Registry::pubkey(),
             thread: epoch_thread_pubkey,
-        }.to_account_metas(Some(false)),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::DeleteSnapshotJob {}.data(),
     };
     let ix_a = Instruction {
@@ -233,7 +218,8 @@ fn create_threads(client: &Client, mint_pubkey: Pubkey) -> Result<()> {
             payer: client.payer_pubkey(),
             system_program: system_program::ID,
             thread: epoch_thread_pubkey,
-        }.to_account_metas(Some(false)),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_thread_program::instruction::ThreadCreate {
             amount: LAMPORTS_PER_SOL,
             id: epoch_thread_id.into(),
@@ -261,8 +247,9 @@ fn create_threads(client: &Client, mint_pubkey: Pubkey) -> Result<()> {
         accounts: clockwork_network_program::accounts::RegistryNonceHash {
             config: Config::pubkey(),
             registry: Registry::pubkey(),
-            thread: hasher_thread_pubkey,  
-        }.to_account_metas(Some(false)),
+            thread: hasher_thread_pubkey,
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::RegistryNonceHash {}.data(),
     };
     let ix_b = Instruction {
@@ -272,13 +259,12 @@ fn create_threads(client: &Client, mint_pubkey: Pubkey) -> Result<()> {
             payer: client.payer_pubkey(),
             system_program: system_program::ID,
             thread: hasher_thread_pubkey,
-        }.to_account_metas(Some(false)),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_thread_program::instruction::ThreadCreate {
             amount: LAMPORTS_PER_SOL,
             id: hasher_thread_id.into(),
-            instructions: vec![
-                registry_hash_ix.into(),
-            ],
+            instructions: vec![registry_hash_ix.into()],
             trigger: Trigger::Cron {
                 schedule: "*/15 * * * * * *".into(),
                 skippable: true,
@@ -298,19 +284,20 @@ fn create_threads(client: &Client, mint_pubkey: Pubkey) -> Result<()> {
         program_id: clockwork_network_program::ID,
         accounts: clockwork_network_program::accounts::ConfigUpdate {
             admin: client.payer_pubkey(),
-            config: Config::pubkey()
-        }.to_account_metas(Some(false)),
+            config: Config::pubkey(),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::ConfigUpdate { settings }.data(),
     };
 
     client
-        .send_and_confirm(&vec![ix_a], &[client.payer()])
+        .send_and_confirm(&[ix_a], &[client.payer()])
         .context(format!(
             "Failed to create thread: {} or update config",
             epoch_thread_id,
         ))?;
     client
-        .send_and_confirm(&vec![ix_b, ix_c], &[client.payer()])
+        .send_and_confirm(&[ix_b, ix_c], &[client.payer()])
         .context(format!("Failed to create thread: {}", hasher_thread_id))?;
 
     Ok(())
@@ -326,7 +313,7 @@ fn create_geyser_plugin_config(config: &CliConfig) -> Result<()> {
     let content = serde_json::to_string_pretty(&geyser_config)
         .context("Unable to serialize PluginConfig to json")?;
     let path = &config.geyser_config();
-    fs::write(&path, content).context(format!("Unable to serialize PluginConfig to {}", path))?;
+    fs::write(path, content).context(format!("Unable to serialize PluginConfig to {}", path))?;
     Ok(())
 }
 
@@ -351,7 +338,7 @@ fn start_test_validator(
     let mut process = cmd
         .spawn()
         .context(format!("solana-test-validator command: {:#?}", cmd))?;
-print_status!("Running", "Clockwork Validator {}\n", crate_version!());
+    print_status!("Running", "Clockwork Validator {}\n", crate_version!());
 
     // Wait for the validator to become healthy
     let ms_wait = 10_000;
@@ -413,12 +400,12 @@ impl TestValidatorHelpers for Command {
         let filename = format!("clockwork_{}_program.so", program_name);
         self.arg("--bpf-program")
             .arg(program_id.to_string())
-            .arg(config.active_runtime(filename.as_str()).to_owned())
+            .arg(config.active_runtime(filename.as_str()))
     }
 
     fn geyser_plugin_config(&mut self, config: &CliConfig) -> &mut Command {
         self.arg("--geyser-plugin-config")
-            .arg(config.geyser_config().to_owned())
+            .arg(config.geyser_config())
     }
 
     fn network_url(&mut self, url: Option<String>) -> &mut Command {

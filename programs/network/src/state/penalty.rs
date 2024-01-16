@@ -1,10 +1,10 @@
 use anchor_lang::{prelude::*, AnchorDeserialize};
 
-pub const SEED_PENALTY: &[u8] = b"penalty";
+use crate::constants::SEED_PENALTY;
 
 /// Escrows the lamport balance owed to a particular worker.
 #[account]
-#[derive(Debug)]
+#[derive(Debug, InitSpace)]
 pub struct Penalty {
     /// The worker who was penalized.
     pub worker: Pubkey,

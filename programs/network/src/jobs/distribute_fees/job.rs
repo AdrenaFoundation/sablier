@@ -1,7 +1,7 @@
 use anchor_lang::{prelude::*, solana_program::instruction::Instruction, InstructionData};
 use clockwork_utils::thread::ThreadResponse;
 
-use crate::state::*;
+use crate::{constants::*, state::*};
 
 #[derive(Accounts)]
 pub struct DistributeFeesJob<'info> {

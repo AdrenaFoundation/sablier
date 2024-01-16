@@ -1,7 +1,6 @@
 use anchor_lang::{prelude::AccountInfo, AccountDeserialize, Discriminator};
 use bincode::deserialize;
-use clockwork_thread_program::state::{Thread as ThreadV2, VersionedThread};
-use clockwork_thread_program_v1::state::Thread as ThreadV1;
+use clockwork_thread_program::state::{Thread, VersionedThread};
 use clockwork_webhook_program::state::Webhook;
 use pyth_sdk_solana::{load_price_feed_from_account_info, PriceFeed};
 use solana_geyser_plugin_interface::geyser_plugin_interface::{
@@ -10,7 +9,7 @@ use solana_geyser_plugin_interface::geyser_plugin_interface::{
 use solana_program::{clock::Clock, pubkey::Pubkey, sysvar};
 use static_pubkey::static_pubkey;
 
-static PYTH_ORACLE_PROGRAM_ID_MAINNET: Pubkey = 
+static PYTH_ORACLE_PROGRAM_ID_MAINNET: Pubkey =
     static_pubkey!("FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH");
 static PYTH_ORACLE_PROGRAM_ID_DEVNET: Pubkey =
     static_pubkey!("gSbePebfvPy7tRqimPoVecS2UsBvYv46ynrzWocc92s");
@@ -41,29 +40,13 @@ impl TryFrom<&mut ReplicaAccountInfo<'_>> for AccountUpdateEvent {
             });
         }
 
-        // If the account belongs to the thread v1 program, parse it.
-        if owner_pubkey.eq(&clockwork_thread_program_v1::ID) && account_info.data.len() > 8 {
-            let d = &account_info.data[..8];
-            if d.eq(&ThreadV1::discriminator()) {
-                return Ok(AccountUpdateEvent::Thread {
-                    thread: VersionedThread::V1(
-                        ThreadV1::try_deserialize(&mut account_info.data).map_err(|_| {
-                            GeyserPluginError::AccountsUpdateError {
-                                msg: "Failed to parse Clockwork thread v1 account".into(),
-                            }
-                        })?,
-                    ),
-                });
-            }
-        }
-
         // If the account belongs to the thread v2 program, parse it.
         if owner_pubkey.eq(&clockwork_thread_program::ID) && account_info.data.len() > 8 {
             let d = &account_info.data[..8];
-            if d.eq(&ThreadV2::discriminator()) {
+            if d.eq(&Thread::discriminator()) {
                 return Ok(AccountUpdateEvent::Thread {
-                    thread: VersionedThread::V2(
-                        ThreadV2::try_deserialize(&mut account_info.data).map_err(|_| {
+                    thread: VersionedThread::V1(
+                        Thread::try_deserialize(&mut account_info.data).map_err(|_| {
                             GeyserPluginError::AccountsUpdateError {
                                 msg: "Failed to parse Clockwork thread v2 account".into(),
                             }

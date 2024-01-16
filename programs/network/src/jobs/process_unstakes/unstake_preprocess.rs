@@ -36,7 +36,10 @@ pub fn handler(ctx: Context<UnstakePreprocess>) -> Result<ThreadResponse> {
                 program_id: crate::ID,
                 accounts: crate::accounts::UnstakeProcess {
                     authority: unstake.authority,
-                    authority_tokens: get_associated_token_address(&unstake.authority, &config.mint),
+                    authority_tokens: get_associated_token_address(
+                        &unstake.authority,
+                        &config.mint,
+                    ),
                     config: config.key(),
                     delegation: unstake.delegation,
                     registry: registry.key(),

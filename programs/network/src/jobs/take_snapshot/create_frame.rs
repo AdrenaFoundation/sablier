@@ -1,13 +1,8 @@
-use anchor_lang::{
-    prelude::*,
-    solana_program::{instruction::Instruction, system_program},
-    InstructionData,
-};
+use anchor_lang::{prelude::*, solana_program::instruction::Instruction, InstructionData};
 use anchor_spl::{associated_token::get_associated_token_address, token::TokenAccount};
 use clockwork_utils::thread::{ThreadResponse, PAYER_PUBKEY};
-use std::mem::size_of;
 
-use crate::state::*;
+use crate::{constants::*, state::*};
 
 #[derive(Accounts)]
 pub struct TakeSnapshotCreateFrame<'info> {
@@ -30,7 +25,7 @@ pub struct TakeSnapshotCreateFrame<'info> {
             snapshot.id.to_be_bytes().as_ref(),
         ],
         bump,
-        constraint = registry.current_epoch.checked_add(1).unwrap().eq(&snapshot.id),
+        constraint = (registry.current_epoch + 1) == snapshot.id,
         constraint = snapshot.total_frames < registry.total_workers,
     )]
     pub snapshot: Account<'info, Snapshot>,
@@ -44,11 +39,10 @@ pub struct TakeSnapshotCreateFrame<'info> {
         ],
         bump,
         payer = payer,
-        space = 8 + size_of::<SnapshotFrame>(),
+        space = 8 + SnapshotFrame::INIT_SPACE,
     )]
     pub snapshot_frame: Account<'info, SnapshotFrame>,
 
-    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 
     #[account(address = config.epoch_thread)]
@@ -56,7 +50,7 @@ pub struct TakeSnapshotCreateFrame<'info> {
 
     #[account(
         address = worker.pubkey(),
-        constraint = worker.id.eq(&snapshot.total_frames),
+        constraint = worker.id == snapshot.total_frames,
     )]
     pub worker: Account<'info, Worker>,
 
@@ -88,14 +82,11 @@ pub fn handler(ctx: Context<TakeSnapshotCreateFrame>) -> Result<ThreadResponse> 
     )?;
 
     // Update snapshot total workers.
-    snapshot.total_stake = snapshot
-        .total_stake
-        .checked_add(worker_stake.amount)
-        .unwrap();
-    snapshot.total_frames = snapshot.total_frames.checked_add(1).unwrap();
+    snapshot.total_stake += worker_stake.amount;
+    snapshot.total_frames += 1;
 
     // Build the next instruction for the thread.
-    let dynamic_instruction = if worker.total_delegations.gt(&0) {
+    let dynamic_instruction = if worker.total_delegations > 0 {
         // This worker has delegations. Create a snapshot entry for each delegation associated with this worker.
         let zeroth_delegation_pubkey = Delegation::pubkey(worker.pubkey(), 0);
         let zeroth_snapshot_entry_pubkey = SnapshotEntry::pubkey(snapshot_frame.key(), 0);
@@ -122,8 +113,8 @@ pub fn handler(ctx: Context<TakeSnapshotCreateFrame>) -> Result<ThreadResponse> 
     } else if snapshot.total_frames.lt(&registry.total_workers) {
         // This worker has no delegations. Create a snapshot frame for the next worker.
         let next_snapshot_frame_pubkey =
-            SnapshotFrame::pubkey(snapshot.key(), snapshot_frame.id.checked_add(1).unwrap());
-        let next_worker_pubkey = Worker::pubkey(worker.id.checked_add(1).unwrap());
+            SnapshotFrame::pubkey(snapshot.key(), snapshot_frame.id + 1);
+        let next_worker_pubkey = Worker::pubkey(worker.id + 1);
         Some(
             Instruction {
                 program_id: crate::ID,

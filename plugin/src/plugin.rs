@@ -161,15 +161,12 @@ impl GeyserPlugin for ClockworkPlugin {
         status: SlotStatus,
     ) -> PluginResult<()> {
         self.inner.clone().spawn(|inner| async move {
-            match status {
-                SlotStatus::Processed => {
-                    inner
-                        .executors
-                        .clone()
-                        .process_slot(inner.observers.clone(), slot, inner.runtime.clone())
-                        .await?;
-                }
-                _ => (),
+            if let SlotStatus::Processed = status {
+                inner
+                    .executors
+                    .clone()
+                    .process_slot(inner.observers.clone(), slot, inner.runtime.clone())
+                    .await?;
             }
             Ok(())
         });

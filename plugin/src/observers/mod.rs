@@ -6,6 +6,7 @@ use std::{fmt::Debug, sync::Arc};
 use thread::ThreadObserver;
 use webhook::WebhookObserver;
 
+#[derive(Default)]
 pub struct Observers {
     pub thread: Arc<ThreadObserver>,
     pub webhook: Arc<WebhookObserver>,
@@ -13,10 +14,7 @@ pub struct Observers {
 
 impl Observers {
     pub fn new() -> Self {
-        Observers {
-            thread: Arc::new(ThreadObserver::new()),
-            webhook: Arc::new(WebhookObserver::new()),
-        }
+        Self::default()
     }
 }
 

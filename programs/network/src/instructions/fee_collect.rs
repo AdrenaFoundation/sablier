@@ -16,7 +16,6 @@ pub struct FeeCollect<'info> {
     )]
     pub fee: Account<'info, Fee>,
 
-    #[account()]
     pub signer: Signer<'info>,
 }
 
@@ -26,15 +25,15 @@ pub fn handler(ctx: Context<FeeCollect>, amount: u64, penalty: bool) -> Result<(
 
     // Increment the collected fee counter.
     if penalty {
-        fee.penalty_balance = fee.penalty_balance.checked_add(amount).unwrap();
+        fee.penalty_balance += amount;
     } else {
-        fee.collected_balance = fee.collected_balance.checked_add(amount).unwrap();
+        fee.collected_balance += amount;
     }
 
     // Verify there are enough lamports to distribute at the end of the epoch.
     let lamport_balance = fee.get_lamports();
-    let data_len = 8 + fee.try_to_vec()?.len();
-    let min_rent_balance = Rent::get().unwrap().minimum_balance(data_len);
+    let data_len = 8 + Fee::INIT_SPACE;
+    let min_rent_balance = Rent::get()?.minimum_balance(data_len);
 
     msg!(
         "Fee collection! lamports: {} collected: {} penalty: {} rent: {}",
@@ -45,12 +44,7 @@ pub fn handler(ctx: Context<FeeCollect>, amount: u64, penalty: bool) -> Result<(
     );
 
     require!(
-        fee.collected_balance
-            .checked_add(fee.penalty_balance)
-            .unwrap()
-            .checked_add(min_rent_balance)
-            .unwrap()
-            .ge(&lamport_balance),
+        (fee.collected_balance + fee.penalty_balance + min_rent_balance) >= lamport_balance
         ClockworkError::InsufficientFeeBalance
     );
 

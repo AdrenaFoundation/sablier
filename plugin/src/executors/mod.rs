@@ -131,9 +131,9 @@ impl AccountGet for RpcClient {
     async fn get<T: AccountDeserialize>(&self, pubkey: &Pubkey) -> ClientResult<T> {
         let data = self.get_account_data(pubkey).await?;
         T::try_deserialize(&mut data.as_slice()).map_err(|_| {
-            ClientError::from(ClientErrorKind::Custom(format!(
-                "Failed to deserialize account data"
-            )))
+            ClientError::from(ClientErrorKind::Custom(
+                "Failed to deserialize account data".to_string(),
+            ))
         })
     }
 }

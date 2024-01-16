@@ -1,31 +1,15 @@
 use {
     super::*,
-    anyhow::{
-        Context,
-        Result,
-    },
+    anyhow::{Context, Result},
     bzip2::read::BzDecoder,
     clap::crate_version,
-    indicatif::{
-        ProgressBar,
-        ProgressStyle,
-    },
-    reqwest::{
-        blocking::get,
-        Url,
-    },
+    indicatif::{ProgressBar, ProgressStyle},
+    reqwest::{blocking::get, Url},
     std::{
         ffi::OsStr,
-        fs::{
-            self,
-            copy,
-            File,
-        },
-        io::{self,},
-        path::{
-            Path,
-            PathBuf,
-        },
+        fs::{self, copy, File},
+        io::{self},
+        path::{Path, PathBuf},
     },
     tar::Archive,
 };
@@ -44,7 +28,7 @@ pub fn download_deps(
     let active_runtime = &runtime_dir.join(&clockwork_tag);
 
     download_and_extract(
-        &active_runtime,
+        active_runtime,
         &solana_archive.unwrap_or(CliConfig::solana_release_url(&solana_tag)),
         &active_runtime.join(CliConfig::solana_release_archive()),
         config::SOLANA_DEPS,
@@ -52,7 +36,7 @@ pub fn download_deps(
     )?;
     if !dev {
         download_and_extract(
-            &active_runtime,
+            active_runtime,
             &clockwork_archive.unwrap_or(CliConfig::clockwork_release_url(&clockwork_tag)),
             &active_runtime.join(CliConfig::clockwork_release_archive()),
             config::CLOCKWORK_DEPS,
@@ -83,8 +67,8 @@ pub fn download_and_extract(
     // create runtime dir if necessary
     fs::create_dir_all(runtime_dir)
         .context(format!("Unable to create dirs for {:#?}", runtime_dir))?;
-    download_file(src_url, &dest_path)?;
-    extract_archive(&dest_path, runtime_dir, files_to_extract)?;
+    download_file(src_url, dest_path)?;
+    extract_archive(dest_path, runtime_dir, files_to_extract)?;
     println!();
     Ok(())
 }
@@ -108,7 +92,7 @@ fn download_file(url: &str, dest: &Path) -> Result<()> {
             let mut source = pb.wrap_read(response);
 
             let mut dest =
-                File::create(&dest).context(format!("Failed to create file {:#?}", dest))?;
+                File::create(dest).context(format!("Failed to create file {dest:#?}"))?;
             io::copy(&mut source, &mut dest)?;
             pb.finish_with_message("Download complete.");
         }
@@ -130,7 +114,7 @@ fn extract_archive(
     files_to_extract: &[&str],
 ) -> Result<()> {
     let file =
-        File::open(&archive_path).context(format!("Failed to open file {:#?}", archive_path))?;
+        File::open(archive_path).context(format!("Failed to open file {:#?}", archive_path))?;
     let target_file_names: Vec<&OsStr> = files_to_extract.iter().map(OsStr::new).collect();
     let mut archive = Archive::new(BzDecoder::new(file));
 
@@ -174,7 +158,7 @@ pub trait ToTagVersion {
 
 impl ToTagVersion for String {
     fn to_tag_version(&self) -> String {
-        if !self.starts_with("v") {
+        if !self.starts_with('v') {
             format!("v{}", self)
         } else {
             self.to_owned()

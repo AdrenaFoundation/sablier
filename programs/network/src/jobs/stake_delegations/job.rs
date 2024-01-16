@@ -24,7 +24,7 @@ pub fn handler(ctx: Context<StakeDelegationsJob>) -> Result<ThreadResponse> {
     let thread = &ctx.accounts.thread;
 
     Ok(ThreadResponse {
-        dynamic_instruction: if registry.total_workers.gt(&0) {
+        dynamic_instruction: if registry.total_workers > 0 {
             Some(
                 Instruction {
                     program_id: crate::ID,

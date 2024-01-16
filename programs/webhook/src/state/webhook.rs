@@ -7,9 +7,7 @@ use std::{
 use anchor_lang::{prelude::*, AnchorDeserialize};
 use serde::{Deserialize, Serialize};
 
-use crate::errors::ClockworkError;
-
-pub const SEED_WEBHOOK: &[u8] = b"webhook";
+use crate::{constants::SEED_WEBHOOK, errors::ClockworkError};
 
 #[account]
 #[derive(Debug, Deserialize, Serialize)]
@@ -47,7 +45,9 @@ impl WebhookAccount for Account<'_, Webhook> {
 }
 
 /// HttpMethod
-#[derive(AnchorDeserialize, AnchorSerialize, Deserialize, Serialize, Clone, Debug, PartialEq)]
+#[derive(
+    AnchorDeserialize, AnchorSerialize, Deserialize, Serialize, Clone, Debug, PartialEq, InitSpace,
+)]
 pub enum HttpMethod {
     Get,
     Post,

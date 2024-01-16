@@ -1,14 +1,8 @@
-use std::mem::size_of;
-
-use anchor_lang::{
-    prelude::*,
-    solana_program::{instruction::Instruction, system_program},
-    InstructionData,
-};
+use anchor_lang::{prelude::*, solana_program::instruction::Instruction, InstructionData};
 use anchor_spl::associated_token::get_associated_token_address;
 use clockwork_utils::thread::{ThreadResponse, PAYER_PUBKEY};
 
-use crate::state::*;
+use crate::{constants::*, state::*};
 
 #[derive(Accounts)]
 pub struct TakeSnapshotCreateSnapshot<'info> {
@@ -28,15 +22,14 @@ pub struct TakeSnapshotCreateSnapshot<'info> {
         init,
         seeds = [
             SEED_SNAPSHOT,
-            registry.current_epoch.checked_add(1).unwrap().to_be_bytes().as_ref(),
+            (registry.current_epoch + 1).to_be_bytes().as_ref(),
         ],
         bump,
-        space = 8 + size_of::<Snapshot>(),
+        space = 8 + Snapshot::INIT_SPACE,
         payer = payer
     )]
     pub snapshot: Account<'info, Snapshot>,
 
-    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 
     #[account(address = config.epoch_thread)]
@@ -52,10 +45,10 @@ pub fn handler(ctx: Context<TakeSnapshotCreateSnapshot>) -> Result<ThreadRespons
     let thread = &ctx.accounts.thread;
 
     // Start a new snapshot.
-    snapshot.init(registry.current_epoch.checked_add(1).unwrap())?;
+    snapshot.init(registry.current_epoch + 1)?;
 
     Ok(ThreadResponse {
-        dynamic_instruction: if registry.total_workers.gt(&0) {
+        dynamic_instruction: if registry.total_workers > 0 {
             // The registry has workers. Create a snapshot frame for the zeroth worker.
             let snapshot_frame_pubkey = SnapshotFrame::pubkey(snapshot.key(), 0);
             let worker_pubkey = Worker::pubkey(0);

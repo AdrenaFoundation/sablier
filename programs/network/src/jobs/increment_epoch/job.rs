@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use clockwork_utils::thread::ThreadResponse;
 
-use crate::state::*;
+use crate::{constants::*, state::*};
 
 #[derive(Accounts)]
 pub struct EpochCutover<'info> {
@@ -21,7 +21,7 @@ pub struct EpochCutover<'info> {
 
 pub fn handler(ctx: Context<EpochCutover>) -> Result<ThreadResponse> {
     let registry = &mut ctx.accounts.registry;
-    registry.current_epoch = registry.current_epoch.checked_add(1).unwrap();
+    registry.current_epoch += 1;
     registry.locked = false;
 
     Ok(ThreadResponse {

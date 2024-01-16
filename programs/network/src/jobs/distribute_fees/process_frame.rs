@@ -1,7 +1,7 @@
 use anchor_lang::{prelude::*, solana_program::instruction::Instruction, InstructionData};
 use clockwork_utils::thread::ThreadResponse;
 
-use crate::state::*;
+use crate::{constants::*, state::*};
 
 #[derive(Accounts)]
 pub struct DistributeFeesProcessFrame<'info> {
@@ -24,7 +24,7 @@ pub struct DistributeFeesProcessFrame<'info> {
 
     #[account(
         address = snapshot.pubkey(),
-        constraint = snapshot.id.eq(&registry.current_epoch)
+        constraint = snapshot.id == registry.current_epoch
     )]
     pub snapshot: Account<'info, Snapshot>,
 
@@ -53,41 +53,26 @@ pub fn handler(ctx: Context<DistributeFeesProcessFrame>) -> Result<ThreadRespons
     let worker = &mut ctx.accounts.worker;
 
     // Calculate the fee account's usuable balance.
-    let fee_lamport_balance = fee.to_account_info().lamports();
-    let fee_data_len = 8 + fee.try_to_vec()?.len();
-    let fee_rent_balance = Rent::get().unwrap().minimum_balance(fee_data_len);
-    let fee_usable_balance = fee_lamport_balance.checked_sub(fee_rent_balance).unwrap();
+    let fee_lamport_balance = fee.get_lamports();
+    let fee_data_len = 8 + Fee::INIT_SPACE;
+    let fee_rent_balance = Rent::get()?.minimum_balance(fee_data_len);
+    let fee_usable_balance = fee_lamport_balance - fee_rent_balance;
 
     // Calculate the commission to be retained by the worker.
-    let commission_balance = fee_usable_balance
-        .checked_mul(worker.commission_rate)
-        .unwrap()
-        .checked_div(100)
-        .unwrap();
+    let commission_balance = fee_usable_balance * worker.commission_rate / 100;
 
     // Transfer commission to the worker.
-    **fee.to_account_info().try_borrow_mut_lamports()? = fee
-        .to_account_info()
-        .lamports()
-        .checked_sub(commission_balance)
-        .unwrap();
-    **worker.to_account_info().try_borrow_mut_lamports()? = worker
-        .to_account_info()
-        .lamports()
-        .checked_add(commission_balance)
-        .unwrap();
+    fee.sub_lamports(commission_balance)?;
+    worker.add_lamports(commission_balance)?;
 
     // Increment the worker's commission balance.
-    worker.commission_balance = worker
-        .commission_balance
-        .checked_add(commission_balance)
-        .unwrap();
+    worker.commission_balance += commission_balance;
 
     // Record the balance that is distributable to delegations.
-    fee.distributable_balance = fee_usable_balance.checked_sub(commission_balance).unwrap();
+    fee.distributable_balance = fee_usable_balance - commission_balance;
 
     // Build next instruction for the thread.
-    let dynamic_instruction = if snapshot_frame.total_entries.gt(&0) {
+    let dynamic_instruction = if snapshot_frame.total_entries > 0 {
         // This snapshot frame has entries. Distribute fees to the delegations associated with the entries.
         let delegation_pubkey = Delegation::pubkey(worker.key(), 0);
         let snapshot_entry_pubkey = SnapshotEntry::pubkey(snapshot_frame.key(), 0);
@@ -110,16 +95,11 @@ pub fn handler(ctx: Context<DistributeFeesProcessFrame>) -> Result<ThreadRespons
             }
             .into(),
         )
-    } else if snapshot_frame
-        .id
-        .checked_add(1)
-        .unwrap()
-        .lt(&snapshot.total_frames)
-    {
+    } else if (snapshot_frame.id + 1) < snapshot.total_frames {
         // This frame has no entries. Move on to the next frame.
-        let next_worker_pubkey = Worker::pubkey(worker.id.checked_add(1).unwrap());
+        let next_worker_pubkey = Worker::pubkey(worker.id + 1);
         let next_snapshot_frame_pubkey =
-            SnapshotFrame::pubkey(snapshot.key(), snapshot_frame.id.checked_add(1).unwrap());
+            SnapshotFrame::pubkey(snapshot.key(), snapshot_frame.id + 1);
         Some(
             Instruction {
                 program_id: crate::ID,

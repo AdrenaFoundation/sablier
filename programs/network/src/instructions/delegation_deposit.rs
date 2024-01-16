@@ -1,5 +1,5 @@
 use {
-    crate::state::*,
+    crate::{constants::*, state::*},
     anchor_lang::prelude::*,
     anchor_spl::token::{transfer, Token, TokenAccount, Transfer},
 };
@@ -39,7 +39,6 @@ pub struct DelegationDeposit<'info> {
     )]
     pub delegation_tokens: Account<'info, TokenAccount>,
 
-    #[account(address = anchor_spl::token::ID)]
     pub token_program: Program<'info, Token>,
 }
 

@@ -17,7 +17,7 @@ fn main() {
     println!("cargo:rustc-env=RUSTC_VERSION={:#?}", rustc_v,);
 
     let output = Command::new("git")
-        .args(&["rev-parse", "HEAD"])
+        .args(["rev-parse", "HEAD"])
         .output()
         .expect("unable to get git commit hash");
     let commit_hash = String::from_utf8(output.stdout).unwrap();

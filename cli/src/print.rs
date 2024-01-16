@@ -1,17 +1,8 @@
 #![allow(dead_code)]
 
 use {
-    std::{
-        fmt::Display,
-        io::Write,
-    },
-    termcolor::{
-        Color,
-        ColorChoice,
-        ColorSpec,
-        StandardStream,
-        WriteColor,
-    },
+    std::{fmt::Display, io::Write},
+    termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor},
 };
 
 #[macro_export]

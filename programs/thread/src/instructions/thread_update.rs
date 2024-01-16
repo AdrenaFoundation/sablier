@@ -1,10 +1,10 @@
-use crate::{errors::ClockworkError, state::*};
+use crate::{constants::*, errors::ClockworkError, state::*};
 
 use anchor_lang::{
     prelude::*,
-    solana_program::system_program,
     system_program::{transfer, Transfer},
 };
+use clockwork_utils::account::AccountInfoExt;
 
 /// Accounts required by the `thread_update` instruction.
 #[derive(Accounts)]
@@ -15,7 +15,6 @@ pub struct ThreadUpdate<'info> {
     pub authority: Signer<'info>,
 
     /// The Solana system program
-    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 
     /// The thread to be updated.
@@ -80,12 +79,13 @@ pub fn handler(ctx: Context<ThreadUpdate>, settings: ThreadSettings) -> Result<(
     }
 
     // Reallocate mem for the thread account
-    thread.realloc()?;
+    thread.realloc_account()?;
 
     // If lamports are required to maintain rent-exemption, pay them
-    let data_len = thread.to_account_info().data_len();
-    let minimum_rent = Rent::get().unwrap().minimum_balance(data_len);
-    if minimum_rent > thread.to_account_info().lamports() {
+    let data_len = thread.data_len();
+    let minimum_rent = Rent::get()?.minimum_balance(data_len);
+    let thread_lamports = thread.get_lamports();
+    if minimum_rent > thread_lamports {
         transfer(
             CpiContext::new(
                 system_program.to_account_info(),
@@ -94,9 +94,7 @@ pub fn handler(ctx: Context<ThreadUpdate>, settings: ThreadSettings) -> Result<(
                     to: thread.to_account_info(),
                 },
             ),
-            minimum_rent
-                .checked_sub(thread.to_account_info().lamports())
-                .unwrap(),
+            minimum_rent - thread_lamports,
         )?;
     }
 

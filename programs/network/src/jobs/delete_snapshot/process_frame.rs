@@ -1,7 +1,7 @@
-use anchor_lang::{prelude::*, InstructionData, solana_program::instruction::Instruction};
+use anchor_lang::{prelude::*, solana_program::instruction::Instruction, InstructionData};
 use clockwork_utils::thread::ThreadResponse;
 
-use crate::state::*;
+use crate::{constants::*, state::*};
 
 #[derive(Accounts)]
 pub struct DeleteSnapshotProcessFrame<'info> {
@@ -21,7 +21,7 @@ pub struct DeleteSnapshotProcessFrame<'info> {
             snapshot.id.to_be_bytes().as_ref(),
         ],
         bump,
-        constraint = snapshot.id.lt(&registry.current_epoch)
+        constraint = snapshot.id < registry.current_epoch
     )]
     pub snapshot: Account<'info, Snapshot>,
 
@@ -38,7 +38,7 @@ pub struct DeleteSnapshotProcessFrame<'info> {
     pub snapshot_frame: Account<'info, SnapshotFrame>,
 
     #[account(
-        mut, 
+        mut,
         address = config.epoch_thread
     )]
     pub thread: Signer<'info>,
@@ -53,30 +53,21 @@ pub fn handler(ctx: Context<DeleteSnapshotProcessFrame>) -> Result<ThreadRespons
     let thread = &mut ctx.accounts.thread;
 
     // If this frame has no entries, then close the frame account.
-    if snapshot_frame.total_entries.eq(&0) {
-        let snapshot_frame_lamports = snapshot_frame.to_account_info().lamports();
-        **snapshot_frame.to_account_info().lamports.borrow_mut() = 0;
-        **thread.to_account_info().lamports.borrow_mut() = thread
-            .to_account_info()
-            .lamports()
-            .checked_add(snapshot_frame_lamports)
-            .unwrap();
-
+    if snapshot_frame.total_entries == 0 {
+        let snapshot_frame_lamports = snapshot_frame.get_lamports();
+        snapshot_frame.sub_lamports(snapshot_frame_lamports)?;
+        thread.add_lamports(snapshot_frame_lamports)?;
 
         // If this is also the last frame in the snapshot, then close the snapshot account.
-        if snapshot_frame.id.checked_add(1).unwrap().eq(&snapshot.total_frames) {
-            let snapshot_lamports = snapshot.to_account_info().lamports();
-            **snapshot.to_account_info().lamports.borrow_mut() = 0;
-            **thread.to_account_info().lamports.borrow_mut() = thread
-                .to_account_info()
-                .lamports()
-                .checked_add(snapshot_lamports)
-                .unwrap();
+        if (snapshot_frame.id + 1) == snapshot.total_frames {
+            let snapshot_lamports = snapshot.get_lamports();
+            snapshot_frame.sub_lamports(snapshot_lamports)?;
+            thread.add_lamports(snapshot_lamports)?;
         }
     }
 
     // Build the next instruction.
-    let dynamic_instruction = if snapshot_frame.total_entries.gt(&0) {
+    let dynamic_instruction = if snapshot_frame.total_entries > 0 {
         // This frame has entries. Delete the entries.
         Some(
             Instruction {
@@ -88,11 +79,13 @@ pub fn handler(ctx: Context<DeleteSnapshotProcessFrame>) -> Result<ThreadRespons
                     snapshot_entry: SnapshotEntry::pubkey(snapshot_frame.key(), 0),
                     snapshot_frame: snapshot_frame.key(),
                     thread: thread.key(),
-                }.to_account_metas(Some(true)),
-                data: crate::instruction::DeleteSnapshotProcessEntry{}.data()
-            }.into()
+                }
+                .to_account_metas(Some(true)),
+                data: crate::instruction::DeleteSnapshotProcessEntry {}.data(),
+            }
+            .into(),
         )
-    } else if snapshot_frame.id.checked_add(1).unwrap().lt(&snapshot.total_frames) {
+    } else if (snapshot_frame.id + 1) < snapshot.total_frames {
         // There are no more entries in this frame. Move on to the next frame.
         Some(
             Instruction {
@@ -101,16 +94,21 @@ pub fn handler(ctx: Context<DeleteSnapshotProcessFrame>) -> Result<ThreadRespons
                     config: config.key(),
                     registry: registry.key(),
                     snapshot: snapshot.key(),
-                    snapshot_frame: SnapshotFrame::pubkey(snapshot.key(), snapshot_frame.id.checked_add(1).unwrap()),
+                    snapshot_frame: SnapshotFrame::pubkey(snapshot.key(), snapshot_frame.id + 1),
                     thread: thread.key(),
-                }.to_account_metas(Some(true)),
-                data: crate::instruction::DeleteSnapshotProcessFrame {}.data()
-            }.into()
+                }
+                .to_account_metas(Some(true)),
+                data: crate::instruction::DeleteSnapshotProcessFrame {}.data(),
+            }
+            .into(),
         )
     } else {
         // This frame has no entries, and it was the last frame. We are done!
         None
     };
 
-    Ok( ThreadResponse { dynamic_instruction, ..ThreadResponse::default() } )
+    Ok(ThreadResponse {
+        dynamic_instruction,
+        ..ThreadResponse::default()
+    })
 }

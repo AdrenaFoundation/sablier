@@ -2,30 +2,24 @@ use std::mem::size_of;
 
 use anchor_lang::{
     prelude::*,
-    solana_program::system_program,
-    system_program::{transfer, Transfer}
+    system_program::{transfer, Transfer},
 };
-use clockwork_utils::thread::{Trigger, SerializableInstruction};
+use clockwork_utils::thread::{SerializableInstruction, Trigger};
 
-use crate::state::*;
-
-/// The minimum exec fee that may be set on a thread.
-const MINIMUM_FEE: u64 = 1000;
+use crate::{constants::*, state::*};
 
 /// Accounts required by the `thread_create` instruction.
 #[derive(Accounts)]
 #[instruction(amount: u64, id: Vec<u8>, instructions: Vec<SerializableInstruction>,  trigger: Trigger)]
 pub struct ThreadCreate<'info> {
     /// The authority (owner) of the thread.
-    #[account()]
     pub authority: Signer<'info>,
 
-    /// The payer for account initializations. 
+    /// The payer for account initializations.
     #[account(mut)]
     pub payer: Signer<'info>,
 
     /// The Solana system program.
-    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 
     /// The thread to be created.
@@ -38,11 +32,11 @@ pub struct ThreadCreate<'info> {
         ],
         bump,
         payer= payer,
-        space = vec![
-            8, 
-            size_of::<Thread>(), 
+        space = [
+            8,
+            size_of::<Thread>(),
             id.len(),
-            instructions.try_to_vec()?.len(),  
+            instructions.try_to_vec()?.len(),
             trigger.try_to_vec()?.len(),
             NEXT_INSTRUCTION_SIZE,
         ].iter().sum()
@@ -50,7 +44,13 @@ pub struct ThreadCreate<'info> {
     pub thread: Account<'info, Thread>,
 }
 
-pub fn handler(ctx: Context<ThreadCreate>, amount: u64, id: Vec<u8>, instructions: Vec<SerializableInstruction>, trigger: Trigger) -> Result<()> {
+pub fn handler(
+    ctx: Context<ThreadCreate>,
+    amount: u64,
+    id: Vec<u8>,
+    instructions: Vec<SerializableInstruction>,
+    trigger: Trigger,
+) -> Result<()> {
     // Get accounts
     let authority = &ctx.accounts.authority;
     let payer = &ctx.accounts.payer;
@@ -61,9 +61,9 @@ pub fn handler(ctx: Context<ThreadCreate>, amount: u64, id: Vec<u8>, instruction
     let bump = ctx.bumps.thread;
     thread.authority = authority.key();
     thread.bump = bump;
-    thread.created_at = Clock::get().unwrap().into();
+    thread.created_at = Clock::get()?.into();
     thread.exec_context = None;
-    thread.fee = MINIMUM_FEE;
+    thread.fee = THREAD_MINIMUM_FEE;
     thread.id = id;
     thread.instructions = instructions;
     thread.name = String::new();
@@ -81,7 +81,7 @@ pub fn handler(ctx: Context<ThreadCreate>, amount: u64, id: Vec<u8>, instruction
                 to: thread.to_account_info(),
             },
         ),
-        amount
+        amount,
     )?;
 
     Ok(())

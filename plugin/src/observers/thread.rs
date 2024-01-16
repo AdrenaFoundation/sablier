@@ -7,7 +7,7 @@ use std::{
 
 use chrono::{DateTime, NaiveDateTime, Utc};
 use clockwork_cron::Schedule;
-use clockwork_thread_program::state::{Trigger, TriggerContext, Equality, VersionedThread};
+use clockwork_thread_program::state::{Equality, Trigger, TriggerContext, VersionedThread};
 use log::info;
 use pyth_sdk_solana::PriceFeed;
 use solana_geyser_plugin_interface::geyser_plugin_interface::{
@@ -16,6 +16,7 @@ use solana_geyser_plugin_interface::geyser_plugin_interface::{
 use solana_program::{clock::Clock, pubkey::Pubkey};
 use tokio::sync::RwLock;
 
+#[derive(Default)]
 pub struct ThreadObserver {
     // Map from slot numbers to the sysvar clock data for that slot.
     pub clocks: RwLock<HashMap<u64, Clock>>,
@@ -56,17 +57,7 @@ pub struct PythThread {
 
 impl ThreadObserver {
     pub fn new() -> Self {
-        Self {
-            clocks: RwLock::new(HashMap::new()),
-            current_epoch: AtomicU64::new(0),
-            account_threads: RwLock::new(HashMap::new()),
-            cron_threads: RwLock::new(HashMap::new()),
-            now_threads: RwLock::new(HashSet::new()),
-            slot_threads: RwLock::new(HashMap::new()),
-            epoch_threads: RwLock::new(HashMap::new()),
-            pyth_threads: RwLock::new(HashMap::new()),
-            updated_accounts: RwLock::new(HashSet::new()),
-        }
+        Self::default()
     }
 
     pub async fn process_slot(self: Arc<Self>, slot: u64) -> PluginResult<HashSet<Pubkey>> {
@@ -99,7 +90,7 @@ impl ThreadObserver {
         let r_account_threads = self.account_threads.read().await;
         let mut w_updated_accounts = self.updated_accounts.write().await;
         w_updated_accounts.iter().for_each(|account_pubkey| {
-            if let Some(thread_pubkeys) = r_account_threads.get(&account_pubkey) {
+            if let Some(thread_pubkeys) = r_account_threads.get(account_pubkey) {
                 thread_pubkeys.iter().for_each(|pubkey| {
                     executable_threads.insert(*pubkey);
                 });
@@ -250,7 +241,7 @@ impl ThreadObserver {
                     drop(w_account_threads);
 
                     // Threads with account triggers might be immediately executable,
-                    // Thus, we should attempt to execute these threads right away without for an account update. 
+                    // Thus, we should attempt to execute these threads right away without for an account update.
                     let mut w_now_threads = self.now_threads.write().await;
                     w_now_threads.insert(thread_pubkey);
                     drop(w_now_threads);
@@ -381,7 +372,7 @@ fn next_moment(after: i64, schedule: String) -> Option<i64> {
     match Schedule::from_str(&schedule) {
         Err(_) => None,
         Ok(schedule) => schedule
-            .next_after(&DateTime::<Utc>::from_utc(
+            .next_after(&DateTime::<Utc>::from_naive_utc_and_offset(
                 NaiveDateTime::from_timestamp_opt(after, 0).unwrap(),
                 Utc,
             ))

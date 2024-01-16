@@ -1,3 +1,4 @@
+pub mod constants;
 pub mod errors;
 pub mod state;
 
@@ -13,7 +14,7 @@ declare_id!("E7p5KFo8kKCDm6BUnWtnVFkQSYh6ZA6xaGAuvpv8NXTa");
 pub mod webhook_program {
     pub use super::*;
 
-    pub fn webhook_create<'info>(
+    pub fn webhook_create(
         ctx: Context<WebhookCreate>,
         body: Vec<u8>,
         headers: std::collections::HashMap<String, String>,
@@ -24,7 +25,7 @@ pub mod webhook_program {
         webhook_create::handler(ctx, body, headers, id, method, url)
     }
 
-    pub fn webhook_respond<'info>(ctx: Context<WebhookRespond>) -> Result<()> {
+    pub fn webhook_respond(ctx: Context<WebhookRespond>) -> Result<()> {
         webhook_respond::handler(ctx)
     }
 }

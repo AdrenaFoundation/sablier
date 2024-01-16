@@ -1,10 +1,12 @@
-use {crate::state::*, anchor_lang::prelude::*};
+use {
+    crate::{constants::*, state::*},
+    anchor_lang::prelude::*,
+};
 
 /// Accounts required by the `thread_resume` instruction.
 #[derive(Accounts)]
 pub struct ThreadResume<'info> {
     /// The authority (owner) of the thread.
-    #[account()]
     pub authority: Signer<'info>,
 
     /// The thread to be resumed.
@@ -29,23 +31,15 @@ pub fn handler(ctx: Context<ThreadResume>) -> Result<()> {
     thread.paused = false;
 
     // Update the exec context
-    match thread.exec_context {
-        None => {}
-        Some(exec_context) => {
-            match exec_context.trigger_context {
-                TriggerContext::Cron { started_at: _ } => {
-                    // Jump ahead to the current timestamp
-                    thread.exec_context = Some(ExecContext {
-                        trigger_context: TriggerContext::Cron {
-                            started_at: Clock::get().unwrap().unix_timestamp,
-                        },
-                        ..exec_context
-                    });
-                }
-                _ => {
-                    // Nothing to do.
-                }
-            }
+    if let Some(exec_context) = thread.exec_context {
+        if let TriggerContext::Cron { started_at: _ } = exec_context.trigger_context {
+            // Jump ahead to the current timestamp
+            thread.exec_context = Some(ExecContext {
+                trigger_context: TriggerContext::Cron {
+                    started_at: Clock::get()?.unix_timestamp,
+                },
+                ..exec_context
+            });
         }
     }
 

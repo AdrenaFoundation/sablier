@@ -257,15 +257,11 @@ impl TxExecutor {
                     .checked_add(ROTATION_CONFIRMATION_PERIOD)
                     .unwrap()
             {
-                if let Ok(sig_status) = client
+                if let Ok(Some(status)) = client
                     .get_signature_status(&rotation_history.signature)
                     .await
                 {
-                    if let Some(status) = sig_status {
-                        status.is_err()
-                    } else {
-                        true
-                    }
+                    status.is_err()
                 } else {
                     true
                 }
@@ -324,14 +320,14 @@ impl TxExecutor {
                 r_executable_threads
                     .iter()
                     .filter(|(_pubkey, metadata)| slot > metadata.due_slot + THREAD_TIMEOUT_WINDOW)
-                    .filter(|(_pubkey, metadata)| slot >= exponential_backoff_threshold(*metadata))
+                    .filter(|(_pubkey, metadata)| slot >= exponential_backoff_threshold(metadata))
                     .map(|(pubkey, metadata)| (*pubkey, metadata.due_slot))
                     .collect::<Vec<(Pubkey, u64)>>()
             } else {
                 // This worker is in the pool. Get pubkeys executable threads.
                 r_executable_threads
                     .iter()
-                    .filter(|(_pubkey, metadata)| slot >= exponential_backoff_threshold(*metadata))
+                    .filter(|(_pubkey, metadata)| slot >= exponential_backoff_threshold(metadata))
                     .map(|(pubkey, metadata)| (*pubkey, metadata.due_slot))
                     .collect::<Vec<(Pubkey, u64)>>()
             };
@@ -490,7 +486,11 @@ impl TxExecutor {
         let r_transaction_history = self.transaction_history.read().await;
         if let Some(metadata) = r_transaction_history.get(&thread_pubkey) {
             if metadata.signature.eq(&tx.signatures[0]) && metadata.sent_slot.le(&slot) {
-                return Err(GeyserPluginError::Custom(format!("Transaction signature is a duplicate of a previously submitted transaction").into()));
+                return Err(GeyserPluginError::Custom(
+                    "Transaction signature is a duplicate of a previously submitted transaction"
+                        .to_string()
+                        .into(),
+                ));
             }
         }
         drop(r_transaction_history);
@@ -554,13 +554,12 @@ async fn get_tpu_client() -> TpuClient<QuicPool, QuicConnectionManager, QuicConf
         CommitmentConfig::processed(),
     ));
 
-    let tpu_client = TpuClient::new(
+    TpuClient::new(
         "clockwork",
         rpc_client,
-        LOCAL_WEBSOCKET_URL.into(),
+        LOCAL_WEBSOCKET_URL,
         TpuClientConfig { fanout_slots: 24 },
     )
     .await
-    .unwrap();
-    tpu_client
+    .unwrap()
 }

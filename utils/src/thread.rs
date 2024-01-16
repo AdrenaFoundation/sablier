@@ -14,7 +14,7 @@ use static_pubkey::static_pubkey;
 pub static PAYER_PUBKEY: Pubkey = static_pubkey!("C1ockworkPayer11111111111111111111111111111");
 
 /// The clock object, representing a specific moment in time recorded by a Solana cluster.
-#[derive(AnchorDeserialize, AnchorSerialize, BorshSchema, Clone, Debug, PartialEq)]
+#[derive(AnchorDeserialize, AnchorSerialize, InitSpace, BorshSchema, Clone, Debug, PartialEq)]
 pub struct ClockData {
     /// The current slot.
     pub slot: u64,
@@ -83,9 +83,9 @@ pub enum Trigger {
     Pyth {
         /// The address of the price feed to monitor.
         price_feed: Pubkey,
-        /// The equality operator (gte or lte) used to compare prices. 
+        /// The equality operator (gte or lte) used to compare prices.
         equality: Equality,
-        /// The limit price to compare the Pyth feed to. 
+        /// The limit price to compare the Pyth feed to.
         limit: i64,
     },
 }
@@ -99,7 +99,7 @@ pub enum Equality {
 }
 
 /// A response value target programs can return to update the thread.
-#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug)]
+#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, Default)]
 pub struct ThreadResponse {
     /// If set, the thread will automatically close and return lamports to the provided address.
     /// If dynamic_instruction is also set, close_to will take precedence and the dynamic instruction will not be executed.
@@ -109,16 +109,6 @@ pub struct ThreadResponse {
     pub dynamic_instruction: Option<SerializableInstruction>,
     /// Value to update the thread trigger to.
     pub trigger: Option<Trigger>,
-}
-
-impl Default for ThreadResponse {
-    fn default() -> Self {
-        return Self {
-            close_to: None,
-            dynamic_instruction: None,
-            trigger: None,
-        };
-    }
 }
 
 /// The data needed execute an instruction on Solana.

@@ -11,9 +11,7 @@ use clockwork_network_program::state::{Worker, WorkerAccount};
 use clockwork_utils::thread::Trigger;
 use pyth_sdk_solana::load_price_feed_from_account_info;
 
-use crate::{errors::*, state::*};
-
-use super::TRANSACTION_BASE_FEE_REIMBURSEMENT;
+use crate::{constants::*, errors::*, state::*};
 
 /// Accounts required by the `thread_kickoff` instruction.
 #[derive(Accounts)]
@@ -45,7 +43,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
     // Get accounts.
     let signatory = &mut ctx.accounts.signatory;
     let thread = &mut ctx.accounts.thread;
-    let clock = Clock::get().unwrap();
+    let clock = Clock::get()?;
 
     match thread.trigger.clone() {
         Trigger::Account {
@@ -67,9 +65,9 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
 
                     // Begin computing the data hash of this account.
                     let mut hasher = DefaultHasher::new();
-                    let data = &account_info.try_borrow_data().unwrap();
+                    let data = &account_info.try_borrow_data()?;
                     let offset = offset as usize;
-                    let range_end = offset.checked_add(size as usize).unwrap() as usize;
+                    let range_end = offset + size as usize;
                     if data.len().gt(&range_end) {
                         data[offset..range_end].hash(&mut hasher);
                     } else {
@@ -108,7 +106,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
             skippable,
         } => {
             // Get the reference timestamp for calculating the thread's scheduled target timestamp.
-            let reference_timestamp = match thread.exec_context.clone() {
+            let reference_timestamp = match thread.exec_context {
                 None => thread.created_at.unix_timestamp,
                 Some(exec_context) => match exec_context.trigger_context {
                     TriggerContext::Cron { started_at } => started_at,
@@ -257,19 +255,11 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
     }
 
     // Realloc the thread account
-    thread.realloc()?;
+    thread.realloc_account()?;
 
     // Reimburse signatory for transaction fee.
-    **thread.to_account_info().try_borrow_mut_lamports()? = thread
-        .to_account_info()
-        .lamports()
-        .checked_sub(TRANSACTION_BASE_FEE_REIMBURSEMENT)
-        .unwrap();
-    **signatory.to_account_info().try_borrow_mut_lamports()? = signatory
-        .to_account_info()
-        .lamports()
-        .checked_add(TRANSACTION_BASE_FEE_REIMBURSEMENT)
-        .unwrap();
+    thread.sub_lamports(TRANSACTION_BASE_FEE_REIMBURSEMENT)?;
+    signatory.add_lamports(TRANSACTION_BASE_FEE_REIMBURSEMENT)?;
 
     Ok(())
 }
@@ -277,7 +267,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
 fn next_timestamp(after: i64, schedule: String) -> Option<i64> {
     Schedule::from_str(&schedule)
         .unwrap()
-        .next_after(&DateTime::<Utc>::from_utc(
+        .next_after(&DateTime::<Utc>::from_naive_utc_and_offset(
             NaiveDateTime::from_timestamp_opt(after, 0).unwrap(),
             Utc,
         ))

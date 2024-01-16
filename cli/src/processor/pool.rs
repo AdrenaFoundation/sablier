@@ -1,10 +1,8 @@
 use anchor_lang::{
-    solana_program::{
-        instruction::Instruction, system_program,
-    },
-    InstructionData, ToAccountMetas
+    solana_program::{instruction::Instruction, system_program},
+    InstructionData, ToAccountMetas,
 };
-use clockwork_network_program::state::{Config, Pool, Registry, PoolSettings};
+use clockwork_network_program::state::{Config, Pool, PoolSettings, Registry};
 
 use crate::{client::Client, errors::CliError};
 
@@ -45,7 +43,8 @@ pub fn update(client: &Client, id: u64, size: usize) -> Result<(), CliError> {
             payer: client.payer_pubkey(),
             pool: pool_pubkey,
             system_program: system_program::ID,
-        }.to_account_metas(Some(false)),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::PoolUpdate { settings }.data(),
     };
     client.send_and_confirm(&[ix], &[client.payer()]).unwrap();

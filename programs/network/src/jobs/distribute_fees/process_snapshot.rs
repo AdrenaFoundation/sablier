@@ -1,7 +1,7 @@
 use anchor_lang::{prelude::*, solana_program::instruction::Instruction, InstructionData};
 use clockwork_utils::thread::ThreadResponse;
 
-use crate::state::*;
+use crate::{constants::*, state::*};
 
 // DONE Payout yield.
 //      Transfer lamports collected by Fee accounts to Delegation accounts based on the stake balance distributions of the current Epoch's SnapshotEntries.
@@ -31,7 +31,7 @@ pub struct DistributeFeesProcessSnapshot<'info> {
 
     #[account(
         address = snapshot.pubkey(),
-        constraint = snapshot.id.eq(&registry.current_epoch)
+        constraint = snapshot.id == registry.current_epoch
     )]
     pub snapshot: Account<'info, Snapshot>,
 
@@ -46,7 +46,7 @@ pub fn handler(ctx: Context<DistributeFeesProcessSnapshot>) -> Result<ThreadResp
     let thread = &ctx.accounts.thread;
 
     Ok(ThreadResponse {
-        dynamic_instruction: if snapshot.total_frames.gt(&0) {
+        dynamic_instruction: if snapshot.total_frames > 0 {
             Some(
                 Instruction {
                     program_id: crate::ID,

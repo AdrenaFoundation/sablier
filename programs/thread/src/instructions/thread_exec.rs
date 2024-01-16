@@ -9,13 +9,7 @@ use anchor_lang::{
 use clockwork_network_program::state::{Fee, Pool, Worker, WorkerAccount};
 use clockwork_utils::thread::{SerializableInstruction, ThreadResponse, PAYER_PUBKEY};
 
-use crate::{errors::ClockworkError, state::*};
-
-/// The ID of the pool workers must be a member of to collect fees.
-const POOL_ID: u64 = 0;
-
-/// The number of lamports to reimburse the worker with after they've submitted a transaction's worth of exec instructions.
-pub const TRANSACTION_BASE_FEE_REIMBURSEMENT: u64 = 5_000;
+use crate::{constants::*, errors::ClockworkError, state::*};
 
 /// Accounts required by the `thread_exec` instruction.
 #[derive(Accounts)]
@@ -24,7 +18,7 @@ pub struct ThreadExec<'info> {
     #[account(
         mut,
         seeds = [
-            clockwork_network_program::state::SEED_FEE,
+            clockwork_network_program::constants::SEED_FEE,
             worker.key().as_ref(),
         ],
         bump,
@@ -154,7 +148,7 @@ pub fn handler(ctx: Context<ThreadExec>) -> Result<()> {
     if next_instruction.is_none() {
         if let Some(ix) = thread.instructions.get((exec_index + 1) as usize) {
             next_instruction = Some(ix.clone());
-            exec_index = exec_index + 1;
+            exec_index += 1;
         }
     }
 
@@ -182,12 +176,7 @@ pub fn handler(ctx: Context<ThreadExec>) -> Result<()> {
     thread.exec_context = Some(ExecContext {
         exec_index,
         execs_since_slot: if clock.slot == thread.exec_context.unwrap().last_exec_at {
-            thread
-                .exec_context
-                .unwrap()
-                .execs_since_slot
-                .checked_add(1)
-                .unwrap()
+            thread.exec_context.unwrap().execs_since_slot + 1
         } else {
             1
         },
@@ -200,35 +189,17 @@ pub fn handler(ctx: Context<ThreadExec>) -> Result<()> {
     let mut signatory_reimbursement =
         signatory_lamports_pre.saturating_sub(signatory_lamports_post);
     if should_reimburse_transaction {
-        signatory_reimbursement = signatory_reimbursement
-            .checked_add(TRANSACTION_BASE_FEE_REIMBURSEMENT)
-            .unwrap();
+        signatory_reimbursement += TRANSACTION_BASE_FEE_REIMBURSEMENT;
     }
-    if signatory_reimbursement.gt(&0) {
-        **thread.to_account_info().try_borrow_mut_lamports()? = thread
-            .to_account_info()
-            .lamports()
-            .checked_sub(signatory_reimbursement)
-            .unwrap();
-        **signatory.to_account_info().try_borrow_mut_lamports()? = signatory
-            .to_account_info()
-            .lamports()
-            .checked_add(signatory_reimbursement)
-            .unwrap();
+    if signatory_reimbursement > 0 {
+        thread.sub_lamports(signatory_reimbursement)?;
+        signatory.add_lamports(signatory_reimbursement)?;
     }
 
     // If the worker is in the pool, debit from the thread account and payout to the worker's fee account.
     if pool.clone().into_inner().workers.contains(&worker.key()) {
-        **thread.to_account_info().try_borrow_mut_lamports()? = thread
-            .to_account_info()
-            .lamports()
-            .checked_sub(thread.fee)
-            .unwrap();
-        **fee.to_account_info().try_borrow_mut_lamports()? = fee
-            .to_account_info()
-            .lamports()
-            .checked_add(thread.fee)
-            .unwrap();
+        thread.sub_lamports(thread.fee)?;
+        fee.add_lamports(thread.fee)?;
     }
 
     Ok(())

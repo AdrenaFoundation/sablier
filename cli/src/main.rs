@@ -8,10 +8,7 @@ mod print;
 mod processor;
 
 use {
-    crate::{
-        config::CliConfig,
-        print::print_style,
-    },
+    crate::{config::CliConfig, print::print_style},
     cli::app,
     errors::CliError,
     processor::process,

@@ -1,9 +1,11 @@
-use {crate::state::*, anchor_lang::prelude::*};
+use {
+    crate::{constants::*, state::*},
+    anchor_lang::prelude::*,
+};
 
 #[derive(Accounts)]
 #[instruction(amount: u64)]
 pub struct WorkerClaim<'info> {
-    #[account()]
     pub authority: Signer<'info>,
 
     #[account(mut)]
@@ -27,19 +29,11 @@ pub fn handler(ctx: Context<WorkerClaim>, amount: u64) -> Result<()> {
     let worker = &mut ctx.accounts.worker;
 
     // Decrement the worker's commission balance.
-    worker.commission_balance = worker.commission_balance.checked_sub(amount).unwrap();
+    worker.commission_balance -= amount;
 
     // Transfer commission to the worker.
-    **worker.to_account_info().try_borrow_mut_lamports()? = worker
-        .to_account_info()
-        .lamports()
-        .checked_sub(amount)
-        .unwrap();
-    **pay_to.to_account_info().try_borrow_mut_lamports()? = pay_to
-        .to_account_info()
-        .lamports()
-        .checked_add(amount)
-        .unwrap();
+    worker.sub_lamports(amount)?;
+    pay_to.add_lamports(amount)?;
 
     Ok(())
 }

@@ -1,8 +1,10 @@
-use {crate::state::*, anchor_lang::prelude::*};
+use {
+    crate::{constants::*, state::*},
+    anchor_lang::prelude::*,
+};
 
 #[derive(Accounts)]
 pub struct RegistryUnlock<'info> {
-    #[account(mut)]
     pub admin: Signer<'info>,
 
     #[account(seeds = [SEED_CONFIG], bump, has_one = admin)]

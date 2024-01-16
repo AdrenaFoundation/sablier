@@ -1,12 +1,12 @@
 use anchor_lang::{prelude::*, AnchorDeserialize};
 
-pub const SEED_SNAPSHOT_FRAME: &[u8] = b"snapshot_frame";
+use crate::constants::SEED_SNAPSHOT_FRAME;
 
 /**
  * SnapshotFrame
  */
 #[account]
-#[derive(Debug)]
+#[derive(Debug, InitSpace)]
 pub struct SnapshotFrame {
     pub id: u64,
     pub snapshot: Pubkey,

@@ -2,24 +2,23 @@ use std::{collections::HashMap, mem::size_of};
 
 use anchor_lang::{
     prelude::*,
-    solana_program::system_program,
     system_program::{transfer, Transfer},
 };
 
-use crate::state::{Relayer, HttpMethod, Webhook, SEED_WEBHOOK};
-
-static WEBHOOK_FEE: u64 = 1_000_000; 
+use crate::{
+    constants::{SEED_WEBHOOK, WEBHOOK_FEE},
+    state::{HttpMethod, Relayer, Webhook},
+};
 
 #[derive(Accounts)]
 #[instruction(
     body: Vec<u8>,
     headers: HashMap<String, String>,
-    id: Vec<u8>, 
-    method: HttpMethod, 
+    id: Vec<u8>,
+    method: HttpMethod,
     url: String
 )]
 pub struct WebhookCreate<'info> {
-    #[account()]
     pub authority: Signer<'info>,
 
     #[account(mut)]
@@ -38,11 +37,10 @@ pub struct WebhookCreate<'info> {
     )]
     pub webhook: Account<'info, Webhook>,
 
-    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler<'info>(
+pub fn handler(
     ctx: Context<WebhookCreate>,
     body: Vec<u8>,
     headers: HashMap<String, String>,
@@ -57,7 +55,7 @@ pub fn handler<'info>(
     let system_program = &ctx.accounts.system_program;
 
     // Initialize the webhook account
-    let current_slot = Clock::get().unwrap().slot;
+    let current_slot = Clock::get()?.slot;
     webhook.authority = authority.key();
     webhook.body = body;
     webhook.created_at = current_slot;

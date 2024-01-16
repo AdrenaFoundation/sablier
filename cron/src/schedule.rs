@@ -83,8 +83,8 @@ impl Schedule {
                             let second_range =
                                 (Included(second_start), Included(Seconds::inclusive_max()));
 
-                            for second in
-                                self.fields.seconds.ordinals().range(second_range).cloned()
+                            if let Some(second) =
+                                self.fields.seconds.ordinals().range(second_range).next()
                             {
                                 let timezone = after.timezone();
                                 let candidate = timezone
@@ -94,7 +94,7 @@ impl Schedule {
                                         day_of_month,
                                         hour,
                                         minute,
-                                        second,
+                                        *second,
                                     )
                                     .unwrap();
                                 if !self
@@ -210,13 +210,15 @@ impl Schedule {
                             let second_range =
                                 (Included(Seconds::inclusive_min()), Included(second_start));
 
-                            for second in self
+                            //TODO Rework it
+                            if let Some(second) = self
                                 .fields
                                 .seconds
                                 .ordinals()
                                 .range(second_range)
                                 .rev()
                                 .cloned()
+                                .next()
                             {
                                 let timezone = before.timezone();
                                 let candidate = timezone

@@ -2,12 +2,7 @@ use {
     crate::deps::ToTagVersion,
     clap::crate_version,
     solana_sdk::commitment_config::CommitmentConfig,
-    std::{
-        env,
-        fs,
-        path::PathBuf,
-        time::Duration,
-    },
+    std::{env, fs, path::PathBuf, time::Duration},
 };
 
 pub const DEFAULT_RPC_TIMEOUT_SECONDS: Duration = Duration::from_secs(30);
@@ -82,7 +77,7 @@ impl CliConfig {
     }
 
     pub fn active_runtime(&self, filename: &str) -> String {
-        if self.dev == true {
+        if self.dev {
             if filename.contains("solana") {
                 self.active_runtime_dir().join(filename).to_string()
             } else if filename.contains("program") {
@@ -103,9 +98,7 @@ impl CliConfig {
                 path.extend(["test-ledger", "validator-keypair.json"]);
                 path
             })
-            .expect(&format!(
-                "Unable to find location of validator-keypair.json"
-            ))
+            .unwrap_or_else(|_| panic!("Unable to find location of validator-keypair.json"))
             .to_string()
     }
 
@@ -114,7 +107,7 @@ impl CliConfig {
     }
 
     pub fn geyser_lib(&self) -> String {
-        if self.dev == true && env::consts::OS.to_lowercase().contains("mac") {
+        if self.dev && env::consts::OS.to_lowercase().contains("mac") {
             self.active_runtime("libclockwork_plugin.dylib")
         } else {
             // in the release process, we always rename dylib to so anyway
@@ -146,8 +139,8 @@ impl CliConfig {
         String::from_utf8(output.stdout)
             .expect("Unable to get output from cargo -vV")
             .split('\n')
-            .find(|line| line.trim_start().to_lowercase().starts_with(&host_prefix))
-            .map(|line| line.trim_start_matches(&host_prefix).trim())
+            .find(|line| line.trim_start().to_lowercase().starts_with(host_prefix))
+            .map(|line| line.trim_start_matches(host_prefix).trim())
             .expect("Unable to detect target 'host' from cargo -vV")
             .to_owned()
     }

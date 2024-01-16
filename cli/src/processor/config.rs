@@ -1,8 +1,6 @@
 use anchor_lang::{
-    solana_program::{
-        instruction::Instruction, pubkey::Pubkey,
-    },
-    InstructionData, ToAccountMetas
+    solana_program::{instruction::Instruction, pubkey::Pubkey},
+    InstructionData, ToAccountMetas,
 };
 use clockwork_network_program::state::{Config, ConfigSettings};
 
@@ -41,7 +39,8 @@ pub fn set(
         accounts: clockwork_network_program::accounts::ConfigUpdate {
             admin: client.payer_pubkey(),
             config: Config::pubkey(),
-        }.to_account_metas(Some(false)),
+        }
+        .to_account_metas(Some(false)),
         data: clockwork_network_program::instruction::ConfigUpdate { settings }.data(),
     };
     client.send_and_confirm(&[ix], &[client.payer()]).unwrap();

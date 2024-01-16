@@ -308,18 +308,18 @@ fn parse_instruction_file(
 }
 
 fn parse_keypair_file(arg: &str, matches: &ArgMatches) -> Result<Keypair, CliError> {
-    Ok(read_keypair_file(parse_string(arg, matches)?)
-        .map_err(|_err| CliError::BadParameter(arg.into()))?)
+    read_keypair_file(parse_string(arg, matches)?)
+        .map_err(|_err| CliError::BadParameter(arg.into()))
 }
 
 fn parse_http_method(arg: &str, matches: &ArgMatches) -> Result<HttpMethod, CliError> {
-    Ok(HttpMethod::from_str(parse_string(arg, matches)?.as_str())
-        .map_err(|_err| CliError::BadParameter(arg.into()))?)
+    HttpMethod::from_str(parse_string(arg, matches)?.as_str())
+        .map_err(|_err| CliError::BadParameter(arg.into()))
 }
 
 fn parse_pubkey(arg: &str, matches: &ArgMatches) -> Result<Pubkey, CliError> {
-    Ok(Pubkey::from_str(parse_string(arg, matches)?.as_str())
-        .map_err(|_err| CliError::BadParameter(arg.into()))?)
+    Pubkey::from_str(parse_string(arg, matches)?.as_str())
+        .map_err(|_err| CliError::BadParameter(arg.into()))
 }
 
 fn parse_string(arg: &str, matches: &ArgMatches) -> Result<String, CliError> {
@@ -330,24 +330,21 @@ fn parse_string(arg: &str, matches: &ArgMatches) -> Result<String, CliError> {
 }
 
 pub fn _parse_i64(arg: &str, matches: &ArgMatches) -> Result<i64, CliError> {
-    Ok(parse_string(arg, matches)?
+    parse_string(arg, matches)?
         .parse::<i64>()
         .map_err(|_err| CliError::BadParameter(arg.into()))
-        .unwrap())
 }
 
 pub fn parse_u64(arg: &str, matches: &ArgMatches) -> Result<u64, CliError> {
-    Ok(parse_string(arg, matches)?
+    parse_string(arg, matches)?
         .parse::<u64>()
         .map_err(|_err| CliError::BadParameter(arg.into()))
-        .unwrap())
 }
 
 pub fn parse_usize(arg: &str, matches: &ArgMatches) -> Result<usize, CliError> {
-    Ok(parse_string(arg, matches)?
+    parse_string(arg, matches)?
         .parse::<usize>()
         .map_err(|_err| CliError::BadParameter(arg.into()))
-        .unwrap())
 }
 
 // Json parsers

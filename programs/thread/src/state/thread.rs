@@ -1,16 +1,17 @@
 use std::mem::size_of;
 
 use anchor_lang::{prelude::*, AnchorDeserialize, AnchorSerialize};
-use clockwork_utils::thread::{ClockData, SerializableInstruction, Trigger};
+use clockwork_utils::{
+    account::AccountInfoExt,
+    thread::{ClockData, SerializableInstruction, Trigger},
+};
 
 pub use clockwork_utils::thread::Equality;
 
-pub const SEED_THREAD: &[u8] = b"thread";
-
-/// Static space for next_instruction field.
-pub const NEXT_INSTRUCTION_SIZE: usize = 1232;
+use crate::constants::{NEXT_INSTRUCTION_SIZE, SEED_THREAD};
 
 /// Tracks the current state of a transaction thread on Solana.
+// TODO Wait for the next version of Anchor to implement InitSpace macro
 #[account]
 #[derive(Debug)]
 pub struct Thread {
@@ -65,7 +66,7 @@ pub trait ThreadAccount {
     fn pubkey(&self) -> Pubkey;
 
     /// Allocate more memory for the account.
-    fn realloc(&mut self) -> Result<()>;
+    fn realloc_account(&mut self) -> Result<()>;
 }
 
 impl ThreadAccount for Account<'_, Thread> {
@@ -73,9 +74,9 @@ impl ThreadAccount for Account<'_, Thread> {
         Thread::pubkey(self.authority, self.id.clone())
     }
 
-    fn realloc(&mut self) -> Result<()> {
+    fn realloc_account(&mut self) -> Result<()> {
         // Realloc memory for the thread account
-        let data_len = vec![
+        let data_len = [
             8,
             size_of::<Thread>(),
             self.id.len(),
@@ -85,13 +86,13 @@ impl ThreadAccount for Account<'_, Thread> {
         ]
         .iter()
         .sum();
-        self.to_account_info().realloc(data_len, false)?;
+        self.realloc(data_len, false)?;
         Ok(())
     }
 }
 
 /// The execution context of a particular transaction thread.
-#[derive(AnchorDeserialize, AnchorSerialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(AnchorDeserialize, AnchorSerialize, InitSpace, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ExecContext {
     /// Index of the next instruction to be executed.
     pub exec_index: u64,
@@ -111,7 +112,7 @@ pub struct ExecContext {
 }
 
 /// The event which allowed a particular transaction thread to be triggered.
-#[derive(AnchorDeserialize, AnchorSerialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(AnchorDeserialize, AnchorSerialize, InitSpace, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TriggerContext {
     /// A running hash of the observed account data.
     Account {
