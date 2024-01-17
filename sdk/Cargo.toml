@@ -1,23 +1,21 @@
 [package]
 name = "clockwork-sdk"
-version = "2.0.18"
+version.workspace = true
 description = "An SDK for building automated programs on Solana"
-edition = "2021"
-license = "AGPL-3.0-or-later"
-homepage = "https://clockwork.xyz"
-repository = "https://github.com/clockwork-xyz/clockwork"
-documentation = "https://docs.clockwork.xyz"
-readme = "./README.md"
-keywords = ["solana"]
+edition.workspace = true
+license.workspace = true
+homepage.workspace = true
+repository.workspace = true
+documentation.workspace = true
+readme.workspace = true
+keywords.workspace = true
 
 [lib]
 name = "clockwork_sdk"
 
 [dependencies]
-anchor-lang = "0.29.0"
-clockwork-thread-program = { path = "../programs/thread", features = [
-    "cpi",
-], version = "=2.0.18" }
+anchor-lang.workspace = true
+clockwork-thread-program = { workspace = true, features = ["cpi"] }
 
 [features]
 default = []
