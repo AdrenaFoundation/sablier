@@ -6,6 +6,7 @@ pub mod thread;
 use std::fmt::{Debug, Display, Formatter};
 
 use anchor_lang::{prelude::Pubkey, prelude::*, AnchorDeserialize};
+use base64::{engine::general_purpose::STANDARD, Engine};
 
 /// Crate build information
 #[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug)]
@@ -53,7 +54,8 @@ where
             .strip_prefix(&preimage)
             .ok_or(ErrorCode::AccountDidNotDeserialize)?;
 
-        let decoded = base64::decode(get_return_data_base64)
+        let decoded = STANDARD
+            .decode(get_return_data_base64)
             .map_err(|_err| ErrorCode::AccountDidNotDeserialize)?;
 
         T::try_from_slice(&decoded).map_err(|_err| ErrorCode::AccountDidNotDeserialize)

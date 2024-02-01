@@ -86,7 +86,7 @@ fn download_file(url: &str, dest: &Path) -> Result<()> {
 
             let pb = ProgressBar::new(response.content_length().unwrap_or(0));
             pb.set_style(ProgressStyle::default_bar()
-                .template("{spinner:.green} 🚚 [{elapsed_precise}] [{bar:40.cyan/blue}] {bytes}/{total_bytes} ({eta})")
+                .template("{spinner:.green} 🚚 [{elapsed_precise}] [{bar:40.cyan/blue}] {bytes}/{total_bytes} ({eta})")?
                 .progress_chars("#>-"));
 
             let mut source = pb.wrap_read(response);

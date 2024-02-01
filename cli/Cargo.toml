@@ -17,7 +17,7 @@ anchor-spl = { features = ["mint", "token"], workspace = true }
 anyhow.workspace = true
 bincode.workspace = true
 bzip2.workspace = true
-clap = { workspace = true, features = ["derive"] }
+clap = { workspace = true, features = ["derive", "cargo"] }
 clockwork-cron.workspace = true
 clockwork-network-program = { workspace = true, features = ["no-entrypoint"] }
 clockwork-relayer-api.workspace = true
