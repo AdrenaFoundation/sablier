@@ -11,11 +11,11 @@ pub mod state;
 mod instructions;
 
 use anchor_lang::prelude::*;
-use clockwork_utils::{
+use instructions::*;
+use sablier_utils::{
     thread::{SerializableInstruction, Trigger},
     CrateInfo,
 };
-use instructions::*;
 use state::*;
 
 declare_id!("CLoCKyJ6DXBJqqu2VWx9RLbgnwwR6BMHHuyasVmfMzBh");

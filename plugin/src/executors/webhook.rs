@@ -1,10 +1,10 @@
 use std::{fmt::Debug, sync::Arc};
 
 use anchor_lang::prelude::Pubkey;
-use clockwork_relayer_api::Relay;
-use clockwork_webhook_program::state::Webhook;
 use log::info;
 use reqwest::header::CONTENT_TYPE;
+use sablier_relayer_api::Relay;
+use sablier_webhook_program::state::Webhook;
 use solana_client::nonblocking::rpc_client::RpcClient;
 use solana_geyser_plugin_interface::geyser_plugin_interface::Result as PluginResult;
 

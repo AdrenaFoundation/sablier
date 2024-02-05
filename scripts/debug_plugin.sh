@@ -3,17 +3,17 @@
 set -e
 
 # Rebuid programs
-rm -rf lib/clockwork_thread_program.so
+rm -rf lib/sablier_thread_program.so
 cd programs/thread && anchor build; cd -;
-cp -fv target/deploy/clockwork_thread_program.so lib/
+cp -fv target/deploy/sablier_thread_program.so lib/
 
 # Rebuild plugin
-rm -rf lib/libclockwork_plugin.dylib
+rm -rf lib/libsablier_plugin.dylib
 cargo build --manifest-path plugin/Cargo.toml
-cp -fv target/debug/libclockwork_plugin.dylib lib/
+cp -fv target/debug/libsablier_plugin.dylib lib/
 
 # bpf-program
-crate_name="hello_clockwork"
+crate_name="hello_sablier"
 cd ~/examples/$crate_name
 anchor build
 cd -
@@ -21,7 +21,7 @@ cd -
 # Clean ledger
 rm -rf test-ledger
 
-RUST_LOG=clockwork_plugin clockwork localnet \
+RUST_LOG=sablier_plugin sablier localnet \
     --bpf-program ~/examples/$crate_name/target/deploy/$crate_name-keypair.json \
     --bpf-program ~/examples/$crate_name/target/deploy/$crate_name.so
 

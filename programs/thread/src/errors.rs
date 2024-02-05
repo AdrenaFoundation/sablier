@@ -2,9 +2,9 @@
 
 use anchor_lang::prelude::*;
 
-/// Errors for the the Clockwork thread program.
+/// Errors for the the Sablier thread program.
 #[error_code]
-pub enum ClockworkError {
+pub enum SablierError {
     /// Thrown if a exec response has an invalid program ID or cannot be parsed.
     #[msg("The exec response could not be parsed")]
     InvalidThreadResponse,

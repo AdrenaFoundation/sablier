@@ -3,7 +3,7 @@
 //! A cron expression parser and schedule explorer
 //! # Example
 //! ```
-//! use clockwork_cron::Schedule;
+//! use sablier_cron::Schedule;
 //! use chrono::{DateTime, NaiveDateTime, Utc};
 //! use std::str::FromStr;
 //!

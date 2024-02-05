@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Stake local node with the Clockwork network
+# Stake local node with the Sablier network
 cd cli
 cargo run -- node register ../test-ledger/validator-keypair.json
 sleep 2

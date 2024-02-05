@@ -85,7 +85,7 @@ SECONDS=0
 
 # Enumerate the bins
 BINS=(
-  clockwork
+  sablier
 )
 
 # Create bin args
@@ -103,10 +103,10 @@ done
 # Define lib extension
 case $targetTriple in
   *darwin*)
-    pluginFilename=libclockwork_plugin.dylib
+    pluginFilename=libsablier_plugin.dylib
     ;;
   *)
-    pluginFilename=libclockwork_plugin.so
+    pluginFilename=libsablier_plugin.so
     ;;
 esac
 
@@ -117,12 +117,12 @@ esac
   # Copy binaries
   case $targetTriple in
     *darwin*)
-      pluginFilename=libclockwork_plugin.dylib
+      pluginFilename=libsablier_plugin.dylib
       cp -fv "target/$targetTriple/$buildVariant/$pluginFilename" "$installDir"/lib
-      mv "$installDir"/lib/libclockwork_plugin.dylib "$installDir"/lib/libclockwork_plugin.so
+      mv "$installDir"/lib/libsablier_plugin.dylib "$installDir"/lib/libsablier_plugin.so
       ;;
     *)
-      pluginFilename=libclockwork_plugin.so
+      pluginFilename=libsablier_plugin.so
       cp -fv "target/$targetTriple/$buildVariant/$pluginFilename" "$installDir"/lib
       ;;
   esac
@@ -132,9 +132,9 @@ esac
     cp -fv "target/$targetTriple/$buildVariant/$bin" "$installDir/bin"
   done
 
-  cp -fv "target/deploy/clockwork_network_program.so" "$installDir/lib"
-  cp -fv "target/deploy/clockwork_thread_program.so" "$installDir/lib"
-  cp -fv "target/deploy/clockwork_webhook_program.so" "$installDir/lib"
+  cp -fv "target/deploy/sablier_network_program.so" "$installDir/lib"
+  cp -fv "target/deploy/sablier_thread_program.so" "$installDir/lib"
+  cp -fv "target/deploy/sablier_webhook_program.so" "$installDir/lib"
 )
 
 # Success message

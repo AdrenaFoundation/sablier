@@ -45,7 +45,7 @@ pub fn handler(ctx: Context<FeeCollect>, amount: u64, penalty: bool) -> Result<(
 
     require!(
         (fee.collected_balance + fee.penalty_balance + min_rent_balance) >= lamport_balance
-        ClockworkError::InsufficientFeeBalance
+        SablierError::InsufficientFeeBalance
     );
 
     Ok(())

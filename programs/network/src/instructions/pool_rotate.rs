@@ -61,13 +61,13 @@ pub fn handler(ctx: Context<PoolRotate>) -> Result<()> {
     require!(
         pool.workers.len() < pool.size
             || is_rotation_window_open(registry, snapshot, snapshot_frame).unwrap(),
-        ClockworkError::PoolFull
+        SablierError::PoolFull
     );
 
     // Verify the worker is not already in the pool.
     require!(
         !pool.workers.contains(&worker.key()),
-        ClockworkError::AlreadyInPool
+        SablierError::AlreadyInPool
     );
 
     // Rotate the worker into the pool.

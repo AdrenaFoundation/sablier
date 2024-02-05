@@ -6,10 +6,10 @@ use anchor_lang::{
     },
     AnchorDeserialize, InstructionData,
 };
-use clockwork_network_program::state::{Fee, Pool, Worker, WorkerAccount};
-use clockwork_utils::thread::{SerializableInstruction, ThreadResponse, PAYER_PUBKEY};
+use sablier_network_program::state::{Fee, Pool, Worker, WorkerAccount};
+use sablier_utils::thread::{SerializableInstruction, ThreadResponse, PAYER_PUBKEY};
 
-use crate::{constants::*, errors::ClockworkError, state::*};
+use crate::{constants::*, errors::SablierError, state::*};
 
 /// Accounts required by the `thread_exec` instruction.
 #[derive(Accounts)]
@@ -18,11 +18,11 @@ pub struct ThreadExec<'info> {
     #[account(
         mut,
         seeds = [
-            clockwork_network_program::constants::SEED_FEE,
+            sablier_network_program::constants::SEED_FEE,
             worker.key().as_ref(),
         ],
         bump,
-        seeds::program = clockwork_network_program::ID,
+        seeds::program = sablier_network_program::ID,
         has_one = worker,
     )]
     pub fee: Account<'info, Fee>,
@@ -44,7 +44,7 @@ pub struct ThreadExec<'info> {
             thread.id.as_slice(),
         ],
         bump = thread.bump,
-        constraint = !thread.paused @ ClockworkError::ThreadPaused,
+        constraint = !thread.paused @ SablierError::ThreadPaused,
         constraint = thread.next_instruction.is_some(),
         constraint = thread.exec_context.is_some()
     )]
@@ -68,7 +68,7 @@ pub fn handler(ctx: Context<ThreadExec>) -> Result<()> {
     if thread.exec_context.unwrap().last_exec_at == clock.slot
         && thread.exec_context.unwrap().execs_since_slot >= thread.rate_limit
     {
-        return Err(ClockworkError::RateLimitExeceeded.into());
+        return Err(SablierError::RateLimitExeceeded.into());
     }
 
     // Record the worker's lamports before invoking inner ixs.
@@ -78,7 +78,7 @@ pub fn handler(ctx: Context<ThreadExec>) -> Result<()> {
     // We have already verified that it is not null during account validation.
     let instruction: &mut SerializableInstruction = &mut thread.next_instruction.clone().unwrap();
 
-    // Inject the signatory's pubkey for the Clockwork payer ID.
+    // Inject the signatory's pubkey for the Sablier payer ID.
     for acc in instruction.accounts.iter_mut() {
         if acc.pubkey.eq(&PAYER_PUBKEY) {
             acc.pubkey = signatory.key();
@@ -98,7 +98,7 @@ pub fn handler(ctx: Context<ThreadExec>) -> Result<()> {
     )?;
 
     // Verify the inner instruction did not write data to the signatory address.
-    require!(signatory.data_is_empty(), ClockworkError::UnauthorizedWrite);
+    require!(signatory.data_is_empty(), SablierError::UnauthorizedWrite);
 
     // Parse the thread response
     let thread_response: Option<ThreadResponse> = match get_return_data() {
@@ -106,7 +106,7 @@ pub fn handler(ctx: Context<ThreadExec>) -> Result<()> {
         Some((program_id, return_data)) => {
             require!(
                 program_id.eq(&instruction.program_id),
-                ClockworkError::InvalidThreadResponse
+                SablierError::InvalidThreadResponse
             );
             ThreadResponse::try_from_slice(return_data.as_slice()).ok()
         }
@@ -123,7 +123,7 @@ pub fn handler(ctx: Context<ThreadExec>) -> Result<()> {
         if let Some(trigger) = thread_response.trigger {
             require!(
                 std::mem::discriminant(&thread.trigger) == std::mem::discriminant(&trigger),
-                ClockworkError::InvalidTriggerVariant
+                SablierError::InvalidTriggerVariant
             );
             thread.trigger = trigger.clone();
 

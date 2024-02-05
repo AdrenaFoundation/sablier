@@ -1,4 +1,4 @@
-use clockwork_utils::thread::ThreadResponse;
+use sablier_utils::thread::ThreadResponse;
 
 use {
     crate::{constants::*, state::*},

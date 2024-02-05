@@ -48,11 +48,11 @@ pub struct WorkerCreate<'info> {
         mut,
         seeds = [SEED_REGISTRY],
         bump,
-        constraint = !registry.locked @ ClockworkError::RegistryLocked
+        constraint = !registry.locked @ SablierError::RegistryLocked
     )]
     pub registry: Account<'info, Registry>,
 
-    #[account(constraint = signatory.key() != authority.key() @ ClockworkError::InvalidSignatory)]
+    #[account(constraint = signatory.key() != authority.key() @ SablierError::InvalidSignatory)]
     pub signatory: Signer<'info>,
 
     pub system_program: Program<'info, System>,

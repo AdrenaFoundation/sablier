@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use chrono::*;
-    use clockwork_cron::{Schedule, TimeUnitSpec};
+    use sablier_cron::{Schedule, TimeUnitSpec};
     use std::str::FromStr;
 
     #[test]

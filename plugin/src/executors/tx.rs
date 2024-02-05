@@ -8,9 +8,9 @@ use std::{
 };
 
 use bincode::serialize;
-use clockwork_network_program::state::{Pool, Registry, Snapshot, SnapshotFrame, Worker};
-use clockwork_thread_program::state::VersionedThread;
 use log::info;
+use sablier_network_program::state::{Pool, Registry, Snapshot, SnapshotFrame, Worker};
+use sablier_thread_program::state::VersionedThread;
 use solana_client::{
     nonblocking::{rpc_client::RpcClient, tpu_client::TpuClient},
     rpc_config::RpcSimulateTransactionConfig,
@@ -555,7 +555,7 @@ async fn get_tpu_client() -> TpuClient<QuicPool, QuicConnectionManager, QuicConf
     ));
 
     TpuClient::new(
-        "clockwork",
+        "sablier",
         rpc_client,
         LOCAL_WEBSOCKET_URL,
         TpuClientConfig { fanout_slots: 24 },

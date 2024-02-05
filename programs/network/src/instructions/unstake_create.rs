@@ -25,7 +25,7 @@ pub struct UnstakeCreate<'info> {
         mut,
         seeds = [SEED_REGISTRY],
         bump,
-        constraint = !registry.locked @ ClockworkError::RegistryLocked
+        constraint = !registry.locked @ SablierError::RegistryLocked
     )]
     pub registry: Account<'info, Registry>,
 
@@ -58,7 +58,7 @@ pub fn handler(ctx: Context<UnstakeCreate>, amount: u64) -> Result<()> {
     // Validate the request is valid.
     require!(
         amount <= delegation.stake_amount,
-        ClockworkError::InvalidUnstakeAmount
+        SablierError::InvalidUnstakeAmount
     );
 
     // Initialize the unstake account.

@@ -1,7 +1,7 @@
 [package]
-name = "clockwork-webhook-program"
+name = "sablier-webhook-program"
 version.workspace = true
-description = "Clockwork webhook program"
+description = "Sablier webhook program"
 edition.workspace = true
 license.workspace = true
 homepage.workspace = true
@@ -12,7 +12,7 @@ keywords.workspace = true
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "clockwork_webhook_program"
+name = "sablier_webhook_program"
 
 [features]
 no-entrypoint = []

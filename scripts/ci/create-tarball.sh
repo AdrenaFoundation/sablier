@@ -19,7 +19,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-RELEASE_BASENAME="${RELEASE_BASENAME:=clockwork-geyser-plugin-release}"
+RELEASE_BASENAME="${RELEASE_BASENAME:=sablier-geyser-plugin-release}"
 TARBALL_BASENAME="${TARBALL_BASENAME:="$RELEASE_BASENAME"}"
 
 echo --- Creating release tarball

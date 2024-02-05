@@ -1,5 +1,5 @@
 [package]
-name = "clockwork-cron"
+name = "sablier-cron"
 version.workspace = true
 description = "A cron expression parser that's safe to use in the Solana runtime"
 edition.workspace = true
@@ -11,7 +11,7 @@ readme.workspace = true
 keywords.workspace = true
 
 [lib]
-name = "clockwork_cron"
+name = "sablier_cron"
 
 [dependencies]
 chrono = { workspace = true, features = ["alloc"] }

@@ -1,8 +1,8 @@
 use std::{convert::TryFrom, fs, path::PathBuf, str::FromStr};
 
 use clap::ArgMatches;
-use clockwork_thread_program::state::{SerializableAccount, SerializableInstruction, Trigger};
-use clockwork_webhook_program::state::HttpMethod;
+use sablier_thread_program::state::{SerializableAccount, SerializableInstruction, Trigger};
+use sablier_webhook_program::state::HttpMethod;
 use serde::{Deserialize as JsonDeserialize, Serialize as JsonSerialize};
 use solana_sdk::{
     pubkey::Pubkey,
@@ -82,7 +82,7 @@ fn parse_bpf_command(matches: &ArgMatches) -> Result<CliCommand, CliError> {
         program_infos,
         force_init: matches.contains_id("force_init"),
         solana_archive: parse_string("solana_archive", matches).ok(),
-        clockwork_archive: parse_string("clockwork_archive", matches).ok(),
+        sablier_archive: parse_string("sablier_archive", matches).ok(),
         dev: matches.contains_id("dev"),
     })
 }

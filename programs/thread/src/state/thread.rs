@@ -1,12 +1,12 @@
 use std::mem::size_of;
 
 use anchor_lang::{prelude::*, AnchorDeserialize, AnchorSerialize};
-use clockwork_utils::{
+use sablier_utils::{
     account::AccountInfoExt,
     thread::{ClockData, SerializableInstruction, Trigger},
 };
 
-pub use clockwork_utils::thread::Equality;
+pub use sablier_utils::thread::Equality;
 
 use crate::constants::{NEXT_INSTRUCTION_SIZE, SEED_THREAD};
 

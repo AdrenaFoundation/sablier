@@ -1,5 +1,5 @@
 use anchor_lang::{prelude::Clock, AccountDeserialize};
-use clockwork_utils::ProgramLogsDeserializable;
+use sablier_utils::ProgramLogsDeserializable;
 use solana_client::{
     client_error, rpc_client::RpcClient, rpc_response::RpcSimulateTransactionResult,
 };

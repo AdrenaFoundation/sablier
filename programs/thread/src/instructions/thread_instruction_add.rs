@@ -2,7 +2,7 @@ use anchor_lang::{
     prelude::*,
     system_program::{transfer, Transfer},
 };
-use clockwork_utils::account::AccountInfoExt;
+use sablier_utils::account::AccountInfoExt;
 
 use crate::{constants::*, state::*};
 

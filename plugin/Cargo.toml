@@ -1,9 +1,9 @@
 [package]
-name = "clockwork_plugin"
+name = "sablier_plugin"
 version.workspace = true
 # this needs to match whatever solana uses!
-rust-version = "1.60.0"
-description = "Clockwork plugin for Solana validators"
+rust-version = "1.73.0"
+description = "Sablier plugin for Solana validators"
 edition.workspace = true
 license.workspace = true
 homepage.workspace = true
@@ -16,20 +16,20 @@ publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-name = "clockwork_plugin"
+name = "sablier_plugin"
 
 [dependencies]
 anchor-lang.workspace = true
 async-trait.workspace = true
 bincode.workspace = true
 chrono = { workspace = true, features = ["alloc"] }
-clockwork-cron.workspace = true
-clockwork-network-program.workspace = true
-clockwork-plugin-utils.workspace = true
-clockwork-relayer-api.workspace = true
-clockwork-thread-program.workspace = true
-clockwork-webhook-program.workspace = true
-clockwork-utils.workspace = true
+sablier-cron.workspace = true
+sablier-network-program.workspace = true
+sablier-plugin-utils.workspace = true
+sablier-relayer-api.workspace = true
+sablier-thread-program.workspace = true
+sablier-webhook-program.workspace = true
+sablier-utils.workspace = true
 log.workspace = true
 pyth-sdk-solana.workspace = true
 reqwest.workspace = true

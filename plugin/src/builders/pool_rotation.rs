@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
 use anchor_lang::{solana_program::instruction::Instruction, InstructionData, ToAccountMetas};
-use clockwork_network_program::state::{Config, Pool, Registry, Snapshot, SnapshotFrame, Worker};
 use log::info;
+use sablier_network_program::state::{Config, Pool, Registry, Snapshot, SnapshotFrame, Worker};
 use solana_client::nonblocking::rpc_client::RpcClient;
 use solana_sdk::{signature::Keypair, signer::Signer, transaction::Transaction};
 
@@ -64,8 +64,8 @@ pub async fn build_pool_rotation_tx<'a>(
     // Build rotation instruction to rotate the worker into pool 0.
     let snapshot_pubkey = Snapshot::pubkey(snapshot.id);
     let ix = Instruction {
-        program_id: clockwork_network_program::ID,
-        accounts: clockwork_network_program::accounts::PoolRotate {
+        program_id: sablier_network_program::ID,
+        accounts: sablier_network_program::accounts::PoolRotate {
             config: Config::pubkey(),
             pool: Pool::pubkey(0),
             registry: Registry::pubkey(),
@@ -75,7 +75,7 @@ pub async fn build_pool_rotation_tx<'a>(
             worker: Worker::pubkey(worker_id),
         }
         .to_account_metas(Some(false)),
-        data: clockwork_network_program::instruction::PoolRotate {}.data(),
+        data: sablier_network_program::instruction::PoolRotate {}.data(),
     };
 
     // Build and sign tx.

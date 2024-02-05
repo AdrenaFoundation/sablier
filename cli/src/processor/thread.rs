@@ -2,22 +2,22 @@ use anchor_lang::{
     solana_program::{instruction::Instruction, system_program},
     AccountDeserialize, InstructionData, ToAccountMetas,
 };
-use clockwork_thread_program::state::{
+use sablier_thread_program::state::{
     SerializableInstruction, Thread, ThreadSettings, Trigger, VersionedThread,
 };
-use clockwork_utils::CrateInfo;
+use sablier_utils::CrateInfo;
 use solana_sdk::pubkey::Pubkey;
 
 use crate::{client::Client, errors::CliError};
 
 pub fn crate_info(client: &Client) -> Result<(), CliError> {
     let ix = Instruction {
-        program_id: clockwork_thread_program::ID,
-        accounts: clockwork_thread_program::accounts::GetCrateInfo {
+        program_id: sablier_thread_program::ID,
+        accounts: sablier_thread_program::accounts::GetCrateInfo {
             system_program: system_program::ID,
         }
         .to_account_metas(Some(false)),
-        data: clockwork_thread_program::instruction::GetCrateInfo {}.data(),
+        data: sablier_thread_program::instruction::GetCrateInfo {}.data(),
     };
     let crate_info: CrateInfo = client.get_return_data(ix).unwrap();
     println!("{:#?}", crate_info);
@@ -32,15 +32,15 @@ pub fn create(
 ) -> Result<(), CliError> {
     let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.clone().into_bytes());
     let ix = Instruction {
-        program_id: clockwork_thread_program::ID,
-        accounts: clockwork_thread_program::accounts::ThreadCreate {
+        program_id: sablier_thread_program::ID,
+        accounts: sablier_thread_program::accounts::ThreadCreate {
             authority: client.payer_pubkey(),
             payer: client.payer_pubkey(),
             system_program: system_program::ID,
             thread: thread_pubkey,
         }
         .to_account_metas(Some(false)),
-        data: clockwork_thread_program::instruction::ThreadCreate {
+        data: sablier_thread_program::instruction::ThreadCreate {
             amount: 0,
             id: id.into_bytes(),
             instructions,
@@ -56,14 +56,14 @@ pub fn create(
 pub fn delete(client: &Client, id: String) -> Result<(), CliError> {
     let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.into_bytes());
     let ix = Instruction {
-        program_id: clockwork_thread_program::ID,
-        accounts: clockwork_thread_program::accounts::ThreadDelete {
+        program_id: sablier_thread_program::ID,
+        accounts: sablier_thread_program::accounts::ThreadDelete {
             authority: client.payer_pubkey(),
             close_to: client.payer_pubkey(),
             thread: thread_pubkey,
         }
         .to_account_metas(Some(false)),
-        data: clockwork_thread_program::instruction::ThreadDelete {}.data(),
+        data: sablier_thread_program::instruction::ThreadDelete {}.data(),
     };
     client.send_and_confirm(&[ix], &[client.payer()]).unwrap();
     Ok(())
@@ -79,13 +79,13 @@ pub fn get(client: &Client, address: Pubkey) -> Result<(), CliError> {
 pub fn pause(client: &Client, id: String) -> Result<(), CliError> {
     let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.into_bytes());
     let ix = Instruction {
-        program_id: clockwork_thread_program::ID,
-        accounts: clockwork_thread_program::accounts::ThreadPause {
+        program_id: sablier_thread_program::ID,
+        accounts: sablier_thread_program::accounts::ThreadPause {
             authority: client.payer_pubkey(),
             thread: thread_pubkey,
         }
         .to_account_metas(Some(false)),
-        data: clockwork_thread_program::instruction::ThreadPause {}.data(),
+        data: sablier_thread_program::instruction::ThreadPause {}.data(),
     };
     client.send_and_confirm(&[ix], &[client.payer()]).unwrap();
     get(client, thread_pubkey)?;
@@ -95,13 +95,13 @@ pub fn pause(client: &Client, id: String) -> Result<(), CliError> {
 pub fn resume(client: &Client, id: String) -> Result<(), CliError> {
     let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.into_bytes());
     let ix = Instruction {
-        program_id: clockwork_thread_program::ID,
-        accounts: clockwork_thread_program::accounts::ThreadResume {
+        program_id: sablier_thread_program::ID,
+        accounts: sablier_thread_program::accounts::ThreadResume {
             authority: client.payer_pubkey(),
             thread: thread_pubkey,
         }
         .to_account_metas(Some(false)),
-        data: clockwork_thread_program::instruction::ThreadResume {}.data(),
+        data: sablier_thread_program::instruction::ThreadResume {}.data(),
     };
     client.send_and_confirm(&[ix], &[client.payer()]).unwrap();
     get(client, thread_pubkey)?;
@@ -111,13 +111,13 @@ pub fn resume(client: &Client, id: String) -> Result<(), CliError> {
 pub fn reset(client: &Client, id: String) -> Result<(), CliError> {
     let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.into_bytes());
     let ix = Instruction {
-        program_id: clockwork_thread_program::ID,
-        accounts: clockwork_thread_program::accounts::ThreadReset {
+        program_id: sablier_thread_program::ID,
+        accounts: sablier_thread_program::accounts::ThreadReset {
             authority: client.payer_pubkey(),
             thread: thread_pubkey,
         }
         .to_account_metas(Some(false)),
-        data: clockwork_thread_program::instruction::ThreadReset {}.data(),
+        data: sablier_thread_program::instruction::ThreadReset {}.data(),
     };
     client.send_and_confirm(&[ix], &[client.payer()]).unwrap();
     get(client, thread_pubkey)?;
@@ -143,14 +143,14 @@ pub fn update(
         trigger,
     };
     let ix = Instruction {
-        program_id: clockwork_thread_program::ID,
-        accounts: clockwork_thread_program::accounts::ThreadUpdate {
+        program_id: sablier_thread_program::ID,
+        accounts: sablier_thread_program::accounts::ThreadUpdate {
             authority: client.payer_pubkey(),
             system_program: system_program::ID,
             thread: thread_pubkey,
         }
         .to_account_metas(Some(false)),
-        data: clockwork_thread_program::instruction::ThreadUpdate { settings }.data(),
+        data: sablier_thread_program::instruction::ThreadUpdate { settings }.data(),
     };
     client.send_and_confirm(&[ix], &[client.payer()]).unwrap();
     get(client, thread_pubkey)?;

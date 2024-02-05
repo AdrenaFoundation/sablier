@@ -22,7 +22,7 @@ fn main() {
         .expect("unable to get git commit hash");
     let commit_hash = String::from_utf8(output.stdout).unwrap();
     let url = format!(
-        "https://github.com/clockwork-xyz/clockwork/tree/{}/cli/Cargo.toml",
+        "https://github.com/sablier-xyz/sablier/tree/{}/cli/Cargo.toml",
         commit_hash
     );
     println!("cargo:rustc-env=SPEC={}", url);

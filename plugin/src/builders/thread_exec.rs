@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
 use anchor_lang::{InstructionData, ToAccountMetas};
-use clockwork_network_program::state::Worker;
-use clockwork_thread_program::state::{Trigger, VersionedThread};
-use clockwork_utils::thread::PAYER_PUBKEY;
 use log::info;
+use sablier_network_program::state::Worker;
+use sablier_thread_program::state::{Trigger, VersionedThread};
+use sablier_utils::thread::PAYER_PUBKEY;
 use solana_account_decoder::UiAccountEncoding;
 use solana_client::{
     nonblocking::rpc_client::RpcClient,
@@ -216,14 +216,14 @@ fn build_kickoff_ix(
     // Build the instruction.
     let mut kickoff_ix = match thread {
         VersionedThread::V1(_) => Instruction {
-            program_id: clockwork_thread_program::ID,
-            accounts: clockwork_thread_program::accounts::ThreadKickoff {
+            program_id: sablier_thread_program::ID,
+            accounts: sablier_thread_program::accounts::ThreadKickoff {
                 signatory: signatory_pubkey,
                 thread: thread_pubkey,
                 worker: worker_pubkey,
             }
             .to_account_metas(Some(false)),
-            data: clockwork_thread_program::instruction::ThreadKickoff {}.data(),
+            data: sablier_thread_program::instruction::ThreadKickoff {}.data(),
         },
     };
 
@@ -262,16 +262,16 @@ fn build_exec_ix(
     // Build the instruction.
     let mut exec_ix = match thread {
         VersionedThread::V1(_) => Instruction {
-            program_id: clockwork_thread_program::ID,
-            accounts: clockwork_thread_program::accounts::ThreadExec {
-                fee: clockwork_network_program::state::Fee::pubkey(worker_pubkey),
-                pool: clockwork_network_program::state::Pool::pubkey(0),
+            program_id: sablier_thread_program::ID,
+            accounts: sablier_thread_program::accounts::ThreadExec {
+                fee: sablier_network_program::state::Fee::pubkey(worker_pubkey),
+                pool: sablier_network_program::state::Pool::pubkey(0),
                 signatory: signatory_pubkey,
                 thread: thread_pubkey,
                 worker: worker_pubkey,
             }
             .to_account_metas(Some(true)),
-            data: clockwork_thread_program::instruction::ThreadExec {}.data(),
+            data: sablier_thread_program::instruction::ThreadExec {}.data(),
         },
     };
 

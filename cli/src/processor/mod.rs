@@ -73,7 +73,7 @@ pub fn process(matches: &ArgMatches) -> Result<(), CliError> {
             program_infos,
             force_init,
             solana_archive,
-            clockwork_archive,
+            sablier_archive,
             dev,
         } => localnet::start(
             &mut config,
@@ -83,7 +83,7 @@ pub fn process(matches: &ArgMatches) -> Result<(), CliError> {
             program_infos,
             force_init,
             solana_archive,
-            clockwork_archive,
+            sablier_archive,
             dev,
         ),
         CliCommand::PoolGet { id } => pool::get(&client, id),

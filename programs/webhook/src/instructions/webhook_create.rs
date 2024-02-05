@@ -62,7 +62,7 @@ pub fn handler(
     webhook.headers = headers;
     webhook.id = id;
     webhook.method = method;
-    webhook.relayer = Relayer::Clockwork;
+    webhook.relayer = Relayer::Sablier;
     webhook.url = url;
 
     // Transfer fees into webhook account to hold in escrow.
