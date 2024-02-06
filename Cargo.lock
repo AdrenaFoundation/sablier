@@ -1264,165 +1264,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "702fc72eb24e5a1e48ce58027a675bc24edd52096d5397d4aea7c6dd9eca0bd1"
 
 [[package]]
-name = "clockwork-cli"
-version = "2.0.18"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "anyhow",
- "bincode",
- "bzip2",
- "cargo_metadata",
- "chrono",
- "clap 4.4.18",
- "clockwork-cron",
- "clockwork-network-program",
- "clockwork-plugin-utils",
- "clockwork-relayer-api",
- "clockwork-thread-program",
- "clockwork-utils",
- "clockwork-webhook-program",
- "dirs-next",
- "indicatif",
- "reqwest",
- "serde",
- "serde_json",
- "solana-cli-config",
- "solana-client",
- "solana-sdk",
- "spl-associated-token-account 1.1.3",
- "spl-token 3.5.0",
- "tar",
- "termcolor",
- "thiserror",
-]
-
-[[package]]
-name = "clockwork-cron"
-version = "2.0.18"
-dependencies = [
- "chrono",
- "nom",
-]
-
-[[package]]
-name = "clockwork-network-program"
-version = "2.0.18"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "clockwork-utils",
-]
-
-[[package]]
-name = "clockwork-plugin-utils"
-version = "2.0.18"
-dependencies = [
- "serde",
- "serde_json",
- "solana-geyser-plugin-interface",
-]
-
-[[package]]
-name = "clockwork-relayer"
-version = "2.0.18"
-dependencies = [
- "actix-cors",
- "actix-web",
- "anchor-lang",
- "clockwork-relayer-api",
- "clockwork-webhook-program",
- "rayon",
- "regex",
- "reqwest",
- "serde",
- "serde_json",
- "solana-client",
- "solana-sdk",
- "solana-zk-token-sdk",
-]
-
-[[package]]
-name = "clockwork-relayer-api"
-version = "2.0.18"
-dependencies = [
- "bincode",
- "serde",
- "solana-sdk",
-]
-
-[[package]]
-name = "clockwork-sdk"
-version = "2.0.18"
-dependencies = [
- "anchor-lang",
- "clockwork-thread-program",
-]
-
-[[package]]
-name = "clockwork-thread-program"
-version = "2.0.18"
-dependencies = [
- "anchor-lang",
- "chrono",
- "clockwork-cron",
- "clockwork-network-program",
- "clockwork-utils",
- "pyth-sdk-solana",
- "version",
-]
-
-[[package]]
-name = "clockwork-utils"
-version = "2.0.18"
-dependencies = [
- "anchor-lang",
- "base64 0.21.7",
- "serde",
- "static-pubkey",
-]
-
-[[package]]
-name = "clockwork-webhook-program"
-version = "2.0.18"
-dependencies = [
- "anchor-lang",
- "serde",
-]
-
-[[package]]
-name = "clockwork_plugin"
-version = "2.0.18"
-dependencies = [
- "anchor-lang",
- "async-trait",
- "bincode",
- "cargo_metadata",
- "chrono",
- "clockwork-cron",
- "clockwork-network-program",
- "clockwork-plugin-utils",
- "clockwork-relayer-api",
- "clockwork-thread-program",
- "clockwork-utils",
- "clockwork-webhook-program",
- "futures",
- "log",
- "pyth-sdk-solana",
- "reqwest",
- "rustc_version",
- "solana-account-decoder",
- "solana-client",
- "solana-geyser-plugin-interface",
- "solana-logger",
- "solana-program",
- "solana-quic-client",
- "solana-sdk",
- "static-pubkey",
- "tokio",
-]
-
-[[package]]
 name = "colorchoice"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3703,6 +3544,165 @@ name = "ryu"
 version = "1.0.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f98d2aa92eebf49b69786be48e4477826b256916e84a57ff2a4f21923b48eb4c"
+
+[[package]]
+name = "sablier-cli"
+version = "1.0.0-alpha.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "anyhow",
+ "bincode",
+ "bzip2",
+ "cargo_metadata",
+ "chrono",
+ "clap 4.4.18",
+ "dirs-next",
+ "indicatif",
+ "reqwest",
+ "sablier-cron",
+ "sablier-network-program",
+ "sablier-plugin-utils",
+ "sablier-relayer-api",
+ "sablier-thread-program",
+ "sablier-utils",
+ "sablier-webhook-program",
+ "serde",
+ "serde_json",
+ "solana-cli-config",
+ "solana-client",
+ "solana-sdk",
+ "spl-associated-token-account 1.1.3",
+ "spl-token 3.5.0",
+ "tar",
+ "termcolor",
+ "thiserror",
+]
+
+[[package]]
+name = "sablier-cron"
+version = "1.0.0-alpha.0"
+dependencies = [
+ "chrono",
+ "nom",
+]
+
+[[package]]
+name = "sablier-network-program"
+version = "1.0.0-alpha.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "sablier-utils",
+]
+
+[[package]]
+name = "sablier-plugin-utils"
+version = "1.0.0-alpha.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "solana-geyser-plugin-interface",
+]
+
+[[package]]
+name = "sablier-relayer"
+version = "1.0.0-alpha.0"
+dependencies = [
+ "actix-cors",
+ "actix-web",
+ "anchor-lang",
+ "rayon",
+ "regex",
+ "reqwest",
+ "sablier-relayer-api",
+ "sablier-webhook-program",
+ "serde",
+ "serde_json",
+ "solana-client",
+ "solana-sdk",
+ "solana-zk-token-sdk",
+]
+
+[[package]]
+name = "sablier-relayer-api"
+version = "1.0.0-alpha.0"
+dependencies = [
+ "bincode",
+ "serde",
+ "solana-sdk",
+]
+
+[[package]]
+name = "sablier-sdk"
+version = "1.0.0-alpha.0"
+dependencies = [
+ "anchor-lang",
+ "sablier-thread-program",
+]
+
+[[package]]
+name = "sablier-thread-program"
+version = "1.0.0-alpha.0"
+dependencies = [
+ "anchor-lang",
+ "chrono",
+ "pyth-sdk-solana",
+ "sablier-cron",
+ "sablier-network-program",
+ "sablier-utils",
+ "version",
+]
+
+[[package]]
+name = "sablier-utils"
+version = "1.0.0-alpha.0"
+dependencies = [
+ "anchor-lang",
+ "base64 0.21.7",
+ "serde",
+ "static-pubkey",
+]
+
+[[package]]
+name = "sablier-webhook-program"
+version = "1.0.0-alpha.0"
+dependencies = [
+ "anchor-lang",
+ "serde",
+]
+
+[[package]]
+name = "sablier_plugin"
+version = "1.0.0-alpha.0"
+dependencies = [
+ "anchor-lang",
+ "async-trait",
+ "bincode",
+ "cargo_metadata",
+ "chrono",
+ "futures",
+ "log",
+ "pyth-sdk-solana",
+ "reqwest",
+ "rustc_version",
+ "sablier-cron",
+ "sablier-network-program",
+ "sablier-plugin-utils",
+ "sablier-relayer-api",
+ "sablier-thread-program",
+ "sablier-utils",
+ "sablier-webhook-program",
+ "solana-account-decoder",
+ "solana-client",
+ "solana-geyser-plugin-interface",
+ "solana-logger",
+ "solana-program",
+ "solana-quic-client",
+ "solana-sdk",
+ "static-pubkey",
+ "tokio",
+]
 
 [[package]]
 name = "schannel"

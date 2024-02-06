@@ -4,7 +4,7 @@ use anchor_lang::{
     prelude::*,
     system_program::{transfer, Transfer},
 };
-use clockwork_utils::thread::{SerializableInstruction, Trigger};
+use sablier_utils::thread::{SerializableInstruction, Trigger};
 
 use crate::{constants::*, state::*};
 

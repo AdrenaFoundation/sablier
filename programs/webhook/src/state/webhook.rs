@@ -7,7 +7,7 @@ use std::{
 use anchor_lang::{prelude::*, AnchorDeserialize};
 use serde::{Deserialize, Serialize};
 
-use crate::{constants::SEED_WEBHOOK, errors::ClockworkError};
+use crate::{constants::SEED_WEBHOOK, errors::SablierError};
 
 #[account]
 #[derive(Debug, Deserialize, Serialize)]
@@ -69,13 +69,13 @@ impl FromStr for HttpMethod {
         match input.to_uppercase().as_str() {
             "GET" => Ok(HttpMethod::Get),
             "POST" => Ok(HttpMethod::Post),
-            _ => Err(ClockworkError::InvalidHttpMethod.into()),
+            _ => Err(SablierError::InvalidHttpMethod.into()),
         }
     }
 }
 
 #[derive(AnchorDeserialize, AnchorSerialize, Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub enum Relayer {
-    Clockwork,
+    Sablier,
     Custom(String),
 }

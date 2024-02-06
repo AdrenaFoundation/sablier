@@ -29,24 +29,24 @@ source = '''
   del(.grok_results)
 '''
 
-# Filter Solana logs for Clockwork logs
+# Filter Solana logs for Sablier logs
 [transforms.filter_solana_logs]
 inputs = ["parse_solana_logs"]
 type = "filter"
 condition = '''
-  .source == "clockwork_plugin::builders::thread_exec" ||
-  .source == "clockwork_plugin::executors::tx" ||
+  .source == "sablier_plugin::builders::thread_exec" ||
+  .source == "sablier_plugin::executors::tx" ||
   .source == "solana_validator" ||
   .source == "solana_core::validator" ||
   .source == "solana_metrics::metrics"
 '''
 
 # Parse program logs into JSON
-[transforms.parse_clockwork_logs]
+[transforms.parse_sablier_logs]
 type = "remap"
 inputs = ["filter_solana_logs"]
 source = '''
-  if .source == "clockwork_plugin::builders::thread_exec" {
+  if .source == "sablier_plugin::builders::thread_exec" {
     .grok_results = parse_groks!(
 	    .message,
 	    patterns: ["slot:%{SPACE}%{_slot} thread: %{_thread} simulation_error: %{_error} logs: %{_logs}"],
@@ -65,19 +65,19 @@ source = '''
   }
 '''
 
-# Filter for only Clockwork simulation logs
-[transforms.filter_clockwork_simulation_logs]
+# Filter for only Sablier simulation logs
+[transforms.filter_sablier_simulation_logs]
 type = "filter"
-inputs = ["parse_clockwork_logs"]
+inputs = ["parse_sablier_logs"]
 condition = '''
-  .source == "clockwork_plugin::builders::thread_exec" &&
+  .source == "sablier_plugin::builders::thread_exec" &&
     !is_null(.error_message)
 '''
 
-# Throttle Clockwork simulation logs
-[transforms.throttle_clockwork_simulation_logs]
+# Throttle Sablier simulation logs
+[transforms.throttle_sablier_simulation_logs]
 type = "throttle"
-inputs = ["filter_clockwork_simulation_logs"]
+inputs = ["filter_sablier_simulation_logs"]
 key_field = "{{ thread }}"
 threshold = 1
 window_secs = 30
@@ -120,22 +120,22 @@ source = '''
 # InfluxDB Sink
 [sinks.influxdb]
 type = "influxdb_logs"
-inputs = ["throttle_clockwork_simulation_logs"]
-endpoint = "" # InfluxDB 2.0 endpoint
-org = "" # InfluxDB organization name
-bucket = "" # InfluxDB bucket name
-measurement = "clockwork-logs" # InfluxDB table name
-token = "" # InfluxDB token
+inputs = ["throttle_sablier_simulation_logs"]
+endpoint = ""                                 # InfluxDB 2.0 endpoint
+org = ""                                      # InfluxDB organization name
+bucket = ""                                   # InfluxDB bucket name
+measurement = "sablier-logs"                  # InfluxDB table name
+token = ""                                    # InfluxDB token
 
 # InfluxDB Sink
 [sinks.influxdb_machine]
 type = "influxdb_logs"
 inputs = ["rename_fields"]
-endpoint = "" # InfluxDB 2.0 endpoint
-org = "" # InfluxDB organization name
-bucket = "" # InfluxDB bucket name
+endpoint = ""                # InfluxDB 2.0 endpoint
+org = ""                     # InfluxDB organization name
+bucket = ""                  # InfluxDB bucket name
 measurement = "machine-logs" # InfluxDB table name
-token = "" # InfluxDB token
+token = ""                   # InfluxDB token
 
 # Test Solana log parser
 [[tests]]
@@ -178,24 +178,24 @@ source = '''
   assert_eq!(.fields.cpu0_freq_mhz, "3717i")
 '''
 
-# Test Clockwork log parser
+# Test Sablier log parser
 [[tests]]
-name = "clockwork_simulation_test"
+name = "sablier_simulation_test"
 
 [[tests.inputs]]
 insert_at = "parse_solana_logs"
 type = "raw"
-value = '[2023-01-11T04:37:09.059509973Z INFO  clockwork_plugin::builders::thread_exec] slot: 215344020 thread: 9K4g3LYdwKhTJVQv85EvsAn7uHo5pSyq7qNs2FqrsD1K simulation_error: "Transaction results in an account (1) without insufficient funds for rent" logs: ["Program ComputeBudget111111111111111111111111111111 invoke [1]", "Program ComputeBudget111111111111111111111111111111 success", "Program 3XXuUFfweXBwFgFfYaejLvZE4cGZiHgKiGfMtdxNzYmv invoke [1]", "Program log: Instruction: ThreadKickoff", "Program 3XXuUFfweXBwFgFfYaejLvZE4cGZiHgKiGfMtdxNzYmv consumed 83495 of 1400000 compute units", "Program 3XXuUFfweXBwFgFfYaejLvZE4cGZiHgKiGfMtdxNzYmv success"]'
+value = '[2023-01-11T04:37:09.059509973Z INFO  sablier_plugin::builders::thread_exec] slot: 215344020 thread: 9K4g3LYdwKhTJVQv85EvsAn7uHo5pSyq7qNs2FqrsD1K simulation_error: "Transaction results in an account (1) without insufficient funds for rent" logs: ["Program ComputeBudget111111111111111111111111111111 invoke [1]", "Program ComputeBudget111111111111111111111111111111 success", "Program 3XXuUFfweXBwFgFfYaejLvZE4cGZiHgKiGfMtdxNzYmv invoke [1]", "Program log: Instruction: ThreadKickoff", "Program 3XXuUFfweXBwFgFfYaejLvZE4cGZiHgKiGfMtdxNzYmv consumed 83495 of 1400000 compute units", "Program 3XXuUFfweXBwFgFfYaejLvZE4cGZiHgKiGfMtdxNzYmv success"]'
 
 [[tests.outputs]]
-extract_from = "parse_clockwork_logs"
+extract_from = "parse_sablier_logs"
 
 [[tests.outputs.conditions]]
 type = "vrl"
 source = '''
   assert_eq!(.slot, "215344020")
   assert_eq!(.level, "INFO")
-  assert_eq!(.source, "clockwork_plugin::builders::thread_exec")
+  assert_eq!(.source, "sablier_plugin::builders::thread_exec")
   assert_eq!(.thread, "9K4g3LYdwKhTJVQv85EvsAn7uHo5pSyq7qNs2FqrsD1K")
   assert_eq!(.error_message, "\"Transaction results in an account (1) without insufficient funds for rent\"")
 '''

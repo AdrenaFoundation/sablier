@@ -1,5 +1,5 @@
 [package]
-name = "clockwork-utils"
+name = "sablier-utils"
 version.workspace = true
 description = "Tools for building blocks on Solana"
 edition.workspace = true
@@ -11,7 +11,7 @@ readme.workspace = true
 keywords.workspace = true
 
 [lib]
-name = "clockwork_utils"
+name = "sablier_utils"
 
 [dependencies]
 anchor-lang.workspace = true

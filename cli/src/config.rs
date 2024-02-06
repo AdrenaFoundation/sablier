@@ -8,13 +8,13 @@ use {
 pub const DEFAULT_RPC_TIMEOUT_SECONDS: Duration = Duration::from_secs(30);
 pub const DEFAULT_CONFIRM_TX_TIMEOUT_SECONDS: Duration = Duration::from_secs(5);
 pub const RELAYER_URL: &str = "http://localhost:8000/";
-pub const CLOCKWORK_RELEASE_BASE_URL: &str =
-    "https://github.com/clockwork-xyz/clockwork/releases/download";
-pub const CLOCKWORK_DEPS: &[&str] = &[
-    "clockwork_network_program.so",
-    "clockwork_thread_program.so",
-    "clockwork_webhook_program.so",
-    "libclockwork_plugin.so",
+pub const SABLIER_RELEASE_BASE_URL: &str =
+    "https://github.com/sablier-xyz/sablier/releases/download";
+pub const SABLIER_DEPS: &[&str] = &[
+    "sablier_network_program.so",
+    "sablier_thread_program.so",
+    "sablier_webhook_program.so",
+    "libsablier_plugin.so",
 ];
 pub const SOLANA_RELEASE_BASE_URL: &str = "https://github.com/solana-labs/solana/releases/download";
 pub const SOLANA_DEPS: &[&str] = &["solana-test-validator"];
@@ -54,7 +54,7 @@ impl CliConfig {
     pub fn default_home() -> PathBuf {
         dirs_next::home_dir()
             .map(|mut path| {
-                path.extend([".config", "clockwork"]);
+                path.extend([".config", "sablier"]);
                 path
             })
             .unwrap()
@@ -108,10 +108,10 @@ impl CliConfig {
 
     pub fn geyser_lib(&self) -> String {
         if self.dev && env::consts::OS.to_lowercase().contains("mac") {
-            self.active_runtime("libclockwork_plugin.dylib")
+            self.active_runtime("libsablier_plugin.dylib")
         } else {
             // in the release process, we always rename dylib to so anyway
-            self.active_runtime("libclockwork_plugin.so")
+            self.active_runtime("libsablier_plugin.so")
         }
     }
 }
@@ -126,7 +126,7 @@ impl PathToString for PathBuf {
     }
 }
 
-// Clockwork Deps Helpers
+// Sablier Deps Helpers
 impl CliConfig {
     // #[tokio::main]
     fn detect_target_triplet() -> String {
@@ -145,18 +145,18 @@ impl CliConfig {
             .to_owned()
     }
 
-    pub fn clockwork_release_url(tag: &str) -> String {
+    pub fn sablier_release_url(tag: &str) -> String {
         format!(
             "{}/{}/{}",
-            CLOCKWORK_RELEASE_BASE_URL,
+            SABLIER_RELEASE_BASE_URL,
             tag,
-            &Self::clockwork_release_archive()
+            &Self::sablier_release_archive()
         )
     }
 
-    pub fn clockwork_release_archive() -> String {
+    pub fn sablier_release_archive() -> String {
         let target_triplet = Self::detect_target_triplet();
-        format!("clockwork-geyser-plugin-release-{}.tar.bz2", target_triplet)
+        format!("sablier-geyser-plugin-release-{}.tar.bz2", target_triplet)
     }
 
     pub fn solana_release_url(tag: &str) -> String {

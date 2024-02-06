@@ -3,7 +3,7 @@ use anchor_spl::{
     associated_token::get_associated_token_address,
     token::{transfer, Token, TokenAccount, Transfer},
 };
-use clockwork_utils::thread::ThreadResponse;
+use sablier_utils::thread::ThreadResponse;
 
 use crate::{constants::*, state::*};
 

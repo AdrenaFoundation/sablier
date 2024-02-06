@@ -6,10 +6,10 @@ use std::{
 };
 
 use chrono::{DateTime, NaiveDateTime, Utc};
-use clockwork_cron::Schedule;
-use clockwork_thread_program::state::{Equality, Trigger, TriggerContext, VersionedThread};
 use log::info;
 use pyth_sdk_solana::PriceFeed;
+use sablier_cron::Schedule;
+use sablier_thread_program::state::{Equality, Trigger, TriggerContext, VersionedThread};
 use solana_geyser_plugin_interface::geyser_plugin_interface::{
     GeyserPluginError, Result as PluginResult,
 };

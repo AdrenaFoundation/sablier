@@ -4,7 +4,7 @@ use {
         prelude::*,
         system_program::{transfer, Transfer},
     },
-    clockwork_utils::account::AccountInfoExt,
+    sablier_utils::account::AccountInfoExt,
     std::mem::size_of,
 };
 

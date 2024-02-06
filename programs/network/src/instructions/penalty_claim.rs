@@ -37,7 +37,7 @@ pub fn handler(ctx: Context<PenaltyClaim>) -> Result<()> {
     let claimable_balance = lamport_balance - min_rent_balance;
     require!(
         claimable_balance > 0,
-        ClockworkError::InsufficientPenaltyBalance
+        SablierError::InsufficientPenaltyBalance
     );
 
     // Pay reimbursment for base transaction fee

@@ -1,10 +1,10 @@
-use crate::{constants::*, errors::ClockworkError, state::*};
+use crate::{constants::*, errors::SablierError, state::*};
 
 use anchor_lang::{
     prelude::*,
     system_program::{transfer, Transfer},
 };
-use clockwork_utils::account::AccountInfoExt;
+use sablier_utils::account::AccountInfoExt;
 
 /// Accounts required by the `thread_update` instruction.
 #[derive(Accounts)]
@@ -57,7 +57,7 @@ pub fn handler(ctx: Context<ThreadUpdate>, settings: ThreadSettings) -> Result<(
         // Require the thread is not in the middle of processing.
         require!(
             std::mem::discriminant(&thread.trigger) == std::mem::discriminant(&trigger),
-            ClockworkError::InvalidTriggerVariant
+            SablierError::InvalidTriggerVariant
         );
         thread.trigger = trigger.clone();
 

@@ -18,14 +18,14 @@ pub fn download_deps(
     runtime_dir: &Path,
     force_init: bool,
     solana_archive: Option<String>,
-    clockwork_archive: Option<String>,
+    sablier_archive: Option<String>,
     dev: bool,
 ) -> Result<()> {
     let solana_tag = env!("GEYSER_INTERFACE_VERSION").to_owned().to_tag_version();
-    let clockwork_tag = crate_version!().to_owned().to_tag_version();
+    let sablier_tag = crate_version!().to_owned().to_tag_version();
 
     // Create the version directory if it does not exist
-    let active_runtime = &runtime_dir.join(&clockwork_tag);
+    let active_runtime = &runtime_dir.join(&sablier_tag);
 
     download_and_extract(
         active_runtime,
@@ -37,9 +37,9 @@ pub fn download_deps(
     if !dev {
         download_and_extract(
             active_runtime,
-            &clockwork_archive.unwrap_or(CliConfig::clockwork_release_url(&clockwork_tag)),
-            &active_runtime.join(CliConfig::clockwork_release_archive()),
-            config::CLOCKWORK_DEPS,
+            &sablier_archive.unwrap_or(CliConfig::sablier_release_url(&sablier_tag)),
+            &active_runtime.join(CliConfig::sablier_release_archive()),
+            config::SABLIER_DEPS,
             force_init,
         )?;
     }

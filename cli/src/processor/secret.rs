@@ -1,8 +1,8 @@
 use anchor_lang::prelude::Pubkey;
-use clockwork_relayer_api::{
+use reqwest::header::CONTENT_TYPE;
+use sablier_relayer_api::{
     SecretApprove, SecretCreate, SecretGet, SecretList, SecretRevoke, SignedRequest,
 };
-use reqwest::header::CONTENT_TYPE;
 use solana_sdk::signer::Signer;
 
 use crate::{client::Client, errors::CliError};

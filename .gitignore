@@ -4,7 +4,7 @@
 target
 **/*.rs.bk
 
-# Clockwork
+# Sablier
 bin/
 lib/
 .env

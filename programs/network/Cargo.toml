@@ -1,7 +1,7 @@
 [package]
-name = "clockwork-network-program"
+name = "sablier-network-program"
 version.workspace = true
-description = "Clockwork networking protocol"
+description = "Sablier networking protocol"
 edition.workspace = true
 license.workspace = true
 homepage.workspace = true
@@ -12,7 +12,7 @@ keywords.workspace = true
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "clockwork_network_program"
+name = "sablier_network_program"
 
 [features]
 no-entrypoint = []
@@ -24,4 +24,4 @@ default = []
 [dependencies]
 anchor-lang.workspace = true
 anchor-spl = { features = ["mint", "token"], workspace = true }
-clockwork-utils.workspace = true
+sablier-utils.workspace = true

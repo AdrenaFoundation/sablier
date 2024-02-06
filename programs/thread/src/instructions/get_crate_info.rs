@@ -1,4 +1,4 @@
-use {anchor_lang::prelude::*, clockwork_utils::CrateInfo};
+use {anchor_lang::prelude::*, sablier_utils::CrateInfo};
 
 /// Accounts required for the `get_crate_info` instruction.
 /// We are not using system program actually
@@ -10,7 +10,7 @@ pub struct GetCrateInfo<'info> {
 
 pub fn handler(_ctx: Context<GetCrateInfo>) -> Result<CrateInfo> {
     let spec = format!(
-        "https://github.com/clockwork-xyz/clockwork/blob/v{}/programs/thread/Cargo.toml",
+        "https://github.com/sablier-xyz/sablier/blob/v{}/programs/thread/Cargo.toml",
         version!()
     );
     let blob = "";

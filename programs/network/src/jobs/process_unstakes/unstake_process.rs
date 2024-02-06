@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*, solana_program::instruction::Instruction, InstructionData};
 use anchor_spl::token::{transfer, Token, TokenAccount, Transfer};
-use clockwork_utils::thread::ThreadResponse;
+use sablier_utils::thread::ThreadResponse;
 
 use crate::{constants::*, errors::*, state::*};
 
@@ -82,7 +82,7 @@ pub fn handler(ctx: Context<UnstakeProcess>) -> Result<ThreadResponse> {
     // Verify the unstake amount is valid.
     require!(
         unstake.amount <= delegation.stake_amount,
-        ClockworkError::InvalidUnstakeAmount
+        SablierError::InvalidUnstakeAmount
     );
 
     // Transfer tokens from the worker to the authority.

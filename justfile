@@ -12,7 +12,7 @@ tarball:
 
 clean:
     cargo clean
-    rm -rfv bin target lib clockwork-geyser-plugin-release*
+    rm -rfv bin target lib sablier-geyser-plugin-release*
 
 re: clean
     just make
@@ -35,13 +35,13 @@ release-patch:
     gh workflow run bump-release.yaml -F bump=patch
 
 cli *args:
-    cargo run --bin clockwork {{args}}
+    cargo run --bin sablier {{args}}
 
 localnet *args: build
-    cargo run --bin clockwork localnet --dev {{args}}
+    cargo run --bin sablier localnet --dev {{args}}
 
 net:
-    cargo run --bin clockwork localnet --dev
+    cargo run --bin sablier localnet --dev
 
 logs:
     less test-ledger/validator.log
@@ -53,16 +53,16 @@ watch:
     cargo watch -c -x "check"
 
 watch-cli:
-    cargo watch -c -x "check --bin clockwork"
+    cargo watch -c -x "check --bin sablier"
 
 
 # links
 pr:
-    open https://github.com/clockwork-xyz/clockwork/pulls
+    open https://github.com/sablier-xyz/sablier/pulls
 
 actions:
-    open https://github.com/clockwork-xyz/clockwork/actions
+    open https://github.com/sablier-xyz/sablier/actions
 
 releases:
-    open https://github.com/clockwork-xyz/clockwork/releases
+    open https://github.com/sablier-xyz/sablier/releases
 

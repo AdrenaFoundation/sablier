@@ -59,7 +59,7 @@ pub enum Trigger {
 
     /// Allows a thread to be kicked off according to a one-time or recurring schedule.
     Cron {
-        /// The schedule in cron syntax. Value must be parsable by the `clockwork_cron` package.
+        /// The schedule in cron syntax. Value must be parsable by the `sablier_cron` package.
         schedule: String,
 
         /// Boolean value indicating whether triggering moments may be skipped if they are missed (e.g. due to network downtime).

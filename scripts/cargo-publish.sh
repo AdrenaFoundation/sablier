@@ -1,27 +1,27 @@
 #!/bin/bash
 
 # Publish shared libs
-cargo publish -p clockwork-cron
+cargo publish -p sablier-cron
 sleep 25
-cargo publish -p clockwork-macros
+cargo publish -p sablier-macros
 sleep 25
-cargo publish -p clockwork-utils
+cargo publish -p sablier-utils
 sleep 25
 
 # Publish programs
-cargo publish -p clockwork-network-program
+cargo publish -p sablier-network-program
 sleep 25
-cargo publish -p clockwork-thread-program
+cargo publish -p sablier-thread-program
 sleep 25
-cargo publish -p clockwork-webhook-program
+cargo publish -p sablier-webhook-program
 sleep 25
 
 # Publish SDK
-cargo publish -p clockwork-sdk
+cargo publish -p sablier-sdk
 sleep 25
 
 # Publish downstream bins and libs
 # These are most likely to fail due to Anchor dependency issues.
-cargo publish -p clockwork-client
+cargo publish -p sablier-client
 sleep 25
-cargo publish -p clockwork-cli
+cargo publish -p sablier-cli

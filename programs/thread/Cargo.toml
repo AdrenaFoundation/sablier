@@ -1,7 +1,7 @@
 [package]
-name = "clockwork-thread-program"
+name = "sablier-thread-program"
 version.workspace = true
-description = "Clockwork thread program"
+description = "Sablier thread program"
 edition.workspace = true
 license.workspace = true
 homepage.workspace = true
@@ -12,7 +12,7 @@ keywords.workspace = true
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "clockwork_thread_program"
+name = "sablier_thread_program"
 
 [features]
 no-entrypoint = []
@@ -24,8 +24,8 @@ default = []
 [dependencies]
 anchor-lang.workspace = true
 chrono = { workspace = true, features = ["alloc"] }
-clockwork-cron.workspace = true
-clockwork-network-program = { features = ["cpi"], workspace = true }
-clockwork-utils.workspace = true
+sablier-cron.workspace = true
+sablier-network-program = { features = ["cpi"], workspace = true }
+sablier-utils.workspace = true
 pyth-sdk-solana.workspace = true
 version.workspace = true

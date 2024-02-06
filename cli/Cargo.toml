@@ -1,7 +1,7 @@
 [package]
-name = "clockwork-cli"
+name = "sablier-cli"
 version.workspace = true
-description = "Command line interface for Clockwork"
+description = "Command line interface for Sablier"
 edition.workspace = true
 license.workspace = true
 homepage.workspace = true
@@ -18,13 +18,13 @@ anyhow.workspace = true
 bincode.workspace = true
 bzip2.workspace = true
 clap = { workspace = true, features = ["derive", "cargo"] }
-clockwork-cron.workspace = true
-clockwork-network-program = { workspace = true, features = ["no-entrypoint"] }
-clockwork-relayer-api.workspace = true
-clockwork-plugin-utils.workspace = true
-clockwork-thread-program = { workspace = true, features = ["no-entrypoint"] }
-clockwork-utils.workspace = true
-clockwork-webhook-program = { workspace = true, features = ["no-entrypoint"] }
+sablier-cron.workspace = true
+sablier-network-program = { workspace = true, features = ["no-entrypoint"] }
+sablier-relayer-api.workspace = true
+sablier-plugin-utils.workspace = true
+sablier-thread-program = { workspace = true, features = ["no-entrypoint"] }
+sablier-utils.workspace = true
+sablier-webhook-program = { workspace = true, features = ["no-entrypoint"] }
 chrono = { workspace = true, features = ["alloc"] }
 dirs-next.workspace = true
 indicatif.workspace = true
@@ -41,7 +41,7 @@ thiserror.workspace = true
 termcolor.workspace = true
 
 [[bin]]
-name = "clockwork"
+name = "sablier"
 path = "src/main.rs"
 
 [build-dependencies]

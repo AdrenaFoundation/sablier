@@ -40,7 +40,7 @@ pub fn handler(ctx: Context<ThreadWithdraw>, amount: u64) -> Result<()> {
 
     require!(
         post_balance > minimum_rent,
-        ClockworkError::WithdrawalTooLarge
+        SablierError::WithdrawalTooLarge
     );
 
     // Withdraw balance from thread to the pay_to account

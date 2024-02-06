@@ -1,6 +1,6 @@
 use clap::{crate_version, Arg, ArgGroup, Command};
-use clockwork_thread_program::state::{SerializableInstruction, Trigger};
-use clockwork_webhook_program::state::HttpMethod;
+use sablier_thread_program::state::{SerializableInstruction, Trigger};
+use sablier_webhook_program::state::HttpMethod;
 use solana_sdk::{pubkey::Pubkey, signature::Keypair};
 
 use crate::parser::ProgramInfo;
@@ -55,7 +55,7 @@ pub enum CliCommand {
         network_url: Option<String>,
         program_infos: Vec<ProgramInfo>,
         solana_archive: Option<String>,
-        clockwork_archive: Option<String>,
+        sablier_archive: Option<String>,
         dev: bool,
     },
 
@@ -148,14 +148,14 @@ pub enum CliCommand {
 }
 
 pub fn app() -> Command {
-    Command::new("Clockwork")
-        .bin_name("clockwork")
+    Command::new("Sablier")
+        .bin_name("sablier")
         .about("An automation engine for the Solana blockchain")
         .version(crate_version!())
         .arg_required_else_help(true)
         .subcommand(
             Command::new("config")
-                .about("Manage the Clockwork network config")
+                .about("Manage the Sablier network config")
                 .arg_required_else_help(true)
                 .subcommand(Command::new("get").about("Get a config value"))
                 .subcommand(
@@ -178,7 +178,7 @@ pub fn app() -> Command {
                         )
                         .group(
                             ArgGroup::new("config_settings")
-                                .args(&["admin", "epoch_thread", "hasher_thread"])
+                                .args(["admin", "epoch_thread", "hasher_thread"])
                                 .multiple(true),
                         ),
                 ),
@@ -196,7 +196,7 @@ pub fn app() -> Command {
         )
         .subcommand(
             Command::new("delegation")
-                .about("Manage a stake delegation to a Clockwork worker")
+                .about("Manage a stake delegation to a Sablier worker")
                 .subcommand(
                     Command::new("create")
                         .about("Create a new delegation")
@@ -306,7 +306,7 @@ pub fn app() -> Command {
         )
         .subcommand(
             Command::new("initialize")
-                .about("Initialize the Clockwork network program")
+                .about("Initialize the Sablier network program")
                 .arg(
                     Arg::new("mint")
                         .long("mint")
@@ -317,11 +317,11 @@ pub fn app() -> Command {
         )
         .subcommand(
             Command::new("localnet")
-                .about("Launch a local Clockwork worker for app development and testing")
+                .about("Launch a local Sablier worker for app development and testing")
                 .arg(
                     Arg::new("bpf_program")
                         .long("bpf-program")
-                        .value_names(&["ADDRESS_OR_KEYPAIR", "BPF_PROGRAM.SO"])
+                        .value_names(["ADDRESS_OR_KEYPAIR", "BPF_PROGRAM.SO"])
                         .num_args(1..)
                         .number_of_values(2)
                         .help(
@@ -334,7 +334,7 @@ pub fn app() -> Command {
                     Arg::new("clone")
                     .long("clone")
                     .short('c')
-                    .value_names(&["ADDRESS"])
+                    .value_names(["ADDRESS"])
                     .num_args(1..)
                     .number_of_values(1)
                     .help("Copy an account from the cluster referenced by the --url argument the genesis configuration. If the ledger already exists then this parameter is silently ignored")
@@ -343,7 +343,7 @@ pub fn app() -> Command {
                     Arg::new("url")
                     .long("url")
                     .short('u')
-                    .value_names(&["URL_OR_MONIKER"])
+                    .value_names(["URL_OR_MONIKER"])
                     .num_args(1)
                     .number_of_values(1)
                     .help("URL for Solana's JSON RPC or moniker (or their first letter): [mainnet-beta, testnet, devnet, localhost]")
@@ -361,22 +361,22 @@ pub fn app() -> Command {
                      ")
                 )
                 .arg(
-                Arg::new("clockwork_archive")
-                    .long("clockwork-archive")
+                Arg::new("sablier_archive")
+                    .long("sablier-archive")
                     .help("url or local path to the solana archive containing the necessary \
                      dependencies such as clocwkork-thread-program, etc. \
-                     Can be useful for debugging or testing different versions of clockwork releases
+                     Can be useful for debugging or testing different versions of sablier releases
                      ")
                 )
                 .arg(
                     Arg::new("dev")
                         .long("dev")
-                        .help("Use development versions of clockwork programs")
+                        .help("Use development versions of sablier programs")
                     )
         )
         .subcommand(
             Command::new("pool")
-                .about("Manage the Clockwork network worker pools")
+                .about("Manage the Sablier network worker pools")
                 .subcommand(
                     Command::new("get")
                         .about("Get a pool")
@@ -539,7 +539,7 @@ pub fn app() -> Command {
                         )
                         .group(
                             ArgGroup::new("trigger")
-                                .args(&["account", "cron", "immediate"])
+                                .args(["account", "cron", "immediate"])
                                 .required(true),
                         ),
                 )
@@ -629,14 +629,14 @@ pub fn app() -> Command {
         )
         .subcommand(
             Command::new("registry")
-                .about("Manage the Clockwork network registry")
+                .about("Manage the Sablier network registry")
                 .arg_required_else_help(true)
                 .subcommand(Command::new("get").about("Lookup the registry"))
                 .subcommand(Command::new("unlock").about("Manually unlock the registry")),
         )
         .subcommand(
             Command::new("snapshot")
-                .about("Lookup the current Clockwork network registry")
+                .about("Lookup the current Sablier network registry")
         )
         .subcommand(
             Command::new("webhook")
@@ -697,7 +697,7 @@ pub fn app() -> Command {
                 .arg_required_else_help(true)
                 .subcommand(
                     Command::new("create")
-                        .about("Register a new worker with the Clockwork network")
+                        .about("Register a new worker with the Sablier network")
                         .arg(
                             Arg::new("signatory_keypair")
                                 .index(1)
@@ -707,7 +707,7 @@ pub fn app() -> Command {
                 )
                 .subcommand(
                     Command::new("get")
-                        .about("Lookup a worker on the Clockwork network")
+                        .about("Lookup a worker on the Sablier network")
                         .arg(
                             Arg::new("id")
                                 .index(1)

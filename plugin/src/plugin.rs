@@ -12,11 +12,11 @@ use crate::{
     config::PluginConfig, events::AccountUpdateEvent, executors::Executors, observers::Observers,
 };
 
-pub struct ClockworkPlugin {
+pub struct SablierPlugin {
     pub inner: Arc<Inner>,
 }
 
-impl Debug for ClockworkPlugin {
+impl Debug for SablierPlugin {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "inner: {:?}", self.inner)
     }
@@ -30,22 +30,22 @@ pub struct Inner {
     pub runtime: Arc<Runtime>,
 }
 
-impl GeyserPlugin for ClockworkPlugin {
+impl GeyserPlugin for SablierPlugin {
     fn name(&self) -> &'static str {
-        "clockwork-plugin"
+        "sablier-plugin"
     }
 
     fn on_load(&mut self, config_file: &str) -> PluginResult<()> {
         solana_logger::setup_with_default("info");
         info!(
-            "clockwork-plugin crate-info - spec: {}, geyser_interface_version: {}, rustc: {}",
+            "sablier-plugin crate-info - spec: {}, geyser_interface_version: {}, rustc: {}",
             env!("SPEC"),
             env!("GEYSER_INTERFACE_VERSION"),
             env!("RUSTC_VERSION")
         );
         info!("Loading snapshot...");
         let config = PluginConfig::read_from(config_file)?;
-        *self = ClockworkPlugin::new_from_config(config);
+        *self = SablierPlugin::new_from_config(config);
         Ok(())
     }
 
@@ -197,7 +197,7 @@ impl GeyserPlugin for ClockworkPlugin {
     }
 }
 
-impl ClockworkPlugin {
+impl SablierPlugin {
     fn new_from_config(config: PluginConfig) -> Self {
         let runtime = build_runtime(config.clone());
         let observers = Arc::new(Observers::new());
@@ -213,7 +213,7 @@ impl ClockworkPlugin {
     }
 }
 
-impl Default for ClockworkPlugin {
+impl Default for SablierPlugin {
     fn default() -> Self {
         Self::new_from_config(PluginConfig::default())
     }
@@ -232,7 +232,7 @@ fn build_runtime(config: PluginConfig) -> Arc<Runtime> {
     Arc::new(
         Builder::new_multi_thread()
             .enable_all()
-            .thread_name("clockwork-plugin")
+            .thread_name("sablier-plugin")
             .worker_threads(config.thread_count)
             .max_blocking_threads(config.thread_count)
             .build()

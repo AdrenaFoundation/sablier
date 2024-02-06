@@ -1,5 +1,5 @@
 [package]
-name = "clockwork-sdk"
+name = "sablier-sdk"
 version.workspace = true
 description = "An SDK for building automated programs on Solana"
 edition.workspace = true
@@ -11,11 +11,11 @@ readme.workspace = true
 keywords.workspace = true
 
 [lib]
-name = "clockwork_sdk"
+name = "sablier_sdk"
 
 [dependencies]
 anchor-lang.workspace = true
-clockwork-thread-program = { workspace = true, features = ["cpi"] }
+sablier-thread-program = { workspace = true, features = ["cpi"] }
 
 [features]
 default = []

@@ -6,10 +6,10 @@ use std::{
 
 use anchor_lang::prelude::*;
 use chrono::{DateTime, NaiveDateTime, Utc};
-use clockwork_cron::Schedule;
-use clockwork_network_program::state::{Worker, WorkerAccount};
-use clockwork_utils::thread::Trigger;
 use pyth_sdk_solana::load_price_feed_from_account_info;
+use sablier_cron::Schedule;
+use sablier_network_program::state::{Worker, WorkerAccount};
+use sablier_utils::thread::Trigger;
 
 use crate::{constants::*, errors::*, state::*};
 
@@ -29,8 +29,8 @@ pub struct ThreadKickoff<'info> {
             thread.id.as_slice(),
         ],
         bump = thread.bump,
-        constraint = !thread.paused @ ClockworkError::ThreadPaused,
-        constraint = thread.next_instruction.is_none() @ ClockworkError::ThreadBusy,
+        constraint = !thread.paused @ SablierError::ThreadPaused,
+        constraint = thread.next_instruction.is_none() @ SablierError::ThreadBusy,
     )]
     pub thread: Box<Account<'info, Thread>>,
 
@@ -54,13 +54,13 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
             // Verify proof that account data has been updated.
             match ctx.remaining_accounts.first() {
                 None => {
-                    return Err(ClockworkError::TriggerConditionFailed.into());
+                    return Err(SablierError::TriggerConditionFailed.into());
                 }
                 Some(account_info) => {
                     // Verify the remaining account is the account this thread is listening for.
                     require!(
                         address.eq(account_info.key),
-                        ClockworkError::TriggerConditionFailed
+                        SablierError::TriggerConditionFailed
                     );
 
                     // Begin computing the data hash of this account.
@@ -83,10 +83,10 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                             } => {
                                 require!(
                                     data_hash.ne(&prior_data_hash),
-                                    ClockworkError::TriggerConditionFailed
+                                    SablierError::TriggerConditionFailed
                                 )
                             }
-                            _ => return Err(ClockworkError::InvalidThreadState.into()),
+                            _ => return Err(SablierError::InvalidThreadState.into()),
                         }
                     }
 
@@ -110,16 +110,16 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                 None => thread.created_at.unix_timestamp,
                 Some(exec_context) => match exec_context.trigger_context {
                     TriggerContext::Cron { started_at } => started_at,
-                    _ => return Err(ClockworkError::InvalidThreadState.into()),
+                    _ => return Err(SablierError::InvalidThreadState.into()),
                 },
             };
 
             // Verify the current timestamp is greater than or equal to the threshold timestamp.
             let threshold_timestamp = next_timestamp(reference_timestamp, schedule.clone())
-                .ok_or(ClockworkError::TriggerConditionFailed)?;
+                .ok_or(SablierError::TriggerConditionFailed)?;
             require!(
                 clock.unix_timestamp.ge(&threshold_timestamp),
-                ClockworkError::TriggerConditionFailed
+                SablierError::TriggerConditionFailed
             );
 
             // If the schedule is marked as skippable, set the started_at of the exec context to be the current timestamp.
@@ -143,7 +143,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
             // Set the exec context.
             require!(
                 thread.exec_context.is_none(),
-                ClockworkError::InvalidThreadState
+                SablierError::InvalidThreadState
             );
             thread.exec_context = Some(ExecContext {
                 exec_index: 0,
@@ -154,7 +154,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
             });
         }
         Trigger::Slot { slot } => {
-            require!(clock.slot.ge(&slot), ClockworkError::TriggerConditionFailed);
+            require!(clock.slot.ge(&slot), SablierError::TriggerConditionFailed);
             thread.exec_context = Some(ExecContext {
                 exec_index: 0,
                 execs_since_reimbursement: 0,
@@ -164,10 +164,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
             });
         }
         Trigger::Epoch { epoch } => {
-            require!(
-                clock.epoch.ge(&epoch),
-                ClockworkError::TriggerConditionFailed
-            );
+            require!(clock.epoch.ge(&epoch), SablierError::TriggerConditionFailed);
             thread.exec_context = Some(ExecContext {
                 exec_index: 0,
                 execs_since_reimbursement: 0,
@@ -179,7 +176,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
         Trigger::Timestamp { unix_ts } => {
             require!(
                 clock.unix_timestamp.ge(&unix_ts),
-                ClockworkError::TriggerConditionFailed
+                SablierError::TriggerConditionFailed
             );
             thread.exec_context = Some(ExecContext {
                 exec_index: 0,
@@ -199,12 +196,12 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
             // Verify price limit has been reached.
             match ctx.remaining_accounts.first() {
                 None => {
-                    return Err(ClockworkError::TriggerConditionFailed.into());
+                    return Err(SablierError::TriggerConditionFailed.into());
                 }
                 Some(account_info) => {
                     require!(
                         price_feed_pubkey.eq(account_info.key),
-                        ClockworkError::TriggerConditionFailed
+                        SablierError::TriggerConditionFailed
                     );
                     const STALENESS_THRESHOLD: u64 = 60; // staleness threshold in seconds
                     let price_feed = load_price_feed_from_account_info(account_info).unwrap();
@@ -216,7 +213,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                         Equality::GreaterThanOrEqual => {
                             require!(
                                 current_price.price.ge(&limit),
-                                ClockworkError::TriggerConditionFailed
+                                SablierError::TriggerConditionFailed
                             );
                             thread.exec_context = Some(ExecContext {
                                 exec_index: 0,
@@ -231,7 +228,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                         Equality::LessThanOrEqual => {
                             require!(
                                 current_price.price.le(&limit),
-                                ClockworkError::TriggerConditionFailed
+                                SablierError::TriggerConditionFailed
                             );
                             thread.exec_context = Some(ExecContext {
                                 exec_index: 0,

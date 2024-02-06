@@ -3,7 +3,7 @@ use anchor_lang::{
     solana_program::{instruction::Instruction, system_program},
     InstructionData,
 };
-use clockwork_utils::thread::{ThreadResponse, PAYER_PUBKEY};
+use sablier_utils::thread::{ThreadResponse, PAYER_PUBKEY};
 
 use crate::state::*;
 

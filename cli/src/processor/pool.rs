@@ -2,7 +2,7 @@ use anchor_lang::{
     solana_program::{instruction::Instruction, system_program},
     InstructionData, ToAccountMetas,
 };
-use clockwork_network_program::state::{Config, Pool, PoolSettings, Registry};
+use sablier_network_program::state::{Config, Pool, PoolSettings, Registry};
 
 use crate::{client::Client, errors::CliError};
 
@@ -36,8 +36,8 @@ pub fn update(client: &Client, id: u64, size: usize) -> Result<(), CliError> {
     let pool_pubkey = Pool::pubkey(id);
     let settings = PoolSettings { size };
     let ix = Instruction {
-        program_id: clockwork_network_program::ID,
-        accounts: clockwork_network_program::accounts::PoolUpdate {
+        program_id: sablier_network_program::ID,
+        accounts: sablier_network_program::accounts::PoolUpdate {
             admin: client.payer_pubkey(),
             config: Config::pubkey(),
             payer: client.payer_pubkey(),
@@ -45,7 +45,7 @@ pub fn update(client: &Client, id: u64, size: usize) -> Result<(), CliError> {
             system_program: system_program::ID,
         }
         .to_account_metas(Some(false)),
-        data: clockwork_network_program::instruction::PoolUpdate { settings }.data(),
+        data: sablier_network_program::instruction::PoolUpdate { settings }.data(),
     };
     client.send_and_confirm(&[ix], &[client.payer()]).unwrap();
     get(client, id)?;
