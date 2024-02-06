@@ -19,7 +19,6 @@ license = "AGPL-3.0-or-later"
 homepage = "https://sablier.dev"
 repository = "https://github.com/sablier-xyz/sablier"
 documentation = "https://docs.sablier.dev"
-readme = "./README.md"
 keywords = ["solana"]
 
 [workspace.dependencies]
