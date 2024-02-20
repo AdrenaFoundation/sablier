@@ -81,15 +81,15 @@ mod tests {
         let starting_date = Utc.with_ymd_and_hms(2023, 3, 1, 14, 29, 36).unwrap();
         let mut events = schedule.after(&starting_date);
         assert_eq!(
-            Utc.with_ymd_and_hms(2023, 03, 03, 0, 0, 0).unwrap(),
+            Utc.with_ymd_and_hms(2023, 3, 3, 0, 0, 0).unwrap(),
             events.next().unwrap()
         );
         assert_eq!(
-            Utc.with_ymd_and_hms(2023, 03, 10, 0, 0, 0).unwrap(),
+            Utc.with_ymd_and_hms(2023, 3, 10, 0, 0, 0).unwrap(),
             events.next().unwrap()
         );
         assert_eq!(
-            Utc.with_ymd_and_hms(2023, 03, 17, 0, 0, 0).unwrap(),
+            Utc.with_ymd_and_hms(2023, 3, 17, 0, 0, 0).unwrap(),
             events.next().unwrap()
         );
     }

@@ -6,8 +6,6 @@ use sablier_utils::{
     thread::{ClockData, SerializableInstruction, Trigger},
 };
 
-pub use sablier_utils::thread::Equality;
-
 use crate::constants::{NEXT_INSTRUCTION_SIZE, SEED_THREAD};
 
 /// Tracks the current state of a transaction thread on Solana.

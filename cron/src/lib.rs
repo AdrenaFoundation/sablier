@@ -7,23 +7,21 @@
 //! use chrono::{DateTime, NaiveDateTime, Utc};
 //! use std::str::FromStr;
 //!
-//! fn main() {
-//!   //               sec  min   hour   day of month   month   day of week   year
-//!   let expression = "0   30   9,12,15     1,15       May-Aug  Mon,Wed,Fri  2018/2";
-//!   let schedule = Schedule::from_str(expression).unwrap();
-//!   let ts = 1234567890;
-//!   let next_ts = match schedule
-//!     .after(&DateTime::<Utc>::from_utc(
-//!         NaiveDateTime::from_timestamp(ts, 0),
-//!         Utc,
-//!     ))
-//!     .take(1)
-//!     .next()
-//!     {
-//!         Some(datetime) => Some(datetime.timestamp()),
-//!         None => None,
-//!     };
-//! }
+//!  //               sec  min   hour   day of month   month   day of week   year
+//!  let expression = "0   30   9,12,15     1,15       May-Aug  Mon,Wed,Fri  2018/2";
+//!  let schedule = Schedule::from_str(expression).unwrap();
+//!  let ts = 1234567890;
+//!  let next_ts = match schedule
+//!    .after(&DateTime::<Utc>::from_utc(
+//!        NaiveDateTime::from_timestamp(ts, 0),
+//!        Utc,
+//!    ))
+//!    .take(1)
+//!    .next()
+//!    {
+//!        Some(datetime) => Some(datetime.timestamp()),
+//!        None => None,
+//!    };
 //!
 //! /*
 //! Upcoming fire times:
