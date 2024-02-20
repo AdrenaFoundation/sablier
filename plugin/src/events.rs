@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::AccountInfo, AccountDeserialize, Discriminator};
 use bincode::deserialize;
-use pyth_sdk_solana::{load_price_feed_from_account_info, PriceFeed};
+use pyth_sdk_solana::{state::SolanaPriceAccount, PriceFeed};
 use sablier_thread_program::state::{Thread, VersionedThread};
 use sablier_webhook_program::state::Webhook;
 use solana_geyser_plugin_interface::geyser_plugin_interface::{
@@ -71,7 +71,7 @@ impl TryFrom<&mut ReplicaAccountInfo<'_>> for AccountUpdateEvent {
                 account_info.executable,
                 account_info.rent_epoch,
             );
-            let price_feed = load_price_feed_from_account_info(&acc_info).map_err(|_| {
+            let price_feed = SolanaPriceAccount::account_info_to_feed(&acc_info).map_err(|_| {
                 GeyserPluginError::AccountsUpdateError {
                     msg: "Failed to parse Pyth price account".into(),
                 }

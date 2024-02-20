@@ -143,7 +143,7 @@ pub async fn build_thread_exec_tx(
 
                 // Parse the resulting thread account for the next instruction to simulate.
                 if let Some(ui_accounts) = response.value.accounts {
-                    if let Some(Some(ui_account)) = ui_accounts.get(0) {
+                    if let Some(Some(ui_account)) = ui_accounts.first() {
                         if let Some(account) = ui_account.decode::<Account>() {
                             if let Ok(sim_thread) = VersionedThread::try_from(account.data) {
                                 if sim_thread.next_instruction().is_some() {

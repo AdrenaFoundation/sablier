@@ -28,16 +28,30 @@ use {
     std::process::{Child, Command},
 };
 
+pub struct LocalnetStartArgs<'a> {
+    pub config: &'a mut CliConfig,
+    pub client: &'a Client,
+    pub clone_addresses: Vec<Pubkey>,
+    pub network_url: Option<String>,
+    pub program_infos: Vec<ProgramInfo>,
+    pub force_init: bool,
+    pub solana_archive: Option<String>,
+    pub sablier_archive: Option<String>,
+    pub dev: bool,
+}
+
 pub fn start(
-    config: &mut CliConfig,
-    client: &Client,
-    clone_addresses: Vec<Pubkey>,
-    network_url: Option<String>,
-    program_infos: Vec<ProgramInfo>,
-    force_init: bool,
-    solana_archive: Option<String>,
-    sablier_archive: Option<String>,
-    dev: bool,
+    LocalnetStartArgs {
+        config,
+        client,
+        clone_addresses,
+        network_url,
+        program_infos,
+        force_init,
+        solana_archive,
+        sablier_archive,
+        dev,
+    }: LocalnetStartArgs<'_>,
 ) -> Result<(), CliError> {
     config.dev = dev;
     deps::download_deps(

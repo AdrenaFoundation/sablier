@@ -2,7 +2,7 @@
 name = "sablier_plugin"
 version.workspace = true
 # this needs to match whatever solana uses!
-rust-version = "1.73.0"
+rust-version = "1.76.0"
 description = "Sablier plugin for Solana validators"
 edition.workspace = true
 license.workspace = true

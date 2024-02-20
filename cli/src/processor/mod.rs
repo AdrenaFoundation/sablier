@@ -20,6 +20,8 @@ use crate::{
     processor::thread::parse_pubkey_from_id_or_address,
 };
 
+use self::localnet::LocalnetStartArgs;
+
 pub fn process(matches: &ArgMatches) -> Result<(), CliError> {
     // Parse command and config
     let command = CliCommand::try_from(matches)?;
@@ -75,9 +77,9 @@ pub fn process(matches: &ArgMatches) -> Result<(), CliError> {
             solana_archive,
             sablier_archive,
             dev,
-        } => localnet::start(
-            &mut config,
-            &client,
+        } => localnet::start(LocalnetStartArgs {
+            config: &mut config,
+            client: &client,
             clone_addresses,
             network_url,
             program_infos,
@@ -85,7 +87,7 @@ pub fn process(matches: &ArgMatches) -> Result<(), CliError> {
             solana_archive,
             sablier_archive,
             dev,
-        ),
+        }),
         CliCommand::PoolGet { id } => pool::get(&client, id),
         CliCommand::PoolList {} => pool::list(&client),
         CliCommand::PoolUpdate { id, size } => pool::update(&client, id, size),
