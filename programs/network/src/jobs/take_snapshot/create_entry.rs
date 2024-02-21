@@ -71,6 +71,7 @@ pub struct TakeSnapshotCreateEntry<'info> {
 
 pub fn handler(ctx: Context<TakeSnapshotCreateEntry>) -> Result<ThreadResponse> {
     // Get accounts.
+    let config_key = ctx.accounts.config.key();
     let config = &ctx.accounts.config.load()?;
     let delegation = &ctx.accounts.delegation;
     let registry = &ctx.accounts.registry;
@@ -102,7 +103,7 @@ pub fn handler(ctx: Context<TakeSnapshotCreateEntry>) -> Result<ThreadResponse> 
             Instruction {
                 program_id: crate::ID,
                 accounts: crate::accounts::TakeSnapshotCreateEntry {
-                    config: ctx.accounts.config.key(),
+                    config: config_key,
                     delegation: next_delegation_pubkey,
                     payer: PAYER_PUBKEY,
                     registry: registry.key(),
@@ -127,7 +128,7 @@ pub fn handler(ctx: Context<TakeSnapshotCreateEntry>) -> Result<ThreadResponse> 
             Instruction {
                 program_id: crate::ID,
                 accounts: crate::accounts::TakeSnapshotCreateFrame {
-                    config: ctx.accounts.config.key(),
+                    config: config_key,
                     payer: PAYER_PUBKEY,
                     registry: registry.key(),
                     snapshot: snapshot.key(),

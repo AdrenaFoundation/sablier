@@ -24,7 +24,8 @@ pub struct UnstakePreprocess<'info> {
 
 pub fn handler(ctx: Context<UnstakePreprocess>) -> Result<ThreadResponse> {
     // Get accounts.
-    let config = &ctx.accounts.config;
+    let config_key = ctx.accounts.config.key();
+    let config = &ctx.accounts.config.load()?;
     let registry = &ctx.accounts.registry;
     let thread = &ctx.accounts.thread;
     let unstake = &ctx.accounts.unstake;
@@ -38,19 +39,16 @@ pub fn handler(ctx: Context<UnstakePreprocess>) -> Result<ThreadResponse> {
                     authority: unstake.authority,
                     authority_tokens: get_associated_token_address(
                         &unstake.authority,
-                        &config.load()?.mint,
+                        &config.mint,
                     ),
-                    config: config.key(),
+                    config: config_key,
                     delegation: unstake.delegation,
                     registry: registry.key(),
                     thread: thread.key(),
                     token_program: anchor_spl::token::ID,
                     unstake: unstake.key(),
                     worker: unstake.worker,
-                    worker_tokens: get_associated_token_address(
-                        &unstake.worker,
-                        &config.load()?.mint,
-                    ),
+                    worker_tokens: get_associated_token_address(&unstake.worker, &config.mint),
                 }
                 .to_account_metas(Some(true)),
                 data: crate::instruction::UnstakeProcess {}.data(),
