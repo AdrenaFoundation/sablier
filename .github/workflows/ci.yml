@@ -1,0 +1,66 @@
+name: Lints and Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  SOLANA_CLI_VERSION: 1.18.2
+  ANCHOR_CLI_VERSION: 0.29.0
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Setup Solana CLI
+        uses: ./.github/actions/setup-solana/
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Setup Anchor CLI
+        run: npm install -g @coral-xyz/anchor-cli@${{ env.ANCHOR_CLI_VERSION }}
+      - name: Cargo tests
+        run: cargo test
+        env:
+          RUST_BACKTRACE: 1
+      - name: Anchor tests
+        run: anchor test
+        timeout-minutes: 10
+
+  lints:
+    name: Lints
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          
+      - name: Run cargo fmt
+        run: cargo fmt --all -- --check
+
+      - name: Run cargo clippy
+        run: cargo clippy --all-targets -- -D warnings
