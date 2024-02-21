@@ -5,11 +5,11 @@ use {
 
 #[derive(Accounts)]
 pub struct PenaltyClaim<'info> {
-    #[account(address = config.admin)]
+    #[account(address = config.load()?.admin)]
     pub admin: Signer<'info>,
 
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(mut)]
     pub pay_to: SystemAccount<'info>,

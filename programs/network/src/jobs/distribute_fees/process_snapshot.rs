@@ -24,7 +24,7 @@ use crate::{constants::*, state::*};
 #[derive(Accounts)]
 pub struct DistributeFeesProcessSnapshot<'info> {
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(seeds = [SEED_REGISTRY], bump)]
     pub registry: Account<'info, Registry>,
@@ -35,7 +35,7 @@ pub struct DistributeFeesProcessSnapshot<'info> {
     )]
     pub snapshot: Account<'info, Snapshot>,
 
-    #[account(address = config.epoch_thread)]
+    #[account(address = config.load()?.epoch_thread)]
     pub thread: Signer<'info>,
 }
 

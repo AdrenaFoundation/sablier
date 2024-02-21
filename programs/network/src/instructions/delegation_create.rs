@@ -13,7 +13,7 @@ pub struct DelegationCreate<'info> {
     pub authority: Signer<'info>,
 
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(
         init,
@@ -36,7 +36,7 @@ pub struct DelegationCreate<'info> {
     )]
     pub delegation_tokens: Account<'info, TokenAccount>,
 
-    #[account(address = config.mint)]
+    #[account(address = config.load()?.mint)]
     pub mint: Account<'info, Mint>,
 
     #[account(

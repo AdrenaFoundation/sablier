@@ -16,7 +16,7 @@ pub struct Initialize<'info> {
         payer = admin,
         space = 8 + Config::INIT_SPACE,
     )]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     pub mint: Account<'info, Mint>,
 

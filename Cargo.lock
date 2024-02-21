@@ -3600,6 +3600,7 @@ version = "1.0.0-alpha.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
+ "bytemuck",
  "sablier-utils",
 ]
 

@@ -14,7 +14,7 @@ pub struct ConfigUpdate<'info> {
         bump,
         has_one = admin
     )]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 }
 
 pub fn handler(ctx: Context<ConfigUpdate>, settings: ConfigSettings) -> Result<()> {

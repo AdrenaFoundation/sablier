@@ -7,7 +7,7 @@ use crate::state::*;
 #[derive(Accounts)]
 pub struct UnstakePreprocess<'info> {
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(
         address = Registry::pubkey(),
@@ -15,7 +15,7 @@ pub struct UnstakePreprocess<'info> {
     )]
     pub registry: Account<'info, Registry>,
 
-    #[account(address = config.epoch_thread)]
+    #[account(address = config.load()?.epoch_thread)]
     pub thread: Signer<'info>,
 
     #[account(address = unstake.pubkey())]
@@ -38,7 +38,7 @@ pub fn handler(ctx: Context<UnstakePreprocess>) -> Result<ThreadResponse> {
                     authority: unstake.authority,
                     authority_tokens: get_associated_token_address(
                         &unstake.authority,
-                        &config.mint,
+                        &config.load()?.mint,
                     ),
                     config: config.key(),
                     delegation: unstake.delegation,
@@ -47,7 +47,10 @@ pub fn handler(ctx: Context<UnstakePreprocess>) -> Result<ThreadResponse> {
                     token_program: anchor_spl::token::ID,
                     unstake: unstake.key(),
                     worker: unstake.worker,
-                    worker_tokens: get_associated_token_address(&unstake.worker, &config.mint),
+                    worker_tokens: get_associated_token_address(
+                        &unstake.worker,
+                        &config.load()?.mint,
+                    ),
                 }
                 .to_account_metas(Some(true)),
                 data: crate::instruction::UnstakeProcess {}.data(),

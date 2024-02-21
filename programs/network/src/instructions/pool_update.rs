@@ -17,7 +17,7 @@ pub struct PoolUpdate<'info> {
         address = Config::pubkey(),
         has_one = admin
     )]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(mut)]
     pub payer: Signer<'info>,

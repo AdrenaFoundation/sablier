@@ -11,12 +11,12 @@ pub struct UnstakeProcess<'info> {
     #[account(
         mut,
         associated_token::authority = delegation.authority,
-        associated_token::mint = config.mint,
+        associated_token::mint = config.load()?.mint,
     )]
     pub authority_tokens: Account<'info, TokenAccount>,
 
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(
         mut,
@@ -38,7 +38,7 @@ pub struct UnstakeProcess<'info> {
     )]
     pub registry: Account<'info, Registry>,
 
-    #[account(address = config.epoch_thread)]
+    #[account(address = config.load()?.epoch_thread)]
     pub thread: Signer<'info>,
 
     pub token_program: Program<'info, Token>,
@@ -61,7 +61,7 @@ pub struct UnstakeProcess<'info> {
     #[account(
         mut,
         associated_token::authority = worker,
-        associated_token::mint = config.mint,
+        associated_token::mint = config.load()?.mint,
     )]
     pub worker_tokens: Account<'info, TokenAccount>,
 }

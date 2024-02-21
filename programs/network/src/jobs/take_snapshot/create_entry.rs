@@ -7,7 +7,7 @@ use crate::{constants::*, state::*};
 #[derive(Accounts)]
 pub struct TakeSnapshotCreateEntry<'info> {
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(
         address = delegation.pubkey(),
@@ -59,7 +59,7 @@ pub struct TakeSnapshotCreateEntry<'info> {
 
     pub system_program: Program<'info, System>,
 
-    #[account(address = config.epoch_thread)]
+    #[account(address = config.load()?.epoch_thread)]
     pub thread: Signer<'info>,
 
     #[account(
@@ -71,7 +71,7 @@ pub struct TakeSnapshotCreateEntry<'info> {
 
 pub fn handler(ctx: Context<TakeSnapshotCreateEntry>) -> Result<ThreadResponse> {
     // Get accounts.
-    let config = &ctx.accounts.config;
+    let config = &ctx.accounts.config.load()?;
     let delegation = &ctx.accounts.delegation;
     let registry = &ctx.accounts.registry;
     let snapshot = &mut ctx.accounts.snapshot;
@@ -102,7 +102,7 @@ pub fn handler(ctx: Context<TakeSnapshotCreateEntry>) -> Result<ThreadResponse> 
             Instruction {
                 program_id: crate::ID,
                 accounts: crate::accounts::TakeSnapshotCreateEntry {
-                    config: config.key(),
+                    config: ctx.accounts.config.key(),
                     delegation: next_delegation_pubkey,
                     payer: PAYER_PUBKEY,
                     registry: registry.key(),
@@ -127,7 +127,7 @@ pub fn handler(ctx: Context<TakeSnapshotCreateEntry>) -> Result<ThreadResponse> 
             Instruction {
                 program_id: crate::ID,
                 accounts: crate::accounts::TakeSnapshotCreateFrame {
-                    config: config.key(),
+                    config: ctx.accounts.config.key(),
                     payer: PAYER_PUBKEY,
                     registry: registry.key(),
                     snapshot: snapshot.key(),

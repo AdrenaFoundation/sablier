@@ -6,7 +6,7 @@ use crate::{constants::*, state::*};
 #[derive(Accounts)]
 pub struct DistributeFeesJob<'info> {
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(
         mut,
@@ -15,7 +15,7 @@ pub struct DistributeFeesJob<'info> {
     )]
     pub registry: Account<'info, Registry>,
 
-    #[account(address = config.epoch_thread)]
+    #[account(address = config.load()?.epoch_thread)]
     pub thread: Signer<'info>,
 }
 

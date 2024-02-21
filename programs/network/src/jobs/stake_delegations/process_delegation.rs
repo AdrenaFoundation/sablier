@@ -10,7 +10,7 @@ use crate::{constants::*, state::*};
 #[derive(Accounts)]
 pub struct StakeDelegationsProcessDelegation<'info> {
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(
         mut,
@@ -27,7 +27,7 @@ pub struct StakeDelegationsProcessDelegation<'info> {
     #[account(
         mut,
         associated_token::authority = delegation,
-        associated_token::mint = config.mint,
+        associated_token::mint = config.load()?.mint,
     )]
     pub delegation_stake: Account<'info, TokenAccount>,
 
@@ -37,7 +37,7 @@ pub struct StakeDelegationsProcessDelegation<'info> {
     )]
     pub registry: Account<'info, Registry>,
 
-    #[account(address = config.epoch_thread)]
+    #[account(address = config.load()?.epoch_thread)]
     pub thread: Signer<'info>,
 
     pub token_program: Program<'info, Token>,
@@ -48,14 +48,15 @@ pub struct StakeDelegationsProcessDelegation<'info> {
     #[account(
         mut,
         associated_token::authority = worker,
-        associated_token::mint = config.mint,
+        associated_token::mint = config.load()?.mint,
     )]
     pub worker_stake: Account<'info, TokenAccount>,
 }
 
 pub fn handler(ctx: Context<StakeDelegationsProcessDelegation>) -> Result<ThreadResponse> {
     // Get accounts.
-    let config = &ctx.accounts.config;
+    let config_key = ctx.accounts.config.key();
+    let config = &ctx.accounts.config.load()?;
     let delegation = &mut ctx.accounts.delegation;
     let delegation_stake = &mut ctx.accounts.delegation_stake;
     let registry = &ctx.accounts.registry;
@@ -96,7 +97,7 @@ pub fn handler(ctx: Context<StakeDelegationsProcessDelegation>) -> Result<Thread
             Instruction {
                 program_id: crate::ID,
                 accounts: crate::accounts::StakeDelegationsProcessDelegation {
-                    config: config.key(),
+                    config: config_key,
                     delegation: next_delegation_pubkey,
                     delegation_stake: get_associated_token_address(
                         &next_delegation_pubkey,
@@ -119,7 +120,7 @@ pub fn handler(ctx: Context<StakeDelegationsProcessDelegation>) -> Result<Thread
             Instruction {
                 program_id: crate::ID,
                 accounts: crate::accounts::StakeDelegationsProcessWorker {
-                    config: config.key(),
+                    config: config_key,
                     registry: registry.key(),
                     thread: thread.key(),
                     worker: Worker::pubkey(worker.id + 1),

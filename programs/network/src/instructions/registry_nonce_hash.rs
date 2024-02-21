@@ -8,7 +8,7 @@ use {
 #[derive(Accounts)]
 pub struct RegistryNonceHash<'info> {
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(
         mut,
@@ -17,7 +17,7 @@ pub struct RegistryNonceHash<'info> {
     )]
     pub registry: Account<'info, Registry>,
 
-    #[account(address = config.hasher_thread)]
+    #[account(address = config.load()?.hasher_thread)]
     pub thread: Signer<'info>,
 }
 

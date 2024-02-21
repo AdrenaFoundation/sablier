@@ -9,13 +9,11 @@ use {
 
 #[derive(Accounts)]
 pub struct WorkerCreate<'info> {
-    pub associated_token_program: Program<'info, AssociatedToken>,
-
     #[account(mut)]
     pub authority: Signer<'info>,
 
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(
         init,
@@ -41,7 +39,7 @@ pub struct WorkerCreate<'info> {
     )]
     pub penalty: Account<'info, Penalty>,
 
-    #[account(address = config.mint)]
+    #[account(address = config.load()?.mint)]
     pub mint: Account<'info, Mint>,
 
     #[account(
@@ -54,10 +52,6 @@ pub struct WorkerCreate<'info> {
 
     #[account(constraint = signatory.key() != authority.key() @ SablierError::InvalidSignatory)]
     pub signatory: Signer<'info>,
-
-    pub system_program: Program<'info, System>,
-
-    pub token_program: Program<'info, Token>,
 
     #[account(
         init,
@@ -78,6 +72,12 @@ pub struct WorkerCreate<'info> {
         associated_token::mint = mint,
     )]
     pub worker_tokens: Account<'info, TokenAccount>,
+
+    pub system_program: Program<'info, System>,
+
+    pub associated_token_program: Program<'info, AssociatedToken>,
+
+    pub token_program: Program<'info, Token>,
 }
 
 pub fn handler(ctx: Context<WorkerCreate>) -> Result<()> {

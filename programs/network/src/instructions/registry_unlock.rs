@@ -8,7 +8,7 @@ pub struct RegistryUnlock<'info> {
     pub admin: Signer<'info>,
 
     #[account(seeds = [SEED_CONFIG], bump, has_one = admin)]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(
         mut,

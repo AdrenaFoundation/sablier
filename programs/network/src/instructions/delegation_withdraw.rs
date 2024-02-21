@@ -13,12 +13,12 @@ pub struct DelegationWithdraw<'info> {
     #[account(
         mut,
         associated_token::authority = authority,
-        associated_token::mint = config.mint,
+        associated_token::mint = config.load()?.mint,
     )]
     pub authority_tokens: Account<'info, TokenAccount>,
 
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(
         mut,
@@ -35,7 +35,7 @@ pub struct DelegationWithdraw<'info> {
     #[account(
         mut,
         associated_token::authority = delegation,
-        associated_token::mint = config.mint,
+        associated_token::mint = config.load()?.mint,
     )]
     pub delegation_tokens: Account<'info, TokenAccount>,
 
