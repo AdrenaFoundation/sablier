@@ -10,7 +10,7 @@ use crate::state::*;
 #[derive(Accounts)]
 pub struct TakeSnapshotJob<'info> {
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(
         address = Registry::pubkey(),
@@ -18,7 +18,7 @@ pub struct TakeSnapshotJob<'info> {
     )]
     pub registry: Account<'info, Registry>,
 
-    #[account(address = config.epoch_thread)]
+    #[account(address = config.load()?.epoch_thread)]
     pub thread: Signer<'info>,
 }
 

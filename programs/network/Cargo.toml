@@ -25,3 +25,4 @@ default = []
 anchor-lang.workspace = true
 anchor-spl = { features = ["mint", "token"], workspace = true }
 sablier-utils.workspace = true
+bytemuck = { workspace = true, features = ["derive", "min_const_generics"] }

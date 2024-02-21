@@ -7,7 +7,7 @@ use crate::{constants::*, state::*};
 #[derive(Accounts)]
 pub struct TakeSnapshotCreateFrame<'info> {
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -45,7 +45,7 @@ pub struct TakeSnapshotCreateFrame<'info> {
 
     pub system_program: Program<'info, System>,
 
-    #[account(address = config.epoch_thread)]
+    #[account(address = config.load()?.epoch_thread)]
     pub thread: Signer<'info>,
 
     #[account(
@@ -56,14 +56,15 @@ pub struct TakeSnapshotCreateFrame<'info> {
 
     #[account(
         associated_token::authority = worker,
-        associated_token::mint = config.mint,
+        associated_token::mint = config.load()?.mint,
     )]
     pub worker_stake: Account<'info, TokenAccount>,
 }
 
 pub fn handler(ctx: Context<TakeSnapshotCreateFrame>) -> Result<ThreadResponse> {
     // Get accounts.
-    let config = &ctx.accounts.config;
+    let config_key = ctx.accounts.config.key();
+    let config = &ctx.accounts.config.load()?;
     let registry = &ctx.accounts.registry;
     let snapshot = &mut ctx.accounts.snapshot;
     let snapshot_frame = &mut ctx.accounts.snapshot_frame;
@@ -94,7 +95,7 @@ pub fn handler(ctx: Context<TakeSnapshotCreateFrame>) -> Result<ThreadResponse> 
             Instruction {
                 program_id: crate::ID,
                 accounts: crate::accounts::TakeSnapshotCreateEntry {
-                    config: config.key(),
+                    config: config_key,
                     delegation: zeroth_delegation_pubkey,
                     payer: PAYER_PUBKEY,
                     registry: registry.key(),
@@ -119,7 +120,7 @@ pub fn handler(ctx: Context<TakeSnapshotCreateFrame>) -> Result<ThreadResponse> 
             Instruction {
                 program_id: crate::ID,
                 accounts: crate::accounts::TakeSnapshotCreateFrame {
-                    config: config.key(),
+                    config: config_key,
                     payer: PAYER_PUBKEY,
                     registry: registry.key(),
                     snapshot: snapshot.key(),

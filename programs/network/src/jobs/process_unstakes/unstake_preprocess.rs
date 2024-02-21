@@ -7,7 +7,7 @@ use crate::state::*;
 #[derive(Accounts)]
 pub struct UnstakePreprocess<'info> {
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(
         address = Registry::pubkey(),
@@ -15,7 +15,7 @@ pub struct UnstakePreprocess<'info> {
     )]
     pub registry: Account<'info, Registry>,
 
-    #[account(address = config.epoch_thread)]
+    #[account(address = config.load()?.epoch_thread)]
     pub thread: Signer<'info>,
 
     #[account(address = unstake.pubkey())]
@@ -24,7 +24,8 @@ pub struct UnstakePreprocess<'info> {
 
 pub fn handler(ctx: Context<UnstakePreprocess>) -> Result<ThreadResponse> {
     // Get accounts.
-    let config = &ctx.accounts.config;
+    let config_key = ctx.accounts.config.key();
+    let config = &ctx.accounts.config.load()?;
     let registry = &ctx.accounts.registry;
     let thread = &ctx.accounts.thread;
     let unstake = &ctx.accounts.unstake;
@@ -40,7 +41,7 @@ pub fn handler(ctx: Context<UnstakePreprocess>) -> Result<ThreadResponse> {
                         &unstake.authority,
                         &config.mint,
                     ),
-                    config: config.key(),
+                    config: config_key,
                     delegation: unstake.delegation,
                     registry: registry.key(),
                     thread: thread.key(),

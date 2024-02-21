@@ -6,7 +6,7 @@ use crate::constants::SEED_CONFIG;
  * Config
  */
 
-#[account]
+#[account(zero_copy)]
 #[derive(Debug, InitSpace)]
 pub struct Config {
     pub admin: Pubkey,
@@ -43,18 +43,20 @@ pub trait ConfigAccount {
     fn update(&mut self, settings: ConfigSettings) -> Result<()>;
 }
 
-impl ConfigAccount for Account<'_, Config> {
+impl ConfigAccount for AccountLoader<'_, Config> {
     fn init(&mut self, admin: Pubkey, mint: Pubkey) -> Result<()> {
-        self.admin = admin;
-        self.mint = mint;
+        let mut config = self.load_init()?;
+        config.admin = admin;
+        config.mint = mint;
         Ok(())
     }
 
     fn update(&mut self, settings: ConfigSettings) -> Result<()> {
-        self.admin = settings.admin;
-        self.epoch_thread = settings.epoch_thread;
-        self.hasher_thread = settings.hasher_thread;
-        self.mint = settings.mint;
+        let mut config = self.load_mut()?;
+        config.admin = settings.admin;
+        config.epoch_thread = settings.epoch_thread;
+        config.hasher_thread = settings.hasher_thread;
+        config.mint = settings.mint;
         Ok(())
     }
 }

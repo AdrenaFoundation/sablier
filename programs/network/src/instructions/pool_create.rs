@@ -6,14 +6,14 @@ use {
 
 #[derive(Accounts)]
 pub struct PoolCreate<'info> {
-    #[account(address = config.admin)]
+    #[account(address = config.load()?.admin)]
     pub admin: Signer<'info>,
 
     #[account(
         address = Config::pubkey(),
         has_one = admin
     )]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(mut)]
     pub payer: Signer<'info>,

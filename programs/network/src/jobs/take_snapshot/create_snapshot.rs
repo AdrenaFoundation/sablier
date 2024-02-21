@@ -7,7 +7,7 @@ use crate::{constants::*, state::*};
 #[derive(Accounts)]
 pub struct TakeSnapshotCreateSnapshot<'info> {
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -32,13 +32,14 @@ pub struct TakeSnapshotCreateSnapshot<'info> {
 
     pub system_program: Program<'info, System>,
 
-    #[account(address = config.epoch_thread)]
+    #[account(address = config.load()?.epoch_thread)]
     pub thread: Signer<'info>,
 }
 
 pub fn handler(ctx: Context<TakeSnapshotCreateSnapshot>) -> Result<ThreadResponse> {
     // Get accounts
-    let config = &ctx.accounts.config;
+    let config_key = ctx.accounts.config.key();
+    let config = &ctx.accounts.config.load()?;
     let registry = &ctx.accounts.registry;
     let snapshot = &mut ctx.accounts.snapshot;
     let system_program = &ctx.accounts.system_program;
@@ -56,7 +57,7 @@ pub fn handler(ctx: Context<TakeSnapshotCreateSnapshot>) -> Result<ThreadRespons
                 Instruction {
                     program_id: crate::ID,
                     accounts: crate::accounts::TakeSnapshotCreateFrame {
-                        config: config.key(),
+                        config: config_key,
                         payer: PAYER_PUBKEY,
                         registry: registry.key(),
                         snapshot: snapshot.key(),

@@ -11,7 +11,7 @@ use {
 #[derive(Accounts)]
 pub struct PoolRotate<'info> {
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(
         mut,

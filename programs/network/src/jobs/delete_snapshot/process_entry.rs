@@ -6,7 +6,7 @@ use crate::{constants::*, state::*};
 #[derive(Accounts)]
 pub struct DeleteSnapshotProcessEntry<'info> {
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(
         address = Registry::pubkey(),
@@ -51,7 +51,7 @@ pub struct DeleteSnapshotProcessEntry<'info> {
 
     #[account(
         mut,
-        address = config.epoch_thread
+        address = config.load()?.epoch_thread
     )]
     pub thread: Signer<'info>,
 }

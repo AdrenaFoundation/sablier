@@ -7,7 +7,7 @@ use crate::state::*;
 #[derive(Accounts)]
 pub struct StakeDelegationsProcessWorker<'info> {
     #[account(address = Config::pubkey())]
-    pub config: Account<'info, Config>,
+    pub config: AccountLoader<'info, Config>,
 
     #[account(
         address = Registry::pubkey(),
@@ -15,7 +15,7 @@ pub struct StakeDelegationsProcessWorker<'info> {
     )]
     pub registry: Account<'info, Registry>,
 
-    #[account(address = config.epoch_thread)]
+    #[account(address = config.load()?.epoch_thread)]
     pub thread: Signer<'info>,
 
     #[account(address = worker.pubkey())]
@@ -24,7 +24,8 @@ pub struct StakeDelegationsProcessWorker<'info> {
 
 pub fn handler(ctx: Context<StakeDelegationsProcessWorker>) -> Result<ThreadResponse> {
     // Get accounts.
-    let config = &ctx.accounts.config;
+    let config_key = ctx.accounts.config.key();
+    let config = &ctx.accounts.config.load()?;
     let registry = &ctx.accounts.registry;
     let thread = &ctx.accounts.thread;
     let worker = &ctx.accounts.worker;
@@ -37,7 +38,7 @@ pub fn handler(ctx: Context<StakeDelegationsProcessWorker>) -> Result<ThreadResp
             Instruction {
                 program_id: crate::ID,
                 accounts: crate::accounts::StakeDelegationsProcessDelegation {
-                    config: config.key(),
+                    config: config_key,
                     delegation: delegation_pubkey,
                     delegation_stake: get_associated_token_address(
                         &delegation_pubkey,
@@ -60,7 +61,7 @@ pub fn handler(ctx: Context<StakeDelegationsProcessWorker>) -> Result<ThreadResp
             Instruction {
                 program_id: crate::ID,
                 accounts: crate::accounts::StakeDelegationsProcessWorker {
-                    config: config.key(),
+                    config: config_key,
                     registry: registry.key(),
                     thread: thread.key(),
                     worker: Worker::pubkey(worker.id + 1),
