@@ -18,7 +18,7 @@ use sablier_utils::{
 };
 use state::*;
 
-declare_id!("CLoCKyJ6DXBJqqu2VWx9RLbgnwwR6BMHHuyasVmfMzBh");
+declare_id!("sabJknyNCneSXYhbNX1S1yU9fnT2tb7kUXA8SjHhDBX");
 
 /// Program for creating transaction threads on Solana.
 #[program]
