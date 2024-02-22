@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 use static_pubkey::static_pubkey;
 
 /// The stand-in pubkey for delegating a payer address to a worker. All workers are re-imbursed by the user for lamports spent during this delegation.
-pub static PAYER_PUBKEY: Pubkey = static_pubkey!("C1ockworkPayer11111111111111111111111111111");
+pub static PAYER_PUBKEY: Pubkey = static_pubkey!("Sab1ierPayer1111111111111111111111111111111");
 
 /// The clock object, representing a specific moment in time recorded by a Solana cluster.
 #[derive(AnchorDeserialize, AnchorSerialize, InitSpace, BorshSchema, Clone, Debug, PartialEq)]
