@@ -5,7 +5,7 @@ use std::{
     sync::{atomic::AtomicU64, Arc},
 };
 
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, Utc};
 use log::info;
 use pyth_sdk_solana::PriceFeed;
 use sablier_cron::Schedule;
@@ -373,7 +373,7 @@ fn next_moment(after: i64, schedule: String) -> Option<i64> {
         Err(_) => None,
         Ok(schedule) => schedule
             .next_after(&DateTime::<Utc>::from_naive_utc_and_offset(
-                NaiveDateTime::from_timestamp_opt(after, 0).unwrap(),
+                DateTime::from_timestamp(after, 0).unwrap().naive_utc(),
                 Utc,
             ))
             .take()

@@ -25,7 +25,7 @@ pub struct WorkerCreate<'info> {
         payer = authority,
         space = 8 + Fee::INIT_SPACE,
     )]
-    pub fee: Account<'info, Fee>,
+    pub fee: Box<Account<'info, Fee>>,
 
     #[account(
         init,
@@ -37,10 +37,10 @@ pub struct WorkerCreate<'info> {
         payer = authority,
         space = 8 + Penalty::INIT_SPACE,
     )]
-    pub penalty: Account<'info, Penalty>,
+    pub penalty: Box<Account<'info, Penalty>>,
 
     #[account(address = config.load()?.mint)]
-    pub mint: Account<'info, Mint>,
+    pub mint: Box<Account<'info, Mint>>,
 
     #[account(
         mut,
@@ -48,10 +48,7 @@ pub struct WorkerCreate<'info> {
         bump,
         constraint = !registry.locked @ SablierError::RegistryLocked
     )]
-    pub registry: Account<'info, Registry>,
-
-    #[account(constraint = signatory.key() != authority.key() @ SablierError::InvalidSignatory)]
-    pub signatory: Signer<'info>,
+    pub registry: Box<Account<'info, Registry>>,
 
     #[account(
         init,
@@ -63,7 +60,7 @@ pub struct WorkerCreate<'info> {
         payer = authority,
         space = 8 + Worker::INIT_SPACE,
     )]
-    pub worker: Account<'info, Worker>,
+    pub worker: Box<Account<'info, Worker>>,
 
     #[account(
         init,
@@ -71,7 +68,7 @@ pub struct WorkerCreate<'info> {
         associated_token::authority = worker,
         associated_token::mint = mint,
     )]
-    pub worker_tokens: Account<'info, TokenAccount>,
+    pub worker_tokens: Box<Account<'info, TokenAccount>>,
 
     pub system_program: Program<'info, System>,
 
@@ -80,17 +77,35 @@ pub struct WorkerCreate<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-pub fn handler(ctx: Context<WorkerCreate>) -> Result<()> {
+pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, WorkerCreate>) -> Result<()>
+where
+    'c: 'info,
+{
     // Get accounts
     let authority = &mut ctx.accounts.authority;
     let fee = &mut ctx.accounts.fee;
     let penalty = &mut ctx.accounts.penalty;
     let registry = &mut ctx.accounts.registry;
-    let signatory = &mut ctx.accounts.signatory;
     let worker = &mut ctx.accounts.worker;
 
+    let remaining_accounts = &mut ctx.remaining_accounts.iter();
+
+    let signatory = {
+        let signatory_info = next_account_info(remaining_accounts)?;
+
+        if !signatory_info.is_signer {
+            return Err(ErrorCode::AccountNotSigner.into());
+        }
+
+        if signatory_info.key == authority.key {
+            return Err(SablierError::InvalidSignatory.into());
+        }
+
+        Signer::try_from(signatory_info)?
+    };
+
     // Initialize the worker accounts.
-    worker.init(authority, registry.total_workers, signatory)?;
+    worker.init(authority, registry.total_workers, &signatory)?;
     fee.init(worker.key())?;
     penalty.init(worker.key())?;
 

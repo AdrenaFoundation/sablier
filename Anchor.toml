@@ -1,12 +1,17 @@
 [toolchain]
 anchor_version = "0.29.0"
-solana_version = "1.18.2"
+solana_version = "1.18.11"
 
 [features]
 seeds = false
 skip-lint = false
 
 [programs.localnet]
+sablier_network_program = "9ESdCQBeSnUspsKFmyoJTu1k4moMG6qbuK1BYVQsZ6Qc"
+sablier_thread_program = "sabJknyNCneSXYhbNX1S1yU9fnT2tb7kUXA8SjHhDBX"
+sablier_webhook_program = "GDZTj1Lxhp7cKoa69xzQRpYBSjN5bvp5KERpiojAoVAx"
+
+[programs.devnet]
 sablier_network_program = "9ESdCQBeSnUspsKFmyoJTu1k4moMG6qbuK1BYVQsZ6Qc"
 sablier_thread_program = "sabJknyNCneSXYhbNX1S1yU9fnT2tb7kUXA8SjHhDBX"
 sablier_webhook_program = "GDZTj1Lxhp7cKoa69xzQRpYBSjN5bvp5KERpiojAoVAx"
@@ -22,5 +27,5 @@ sablier_thread_program = "sabJknyNCneSXYhbNX1S1yU9fnT2tb7kUXA8SjHhDBX"
 sablier_webhook_program = "GDZTj1Lxhp7cKoa69xzQRpYBSjN5bvp5KERpiojAoVAx"
 
 [provider]
-cluster = "Localnet"
+cluster = "Devnet"
 wallet = "~/.config/solana/id.json"

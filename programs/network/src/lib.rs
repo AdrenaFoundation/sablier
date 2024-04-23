@@ -78,7 +78,12 @@ pub mod network_program {
         worker_claim::handler(ctx, amount)
     }
 
-    pub fn worker_create(ctx: Context<WorkerCreate>) -> Result<()> {
+    pub fn worker_create<'a, 'b, 'c, 'info>(
+        ctx: Context<'a, 'b, 'c, 'info, WorkerCreate>,
+    ) -> Result<()>
+    where
+        'c: 'info,
+    {
         worker_create::handler(ctx)
     }
 
