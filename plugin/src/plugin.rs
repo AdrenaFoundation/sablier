@@ -35,7 +35,7 @@ impl GeyserPlugin for SablierPlugin {
         "sablier-plugin"
     }
 
-    fn on_load(&mut self, config_file: &str) -> PluginResult<()> {
+    fn on_load(&mut self, config_file: &str, _is_reload: bool) -> PluginResult<()> {
         solana_logger::setup_with_default("info");
         info!(
             "sablier-plugin crate-info - spec: {}, geyser_interface_version: {}, rustc: {}",

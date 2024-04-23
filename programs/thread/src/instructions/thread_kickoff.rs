@@ -5,7 +5,7 @@ use std::{
 };
 
 use anchor_lang::prelude::*;
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, Utc};
 use pyth_sdk_solana::state::SolanaPriceAccount;
 use sablier_cron::Schedule;
 use sablier_network_program::state::{Worker, WorkerAccount};
@@ -266,7 +266,7 @@ fn next_timestamp(after: i64, schedule: String) -> Option<i64> {
     Schedule::from_str(&schedule)
         .unwrap()
         .next_after(&DateTime::<Utc>::from_naive_utc_and_offset(
-            NaiveDateTime::from_timestamp_opt(after, 0).unwrap(),
+            DateTime::from_timestamp(after, 0).unwrap().naive_utc(),
             Utc,
         ))
         .take()
