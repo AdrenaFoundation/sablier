@@ -27,5 +27,5 @@ sablier_thread_program = "sabJknyNCneSXYhbNX1S1yU9fnT2tb7kUXA8SjHhDBX"
 sablier_webhook_program = "GDZTj1Lxhp7cKoa69xzQRpYBSjN5bvp5KERpiojAoVAx"
 
 [provider]
-cluster = "Devnet"
+cluster = "Localnet"
 wallet = "~/.config/solana/id.json"
