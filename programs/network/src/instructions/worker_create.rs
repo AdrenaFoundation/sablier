@@ -95,8 +95,8 @@ pub fn handler<'info>(ctx: Context<'_, '_, 'info, 'info, WorkerCreate<'info>>) -
             .get(1)
             .ok_or(ErrorCode::AccountNotEnoughKeys)?;
 
-        if !penalty_info.is_signer {
-            return Err(ErrorCode::AccountNotSigner.into());
+        if !penalty_info.is_writable {
+            return Err(ErrorCode::AccountNotMutable.into());
         }
 
         let (pda_key, bump) =
