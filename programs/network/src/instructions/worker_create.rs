@@ -122,7 +122,7 @@ pub fn handler<'info>(ctx: Context<'_, '_, 'info, 'info, WorkerCreate<'info>>) -
             account_space as u64,
             &crate::ID,
         )?;
-        Account::try_from(penalty_info)?
+        Account::try_from_unchecked(penalty_info)?
     };
 
     // Initialize the worker accounts.
