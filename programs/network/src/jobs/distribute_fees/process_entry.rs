@@ -25,12 +25,12 @@ pub struct DistributeFeesProcessEntry<'info> {
         mut,
         seeds = [
             SEED_FEE,
-            fee.worker.as_ref(),
+            fee.load()?.worker.as_ref(),
         ],
         bump,
         has_one = worker,
     )]
-    pub fee: Account<'info, Fee>,
+    pub fee: AccountLoader<'info, Fee>,
 
     #[account(address = Registry::pubkey())]
     pub registry: Account<'info, Registry>,
@@ -66,6 +66,7 @@ pub fn handler(ctx: Context<DistributeFeesProcessEntry>) -> Result<ThreadRespons
     let config = &ctx.accounts.config;
     let delegation = &mut ctx.accounts.delegation;
     let fee = &mut ctx.accounts.fee;
+    let fee_data = fee.load()?;
     let registry = &ctx.accounts.registry;
     let snapshot = &ctx.accounts.snapshot;
     let snapshot_entry = &ctx.accounts.snapshot_entry;
@@ -75,7 +76,7 @@ pub fn handler(ctx: Context<DistributeFeesProcessEntry>) -> Result<ThreadRespons
 
     // Calculate the balance of this particular delegation, based on the weight of its stake with this worker.
     let distribution_balance = if snapshot_frame.stake_amount > 0 {
-        fee.distributable_balance * snapshot_entry.stake_amount / snapshot_frame.stake_amount
+        fee_data.distributable_balance * snapshot_entry.stake_amount / snapshot_frame.stake_amount
     } else {
         0
     };

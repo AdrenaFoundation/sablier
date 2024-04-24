@@ -25,7 +25,7 @@ pub struct ThreadExec<'info> {
         seeds::program = sablier_network_program::ID,
         has_one = worker,
     )]
-    pub fee: Account<'info, Fee>,
+    pub fee: AccountLoader<'info, Fee>,
 
     /// The active worker pool.
     #[account(address = Pool::pubkey(POOL_ID))]

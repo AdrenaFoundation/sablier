@@ -25,19 +25,7 @@ pub struct WorkerCreate<'info> {
         payer = authority,
         space = 8 + Fee::INIT_SPACE,
     )]
-    pub fee: Box<Account<'info, Fee>>,
-
-    #[account(
-        init,
-        seeds = [
-            SEED_PENALTY,
-            worker.key().as_ref(),
-        ],
-        bump,
-        payer = authority,
-        space = 8 + Penalty::INIT_SPACE,
-    )]
-    pub penalty: Box<Account<'info, Penalty>>,
+    pub fee: AccountLoader<'info, Fee>,
 
     #[account(address = config.load()?.mint)]
     pub mint: Box<Account<'info, Mint>>,
@@ -77,21 +65,18 @@ pub struct WorkerCreate<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-pub fn handler<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, WorkerCreate>) -> Result<()>
-where
-    'c: 'info,
-{
+pub fn handler<'info>(ctx: Context<'_, '_, 'info, 'info, WorkerCreate<'info>>) -> Result<()> {
     // Get accounts
     let authority = &mut ctx.accounts.authority;
     let fee = &mut ctx.accounts.fee;
-    let penalty = &mut ctx.accounts.penalty;
     let registry = &mut ctx.accounts.registry;
     let worker = &mut ctx.accounts.worker;
 
-    let remaining_accounts = &mut ctx.remaining_accounts.iter();
-
     let signatory = {
-        let signatory_info = next_account_info(remaining_accounts)?;
+        let signatory_info = ctx
+            .remaining_accounts
+            .first()
+            .ok_or(ErrorCode::AccountNotEnoughKeys)?;
 
         if !signatory_info.is_signer {
             return Err(ErrorCode::AccountNotSigner.into());
@@ -102,6 +87,42 @@ where
         }
 
         Signer::try_from(signatory_info)?
+    };
+
+    let mut penalty: Account<Penalty> = {
+        let penalty_info = ctx
+            .remaining_accounts
+            .get(1)
+            .ok_or(ErrorCode::AccountNotEnoughKeys)?;
+
+        if !penalty_info.is_signer {
+            return Err(ErrorCode::AccountNotSigner.into());
+        }
+
+        let (pda_key, bump) =
+            Pubkey::find_program_address(&[SEED_PENALTY, worker.key().as_ref()], &crate::ID);
+
+        if &pda_key != penalty_info.key {
+            return Err(ErrorCode::ConstraintSeeds.into());
+        }
+
+        let account_space = 8 + Penalty::INIT_SPACE;
+        let lamports = Rent::get()?.minimum_balance(account_space);
+        let cpi_accounts = anchor_lang::system_program::CreateAccount {
+            from: authority.to_account_info(),
+            to: penalty_info.to_owned(),
+        };
+        let cpi_context = anchor_lang::context::CpiContext::new(
+            ctx.accounts.system_program.to_account_info(),
+            cpi_accounts,
+        );
+        anchor_lang::system_program::create_account(
+            cpi_context.with_signer(&[&[SEED_PENALTY, worker.key().as_ref(), &[bump][..]][..]]),
+            lamports,
+            account_space as u64,
+            &crate::ID,
+        )?;
+        Account::try_from(penalty_info)?
     };
 
     // Initialize the worker accounts.

@@ -96,7 +96,6 @@ pub fn create(client: &Client, signatory: Keypair, silent: bool) -> Result<(), C
         authority: client.payer_pubkey(),
         config: Config::pubkey(),
         fee: Fee::pubkey(worker_pubkey),
-        penalty: Penalty::pubkey(worker_pubkey),
         mint: config.mint,
         registry: Registry::pubkey(),
         system_program: system_program::ID,
@@ -106,6 +105,7 @@ pub fn create(client: &Client, signatory: Keypair, silent: bool) -> Result<(), C
     }
     .to_account_metas(Some(false));
     accounts.push(AccountMeta::new_readonly(signatory.pubkey(), true));
+    accounts.push(AccountMeta::new(Penalty::pubkey(worker_pubkey), false));
 
     let ix = Instruction {
         program_id: sablier_network_program::ID,
