@@ -16,7 +16,7 @@ use jobs::*;
 use sablier_utils::thread::*;
 use state::*;
 
-declare_id!("9ESdCQBeSnUspsKFmyoJTu1k4moMG6qbuK1BYVQsZ6Qc");
+declare_id!("H6CTDj7ewA6PT1jGt2WTnkhWb2RwwuoQkAsgzRuSsnaV");
 
 #[program]
 pub mod network_program {

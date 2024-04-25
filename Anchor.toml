@@ -6,25 +6,25 @@ solana_version = "1.18.11"
 seeds = false
 skip-lint = false
 
-[programs.localnet]
-sablier_network_program = "9ESdCQBeSnUspsKFmyoJTu1k4moMG6qbuK1BYVQsZ6Qc"
-sablier_thread_program = "sabJknyNCneSXYhbNX1S1yU9fnT2tb7kUXA8SjHhDBX"
-sablier_webhook_program = "GDZTj1Lxhp7cKoa69xzQRpYBSjN5bvp5KERpiojAoVAx"
-
 [programs.devnet]
-sablier_network_program = "9ESdCQBeSnUspsKFmyoJTu1k4moMG6qbuK1BYVQsZ6Qc"
-sablier_thread_program = "sabJknyNCneSXYhbNX1S1yU9fnT2tb7kUXA8SjHhDBX"
-sablier_webhook_program = "GDZTj1Lxhp7cKoa69xzQRpYBSjN5bvp5KERpiojAoVAx"
+sablier_network_program = "H6CTDj7ewA6PT1jGt2WTnkhWb2RwwuoQkAsgzRuSsnaV"
+sablier_thread_program = "sabGLGXfBiUCkwtprPMtatG6tCNxhcWWs1hjQAvDqEE"
+sablier_webhook_program = "ARqVfCUQeS3cr7NXg18kHvDmCw57amv1yHEGu9rsvVeN"
+
+[programs.localnet]
+sablier_network_program = "H6CTDj7ewA6PT1jGt2WTnkhWb2RwwuoQkAsgzRuSsnaV"
+sablier_thread_program = "sabGLGXfBiUCkwtprPMtatG6tCNxhcWWs1hjQAvDqEE"
+sablier_webhook_program = "ARqVfCUQeS3cr7NXg18kHvDmCw57amv1yHEGu9rsvVeN"
 
 [programs.mainnet]
-sablier_network_program = "9ESdCQBeSnUspsKFmyoJTu1k4moMG6qbuK1BYVQsZ6Qc"
-sablier_thread_program = "sabJknyNCneSXYhbNX1S1yU9fnT2tb7kUXA8SjHhDBX"
-sablier_webhook_program = "GDZTj1Lxhp7cKoa69xzQRpYBSjN5bvp5KERpiojAoVAx"
+sablier_network_program = "H6CTDj7ewA6PT1jGt2WTnkhWb2RwwuoQkAsgzRuSsnaV"
+sablier_thread_program = "sabGLGXfBiUCkwtprPMtatG6tCNxhcWWs1hjQAvDqEE"
+sablier_webhook_program = "ARqVfCUQeS3cr7NXg18kHvDmCw57amv1yHEGu9rsvVeN"
 
 [programs.testnet]
-sablier_network_program = "9ESdCQBeSnUspsKFmyoJTu1k4moMG6qbuK1BYVQsZ6Qc"
-sablier_thread_program = "sabJknyNCneSXYhbNX1S1yU9fnT2tb7kUXA8SjHhDBX"
-sablier_webhook_program = "GDZTj1Lxhp7cKoa69xzQRpYBSjN5bvp5KERpiojAoVAx"
+sablier_network_program = "H6CTDj7ewA6PT1jGt2WTnkhWb2RwwuoQkAsgzRuSsnaV"
+sablier_thread_program = "sabGLGXfBiUCkwtprPMtatG6tCNxhcWWs1hjQAvDqEE"
+sablier_webhook_program = "ARqVfCUQeS3cr7NXg18kHvDmCw57amv1yHEGu9rsvVeN"
 
 [provider]
 cluster = "Localnet"
