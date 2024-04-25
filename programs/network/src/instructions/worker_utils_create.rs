@@ -13,7 +13,7 @@ pub struct WorkerUtilsCreate<'info> {
     #[account(
         seeds = [
             SEED_WORKER,
-            registry.total_workers.to_be_bytes().as_ref(),
+            (registry.total_workers - 1).to_be_bytes().as_ref(),
         ],
         bump = worker.bump,
     )]
