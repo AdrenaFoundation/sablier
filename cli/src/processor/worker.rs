@@ -95,7 +95,6 @@ pub fn create(client: &Client, signatory: Keypair, silent: bool) -> Result<(), C
             associated_token_program: associated_token::ID,
             authority: client.payer_pubkey(),
             config: Config::pubkey(),
-            // fee: Fee::pubkey(worker_pubkey),
             signatory: signatory.pubkey(),
             mint: config.mint,
             registry: Registry::pubkey(),
