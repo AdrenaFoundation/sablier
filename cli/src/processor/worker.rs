@@ -108,7 +108,6 @@ pub fn create(client: &Client, signatory: Keypair, silent: bool) -> Result<(), C
         data: sablier_network_program::instruction::WorkerCreate {}.data(),
     };
 
-    let worker_pubkey = Worker::pubkey(worker_id + 1);
     let ix_utils = Instruction {
         program_id: sablier_network_program::ID,
         accounts: sablier_network_program::accounts::WorkerUtilsCreate {
