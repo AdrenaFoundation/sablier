@@ -3631,7 +3631,7 @@ checksum = "e86697c916019a8588c99b5fac3cead74ec0b4b819707a682fd4d23fa0ce1ba1"
 
 [[package]]
 name = "sablier-cli"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -3665,7 +3665,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-cron"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "chrono",
  "nom",
@@ -3673,7 +3673,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-network-program"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -3683,7 +3683,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-plugin-utils"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "serde",
  "serde_json",
@@ -3692,7 +3692,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-relayer"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "actix-cors",
  "actix-web",
@@ -3711,7 +3711,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-relayer-api"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "bincode",
  "serde",
@@ -3720,7 +3720,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-sdk"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "anchor-lang",
  "sablier-thread-program",
@@ -3728,7 +3728,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-thread-program"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "anchor-lang",
  "chrono",
@@ -3741,7 +3741,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-utils"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "anchor-lang",
  "base64 0.21.7",
@@ -3751,7 +3751,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-webhook-program"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "anchor-lang",
  "serde",
@@ -3759,7 +3759,7 @@ dependencies = [
 
 [[package]]
 name = "sablier_plugin"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 dependencies = [
  "anchor-lang",
  "async-trait",
@@ -5914,11 +5914,11 @@ checksum = "ac3b87c63620426dd9b991e5ce0329eff545bccbbb34f3be09ff6fb6ab51b7b6"
 
 [[package]]
 name = "winapi-util"
-version = "0.1.6"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f29e6f9198ba0d26b4c9f07dbe6f9ed633e1f3d5b8b414090084349e46a52596"
+checksum = "4d4cc384e1e73b93bafa6fb4f1df8c41695c8a91cf9c4c64358067d15a7b6c6b"
 dependencies = [
- "winapi",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
