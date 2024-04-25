@@ -1,4 +1,4 @@
-use anchor_lang::{prelude::*, AnchorDeserialize};
+use anchor_lang::prelude::*;
 
 use crate::constants::SEED_FEE;
 
@@ -10,6 +10,7 @@ pub struct Fee {
     pub distributable_balance: u64,
     /// The worker who received the fees.
     pub worker: Pubkey,
+    pub bump: u8,
 }
 
 impl Fee {
@@ -25,7 +26,7 @@ pub trait FeeAccount {
     fn pubkey(&self) -> Pubkey;
 
     /// Initialize the account to hold fee object.
-    fn init(&mut self, worker: Pubkey) -> Result<()>;
+    fn init(&mut self, worker: Pubkey, bump: u8) -> Result<()>;
 }
 
 impl FeeAccount for Account<'_, Fee> {
@@ -33,9 +34,10 @@ impl FeeAccount for Account<'_, Fee> {
         Fee::pubkey(self.worker)
     }
 
-    fn init(&mut self, worker: Pubkey) -> Result<()> {
+    fn init(&mut self, worker: Pubkey, bump: u8) -> Result<()> {
         self.distributable_balance = 0;
         self.worker = worker;
+        self.bump = bump;
         Ok(())
     }
 }

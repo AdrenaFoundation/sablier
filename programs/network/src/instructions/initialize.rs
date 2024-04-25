@@ -54,7 +54,7 @@ pub fn handler(ctx: Context<Initialize>) -> Result<()> {
 
     // Initialize accounts.
     config.init(admin.key(), mint.key())?;
-    registry.init()?;
+    registry.init(ctx.bumps.registry)?;
     snapshot.init(0)?;
 
     Ok(())

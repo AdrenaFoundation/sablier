@@ -24,11 +24,11 @@ async-trait.workspace = true
 bincode.workspace = true
 chrono = { workspace = true, features = ["alloc"] }
 sablier-cron.workspace = true
-sablier-network-program.workspace = true
+sablier-network-program = { workspace = true, features = ["no-entrypoint"] }
 sablier-plugin-utils.workspace = true
 sablier-relayer-api.workspace = true
-sablier-thread-program.workspace = true
-sablier-webhook-program.workspace = true
+sablier-thread-program = { workspace = true, features = ["no-entrypoint"] }
+sablier-webhook-program = { workspace = true, features = ["no-entrypoint"] }
 sablier-utils.workspace = true
 log.workspace = true
 pyth-sdk-solana.workspace = true
