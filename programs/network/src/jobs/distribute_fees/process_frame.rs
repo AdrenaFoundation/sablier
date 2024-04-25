@@ -12,12 +12,12 @@ pub struct DistributeFeesProcessFrame<'info> {
         mut,
         seeds = [
             SEED_FEE,
-            fee.load()?.worker.as_ref(),
+            fee.worker.as_ref(),
         ],
         bump,
         has_one = worker,
     )]
-    pub fee: AccountLoader<'info, Fee>,
+    pub fee: Account<'info, Fee>,
 
     #[account(address = Registry::pubkey())]
     pub registry: Account<'info, Registry>,
@@ -46,7 +46,6 @@ pub fn handler(ctx: Context<DistributeFeesProcessFrame>) -> Result<ThreadRespons
     // Get accounts.
     let config = &ctx.accounts.config;
     let fee = &mut ctx.accounts.fee;
-    let fee_data = &mut fee.load_mut()?;
     let registry = &ctx.accounts.registry;
     let snapshot = &ctx.accounts.snapshot;
     let snapshot_frame = &ctx.accounts.snapshot_frame;
@@ -70,7 +69,7 @@ pub fn handler(ctx: Context<DistributeFeesProcessFrame>) -> Result<ThreadRespons
     worker.commission_balance += commission_balance;
 
     // Record the balance that is distributable to delegations.
-    fee_data.distributable_balance = fee_usable_balance - commission_balance;
+    fee.distributable_balance = fee_usable_balance - commission_balance;
 
     // Build next instruction for the thread.
     let dynamic_instruction = if snapshot_frame.total_entries > 0 {

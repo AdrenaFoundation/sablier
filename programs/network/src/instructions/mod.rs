@@ -14,6 +14,7 @@ pub mod unstake_create;
 pub mod worker_claim;
 pub mod worker_create;
 pub mod worker_update;
+pub mod worker_utils_create;
 
 pub use config_update::*;
 pub use delegation_claim::*;
@@ -31,3 +32,4 @@ pub use unstake_create::*;
 pub use worker_claim::*;
 pub use worker_create::*;
 pub use worker_update::*;
+pub use worker_utils_create::*;

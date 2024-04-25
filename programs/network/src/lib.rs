@@ -78,10 +78,12 @@ pub mod network_program {
         worker_claim::handler(ctx, amount)
     }
 
-    pub fn worker_create<'info>(
-        ctx: Context<'_, '_, 'info, 'info, WorkerCreate<'info>>,
-    ) -> Result<()> {
+    pub fn worker_create(ctx: Context<WorkerCreate>) -> Result<()> {
         worker_create::handler(ctx)
+    }
+
+    pub fn worker_utils_create(ctx: Context<WorkerUtilsCreate>) -> Result<()> {
+        worker_utils_create::handler(ctx)
     }
 
     pub fn worker_update(ctx: Context<WorkerUpdate>, settings: WorkerSettings) -> Result<()> {

@@ -6,10 +6,7 @@ use anchor_spl::{associated_token, associated_token::get_associated_token_addres
 use sablier_network_program::state::{
     Config, Fee, Penalty, Registry, Snapshot, SnapshotFrame, Worker, WorkerSettings,
 };
-use solana_sdk::{
-    instruction::AccountMeta,
-    signature::{Keypair, Signer},
-};
+use solana_sdk::signature::{Keypair, Signer};
 
 use crate::{client::Client, errors::CliError};
 
@@ -91,29 +88,42 @@ pub fn create(client: &Client, signatory: Keypair, silent: bool) -> Result<(), C
     // Build ix
     let worker_id = registry.total_workers;
     let worker_pubkey = Worker::pubkey(worker_id);
-    let mut accounts = sablier_network_program::accounts::WorkerCreate {
-        associated_token_program: associated_token::ID,
-        authority: client.payer_pubkey(),
-        config: Config::pubkey(),
-        fee: Fee::pubkey(worker_pubkey),
-        mint: config.mint,
-        registry: Registry::pubkey(),
-        system_program: system_program::ID,
-        token_program: token::ID,
-        worker: worker_pubkey,
-        worker_tokens: get_associated_token_address(&worker_pubkey, &config.mint),
-    }
-    .to_account_metas(Some(false));
-    accounts.push(AccountMeta::new_readonly(signatory.pubkey(), true));
-    accounts.push(AccountMeta::new(Penalty::pubkey(worker_pubkey), false));
 
     let ix = Instruction {
         program_id: sablier_network_program::ID,
-        accounts,
+        accounts: sablier_network_program::accounts::WorkerCreate {
+            associated_token_program: associated_token::ID,
+            authority: client.payer_pubkey(),
+            config: Config::pubkey(),
+            // fee: Fee::pubkey(worker_pubkey),
+            signatory: signatory.pubkey(),
+            mint: config.mint,
+            registry: Registry::pubkey(),
+            system_program: system_program::ID,
+            token_program: token::ID,
+            worker: worker_pubkey,
+            worker_tokens: get_associated_token_address(&worker_pubkey, &config.mint),
+        }
+        .to_account_metas(Some(false)),
         data: sablier_network_program::instruction::WorkerCreate {}.data(),
     };
+
+    let worker_pubkey = Worker::pubkey(worker_id + 1);
+    let ix_utils = Instruction {
+        program_id: sablier_network_program::ID,
+        accounts: sablier_network_program::accounts::WorkerUtilsCreate {
+            authority: client.payer_pubkey(),
+            worker: worker_pubkey,
+            registry: Registry::pubkey(),
+            fee: Fee::pubkey(worker_pubkey),
+            penalty: Penalty::pubkey(worker_pubkey),
+            system_program: system_program::ID,
+        }
+        .to_account_metas(Some(false)),
+        data: sablier_network_program::instruction::WorkerUtilsCreate {}.data(),
+    };
     client
-        .send_and_confirm(&[ix], &[client.payer(), &signatory])
+        .send_and_confirm(&[ix, ix_utils], &[client.payer(), &signatory])
         .unwrap();
     if !silent {
         get(client, worker_id)?;

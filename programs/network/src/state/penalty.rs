@@ -8,6 +8,7 @@ use crate::constants::SEED_PENALTY;
 pub struct Penalty {
     /// The worker who was penalized.
     pub worker: Pubkey,
+    pub bump: u8,
 }
 
 impl Penalty {
@@ -23,7 +24,7 @@ pub trait PenaltyAccount {
     fn pubkey(&self) -> Pubkey;
 
     /// Initialize the account to hold penalty object.
-    fn init(&mut self, worker: Pubkey) -> Result<()>;
+    fn init(&mut self, worker: Pubkey, bump: u8) -> Result<()>;
 }
 
 impl PenaltyAccount for Account<'_, Penalty> {
@@ -31,8 +32,9 @@ impl PenaltyAccount for Account<'_, Penalty> {
         Penalty::pubkey(self.worker)
     }
 
-    fn init(&mut self, worker: Pubkey) -> Result<()> {
+    fn init(&mut self, worker: Pubkey, bump: u8) -> Result<()> {
         self.worker = worker;
+        self.bump = bump;
         Ok(())
     }
 }

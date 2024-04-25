@@ -18,6 +18,7 @@ pub struct Worker {
     pub signatory: Pubkey,
     /// The number delegations allocated to this worker.
     pub total_delegations: u64,
+    pub bump: u8,
 }
 
 impl Worker {
@@ -37,7 +38,8 @@ pub struct WorkerSettings {
 pub trait WorkerAccount {
     fn pubkey(&self) -> Pubkey;
 
-    fn init(&mut self, authority: &mut Signer, id: u64, signatory: &Signer) -> Result<()>;
+    fn init(&mut self, authority: &mut Signer, id: u64, signatory: &Signer, bump: u8)
+        -> Result<()>;
 
     fn update(&mut self, settings: WorkerSettings) -> Result<()>;
 }
@@ -47,13 +49,20 @@ impl WorkerAccount for Account<'_, Worker> {
         Worker::pubkey(self.id)
     }
 
-    fn init(&mut self, authority: &mut Signer, id: u64, signatory: &Signer) -> Result<()> {
+    fn init(
+        &mut self,
+        authority: &mut Signer,
+        id: u64,
+        signatory: &Signer,
+        bump: u8,
+    ) -> Result<()> {
         self.authority = authority.key();
         self.commission_balance = 0;
         self.commission_rate = 0;
         self.id = id;
         self.signatory = signatory.key();
         self.total_delegations = 0;
+        self.bump = bump;
         Ok(())
     }
 

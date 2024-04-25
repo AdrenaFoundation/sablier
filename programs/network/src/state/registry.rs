@@ -18,6 +18,7 @@ pub struct Registry {
     pub total_pools: u64,
     pub total_unstakes: u64,
     pub total_workers: u64,
+    pub bump: u8,
 }
 
 impl Registry {
@@ -31,16 +32,17 @@ impl Registry {
  */
 
 pub trait RegistryAccount {
-    fn init(&mut self) -> Result<()>;
+    fn init(&mut self, bump: u8) -> Result<()>;
 
     fn hash_nonce(&mut self) -> Result<()>;
 }
 
 impl RegistryAccount for Account<'_, Registry> {
-    fn init(&mut self) -> Result<()> {
+    fn init(&mut self, bump: u8) -> Result<()> {
         self.current_epoch = 0;
         self.locked = false;
         self.total_workers = 0;
+        self.bump = bump;
         Ok(())
     }
 
