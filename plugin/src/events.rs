@@ -40,7 +40,7 @@ impl TryFrom<&mut ReplicaAccountInfo<'_>> for AccountUpdateEvent {
             });
         }
 
-        // If the account belongs to the thread v2 program, parse it.
+        // If the account belongs to the thread v1 program, parse it.
         if owner_pubkey.eq(&sablier_thread_program::ID) && account_info.data.len() > 8 {
             let d = &account_info.data[..8];
             if d.eq(&Thread::discriminator()) {
@@ -48,7 +48,7 @@ impl TryFrom<&mut ReplicaAccountInfo<'_>> for AccountUpdateEvent {
                     thread: VersionedThread::V1(
                         Thread::try_deserialize(&mut account_info.data).map_err(|_| {
                             GeyserPluginError::AccountsUpdateError {
-                                msg: "Failed to parse Sablier thread v2 account".into(),
+                                msg: "Failed to parse Sablier thread v1 account".into(),
                             }
                         })?,
                     ),
