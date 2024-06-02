@@ -3,9 +3,11 @@
 # Publish shared libs
 cargo publish -p sablier-cron
 sleep 25
-cargo publish -p sablier-macros
-sleep 25
 cargo publish -p sablier-utils
+sleep 25
+cargo publish -p sablier-relayer-api
+sleep 25
+cargo publish -p sablier-plugin-utils
 sleep 25
 
 # Publish programs
@@ -22,6 +24,4 @@ sleep 25
 
 # Publish downstream bins and libs
 # These are most likely to fail due to Anchor dependency issues.
-cargo publish -p sablier-client
-sleep 25
 cargo publish -p sablier-cli
