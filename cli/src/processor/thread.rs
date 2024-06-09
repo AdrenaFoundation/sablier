@@ -27,10 +27,15 @@ pub fn crate_info(client: &Client) -> Result<(), CliError> {
 pub fn create(
     client: &Client,
     id: String,
+    domain: String,
     instructions: Vec<SerializableInstruction>,
     trigger: Trigger,
 ) -> Result<(), CliError> {
-    let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.clone().into_bytes());
+    let thread_pubkey = Thread::pubkey(
+        client.payer_pubkey(),
+        id.clone().into_bytes(),
+        Some(domain.into_bytes()),
+    );
     let ix = Instruction {
         program_id: sablier_thread_program::ID,
         accounts: sablier_thread_program::accounts::ThreadCreate {
@@ -43,6 +48,7 @@ pub fn create(
         data: sablier_thread_program::instruction::ThreadCreate {
             amount: 0,
             id: id.into_bytes(),
+            domain: None,
             instructions,
             trigger,
         }
@@ -54,7 +60,7 @@ pub fn create(
 }
 
 pub fn delete(client: &Client, id: String) -> Result<(), CliError> {
-    let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.into_bytes());
+    let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.into_bytes(), None);
     let ix = Instruction {
         program_id: sablier_thread_program::ID,
         accounts: sablier_thread_program::accounts::ThreadDelete {
@@ -77,7 +83,7 @@ pub fn get(client: &Client, address: Pubkey) -> Result<(), CliError> {
 }
 
 pub fn pause(client: &Client, id: String) -> Result<(), CliError> {
-    let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.into_bytes());
+    let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.into_bytes(), None);
     let ix = Instruction {
         program_id: sablier_thread_program::ID,
         accounts: sablier_thread_program::accounts::ThreadPause {
@@ -93,7 +99,7 @@ pub fn pause(client: &Client, id: String) -> Result<(), CliError> {
 }
 
 pub fn resume(client: &Client, id: String) -> Result<(), CliError> {
-    let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.into_bytes());
+    let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.into_bytes(), None);
     let ix = Instruction {
         program_id: sablier_thread_program::ID,
         accounts: sablier_thread_program::accounts::ThreadResume {
@@ -109,7 +115,7 @@ pub fn resume(client: &Client, id: String) -> Result<(), CliError> {
 }
 
 pub fn reset(client: &Client, id: String) -> Result<(), CliError> {
-    let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.into_bytes());
+    let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.into_bytes(), None);
     let ix = Instruction {
         program_id: sablier_thread_program::ID,
         accounts: sablier_thread_program::accounts::ThreadReset {
@@ -130,7 +136,7 @@ pub fn update(
     rate_limit: Option<u64>,
     schedule: Option<String>,
 ) -> Result<(), CliError> {
-    let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.into_bytes());
+    let thread_pubkey = Thread::pubkey(client.payer_pubkey(), id.into_bytes(), None);
     let trigger = schedule.map(|schedule| Trigger::Cron {
         schedule,
         skippable: true,
@@ -162,6 +168,6 @@ pub fn parse_pubkey_from_id_or_address(
     id: Option<String>,
     address: Option<Pubkey>,
 ) -> Result<Pubkey, CliError> {
-    let address_from_id = id.map(|str| Thread::pubkey(authority, str.into()));
+    let address_from_id = id.map(|str| Thread::pubkey(authority, str.into(), None));
     address.or(address_from_id).ok_or(CliError::InvalidAddress)
 }

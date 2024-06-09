@@ -10,7 +10,7 @@ use crate::{constants::*, state::*};
 
 /// Accounts required by the `thread_create` instruction.
 #[derive(Accounts)]
-#[instruction(amount: u64, id: Vec<u8>, instructions: Vec<SerializableInstruction>,  trigger: Trigger)]
+#[instruction(amount: u64, id: Vec<u8>, domain: Option<Vec<u8>>, instructions: Vec<SerializableInstruction>,  trigger: Trigger)]
 pub struct ThreadCreate<'info> {
     /// The authority (owner) of the thread.
     pub authority: Signer<'info>,
@@ -29,6 +29,7 @@ pub struct ThreadCreate<'info> {
             SEED_THREAD,
             authority.key().as_ref(),
             id.as_slice(),
+            domain.as_ref().unwrap_or(&Vec::new()).as_slice()
         ],
         bump,
         payer= payer,
@@ -48,6 +49,7 @@ pub fn handler(
     ctx: Context<ThreadCreate>,
     amount: u64,
     id: Vec<u8>,
+    domain: Option<Vec<u8>>,
     instructions: Vec<SerializableInstruction>,
     trigger: Trigger,
 ) -> Result<()> {
@@ -65,6 +67,7 @@ pub fn handler(
     thread.exec_context = None;
     thread.fee = THREAD_MINIMUM_FEE;
     thread.id = id;
+    thread.domain = domain;
     thread.instructions = instructions;
     thread.name = String::new();
     thread.next_instruction = None;

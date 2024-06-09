@@ -164,7 +164,7 @@ fn register_worker(client: &Client, config: &CliConfig) -> Result<()> {
 fn create_threads(client: &Client, mint_pubkey: Pubkey) -> Result<()> {
     // Create epoch thread.
     let epoch_thread_id = "sablier.network.epoch";
-    let epoch_thread_pubkey = Thread::pubkey(client.payer_pubkey(), epoch_thread_id.into());
+    let epoch_thread_pubkey = Thread::pubkey(client.payer_pubkey(), epoch_thread_id.into(), None);
     let ix_a1 = Instruction {
         program_id: sablier_network_program::ID,
         accounts: sablier_network_program::accounts::DistributeFeesJob {
@@ -237,6 +237,7 @@ fn create_threads(client: &Client, mint_pubkey: Pubkey) -> Result<()> {
         data: sablier_thread_program::instruction::ThreadCreate {
             amount: LAMPORTS_PER_SOL,
             id: epoch_thread_id.into(),
+            domain: None,
             instructions: vec![
                 ix_a1.into(),
                 ix_a2.into(),
@@ -255,7 +256,7 @@ fn create_threads(client: &Client, mint_pubkey: Pubkey) -> Result<()> {
 
     // Create hasher thread.
     let hasher_thread_id = "sablier.network.hasher";
-    let hasher_thread_pubkey = Thread::pubkey(client.payer_pubkey(), hasher_thread_id.into());
+    let hasher_thread_pubkey = Thread::pubkey(client.payer_pubkey(), hasher_thread_id.into(), None);
     let registry_hash_ix = Instruction {
         program_id: sablier_network_program::ID,
         accounts: sablier_network_program::accounts::RegistryNonceHash {
@@ -278,6 +279,7 @@ fn create_threads(client: &Client, mint_pubkey: Pubkey) -> Result<()> {
         data: sablier_thread_program::instruction::ThreadCreate {
             amount: LAMPORTS_PER_SOL,
             id: hasher_thread_id.into(),
+            domain: None,
             instructions: vec![registry_hash_ix.into()],
             trigger: Trigger::Cron {
                 schedule: "*/15 * * * * * *".into(),

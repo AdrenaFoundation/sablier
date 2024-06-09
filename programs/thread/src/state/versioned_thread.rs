@@ -31,6 +31,12 @@ impl VersionedThread {
         }
     }
 
+    pub fn domain(&self) -> Option<Vec<u8>> {
+        match self {
+            Self::V1(t) => t.domain.clone(),
+        }
+    }
+
     pub fn next_instruction(&self) -> Option<SerializableInstruction> {
         match self {
             Self::V1(t) => t.next_instruction.clone(),
@@ -51,7 +57,7 @@ impl VersionedThread {
 
     pub fn pubkey(&self) -> Pubkey {
         match self {
-            Self::V1(_) => Thread::pubkey(self.authority(), self.id()),
+            Self::V1(_) => Thread::pubkey(self.authority(), self.id(), self.domain()),
         }
     }
 

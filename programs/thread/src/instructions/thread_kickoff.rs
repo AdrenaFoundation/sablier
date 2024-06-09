@@ -27,12 +27,13 @@ pub struct ThreadKickoff<'info> {
             SEED_THREAD,
             thread.authority.as_ref(),
             thread.id.as_slice(),
+            thread.domain.as_ref().unwrap_or(&Vec::new()).as_slice()
         ],
         bump = thread.bump,
         constraint = !thread.paused @ SablierError::ThreadPaused,
         constraint = thread.next_instruction.is_none() @ SablierError::ThreadBusy,
     )]
-    pub thread: Box<Account<'info, Thread>>,
+    pub thread: Account<'info, Thread>,
 
     /// The worker.
     #[account(address = worker.pubkey())]
@@ -117,6 +118,11 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
             // Verify the current timestamp is greater than or equal to the threshold timestamp.
             let threshold_timestamp = next_timestamp(reference_timestamp, schedule.clone())
                 .ok_or(SablierError::TriggerConditionFailed)?;
+            msg!(
+                "Threshold timestamp: {}, clock timestamp: {}",
+                threshold_timestamp,
+                clock.unix_timestamp
+            );
             require!(
                 clock.unix_timestamp.ge(&threshold_timestamp),
                 SablierError::TriggerConditionFailed

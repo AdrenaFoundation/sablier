@@ -99,9 +99,10 @@ pub fn process(matches: &ArgMatches) -> Result<(), CliError> {
         CliCommand::ThreadCrateInfo {} => thread::crate_info(&client),
         CliCommand::ThreadCreate {
             id,
+            domain,
             kickoff_instruction,
             trigger,
-        } => thread::create(&client, id, vec![kickoff_instruction], trigger),
+        } => thread::create(&client, id, domain, vec![kickoff_instruction], trigger),
         CliCommand::ThreadDelete { id } => thread::delete(&client, id),
         CliCommand::ThreadPause { id } => thread::pause(&client, id),
         CliCommand::ThreadResume { id } => thread::resume(&client, id),
