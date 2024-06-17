@@ -5,7 +5,7 @@ use std::{
 };
 
 use anchor_lang::prelude::*;
-use chrono::{DateTime, Utc};
+use chrono::DateTime;
 use pyth_sdk_solana::state::SolanaPriceAccount;
 use sablier_cron::Schedule;
 use sablier_network_program::state::{Worker, WorkerAccount};
@@ -265,10 +265,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
 fn next_timestamp(after: i64, schedule: String) -> Option<i64> {
     Schedule::from_str(&schedule)
         .unwrap()
-        .next_after(&DateTime::<Utc>::from_naive_utc_and_offset(
-            DateTime::from_timestamp(after, 0).unwrap().naive_utc(),
-            Utc,
-        ))
+        .next_after(&DateTime::from_timestamp(after, 0).unwrap())
         .take()
         .map(|datetime| datetime.timestamp())
 }
