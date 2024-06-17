@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::DateTime;
 use sablier_cron::Schedule;
 use std::str::FromStr;
 
@@ -9,12 +9,7 @@ pub fn get(client: &Client, schedule: String) -> Result<(), CliError> {
     let schedule = Schedule::from_str(schedule.as_str()).unwrap();
 
     let mut i = 0;
-    for t in schedule.after(&DateTime::<Utc>::from_naive_utc_and_offset(
-        DateTime::from_timestamp(clock.unix_timestamp, 0)
-            .unwrap()
-            .naive_utc(),
-        Utc,
-    )) {
+    for t in schedule.after(&DateTime::from_timestamp(clock.unix_timestamp, 0).unwrap()) {
         println!("{:#?}", t);
         i += 1;
         if i > 8 {

@@ -1,11 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-    fmt::Debug,
-    str::FromStr,
-    sync::{atomic::AtomicU64, Arc},
-};
-
-use chrono::{DateTime, Utc};
+use chrono::DateTime;
 use log::info;
 use pyth_sdk_solana::PriceFeed;
 use sablier_cron::Schedule;
@@ -14,6 +7,12 @@ use solana_geyser_plugin_interface::geyser_plugin_interface::{
     GeyserPluginError, Result as PluginResult,
 };
 use solana_program::{clock::Clock, pubkey::Pubkey};
+use std::{
+    collections::{HashMap, HashSet},
+    fmt::Debug,
+    str::FromStr,
+    sync::{atomic::AtomicU64, Arc},
+};
 use tokio::sync::RwLock;
 
 #[derive(Default)]
@@ -221,11 +220,7 @@ impl ThreadObserver {
         } else {
             // Otherwise, index the thread according to its trigger type.
             match thread.trigger() {
-                Trigger::Account {
-                    address,
-                    offset: _,
-                    size: _,
-                } => {
+                Trigger::Account { address, .. } => {
                     // Index the thread by its trigger's account pubkey.
                     let mut w_account_threads = self.account_threads.write().await;
                     w_account_threads
@@ -246,10 +241,7 @@ impl ThreadObserver {
                     w_now_threads.insert(thread_pubkey);
                     drop(w_now_threads);
                 }
-                Trigger::Cron {
-                    schedule,
-                    skippable: _,
-                } => {
+                Trigger::Cron { schedule, .. } => {
                     // Find a reference timestamp for calculating the thread's upcoming target time.
                     let reference_timestamp = match thread.exec_context() {
                         None => thread.created_at().unix_timestamp,
@@ -372,10 +364,7 @@ fn next_moment(after: i64, schedule: String) -> Option<i64> {
     match Schedule::from_str(&schedule) {
         Err(_) => None,
         Ok(schedule) => schedule
-            .next_after(&DateTime::<Utc>::from_naive_utc_and_offset(
-                DateTime::from_timestamp(after, 0).unwrap().naive_utc(),
-                Utc,
-            ))
+            .next_after(&DateTime::from_timestamp(after, 0).unwrap())
             .take()
             .map(|datetime| datetime.timestamp()),
     }

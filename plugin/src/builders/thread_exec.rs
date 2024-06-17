@@ -102,14 +102,10 @@ pub async fn build_thread_exec_tx(
             // If there was a simulation error, stop packing and exit now.
             Err(err) => {
                 if let solana_client::client_error::ClientErrorKind::RpcError(
-                    solana_client::rpc_request::RpcError::RpcResponseError {
-                        code,
-                        message: _,
-                        data: _,
-                    },
+                    solana_client::rpc_request::RpcError::RpcResponseError { code, .. },
                 ) = err.kind
                 {
-                    if code.eq(&JSON_RPC_SERVER_ERROR_MIN_CONTEXT_SLOT_NOT_REACHED) {
+                    if code == JSON_RPC_SERVER_ERROR_MIN_CONTEXT_SLOT_NOT_REACHED {
                         return Err(GeyserPluginError::Custom(
                             "RPC client has not reached min context slot".into(),
                         ));
