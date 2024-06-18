@@ -45,7 +45,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
     let thread = &mut ctx.accounts.thread;
     let clock = Clock::get()?;
 
-    match thread.trigger.clone() {
+    match &thread.trigger {
         Trigger::Account {
             address,
             offset,
@@ -66,8 +66,8 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                     // Begin computing the data hash of this account.
                     let mut hasher = DefaultHasher::new();
                     let data = &account_info.try_borrow_data()?;
-                    let offset = offset as usize;
-                    let range_end = offset + size as usize;
+                    let offset = *offset as usize;
+                    let range_end = offset + *size as usize;
                     if data.len().gt(&range_end) {
                         data[offset..range_end].hash(&mut hasher);
                     } else {
@@ -115,7 +115,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
             };
 
             // Verify the current timestamp is greater than or equal to the threshold timestamp.
-            let threshold_timestamp = next_timestamp(reference_timestamp, schedule.clone())
+            let threshold_timestamp = next_timestamp(reference_timestamp, schedule)
                 .ok_or(SablierError::TriggerConditionFailed)?;
             require!(
                 clock.unix_timestamp.ge(&threshold_timestamp),
@@ -124,7 +124,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
 
             // If the schedule is marked as skippable, set the started_at of the exec context to be the current timestamp.
             // Otherwise, the exec context must iterate through each scheduled kickoff moment.
-            let started_at = if skippable {
+            let started_at = if *skippable {
                 clock.unix_timestamp
             } else {
                 threshold_timestamp
@@ -154,28 +154,28 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
             });
         }
         Trigger::Slot { slot } => {
-            require!(clock.slot.ge(&slot), SablierError::TriggerConditionFailed);
+            require!(clock.slot.ge(slot), SablierError::TriggerConditionFailed);
             thread.exec_context = Some(ExecContext {
                 exec_index: 0,
                 execs_since_reimbursement: 0,
                 execs_since_slot: 0,
                 last_exec_at: clock.slot,
-                trigger_context: TriggerContext::Slot { started_at: slot },
+                trigger_context: TriggerContext::Slot { started_at: *slot },
             });
         }
         Trigger::Epoch { epoch } => {
-            require!(clock.epoch.ge(&epoch), SablierError::TriggerConditionFailed);
+            require!(clock.epoch.ge(epoch), SablierError::TriggerConditionFailed);
             thread.exec_context = Some(ExecContext {
                 exec_index: 0,
                 execs_since_reimbursement: 0,
                 execs_since_slot: 0,
                 last_exec_at: clock.slot,
-                trigger_context: TriggerContext::Epoch { started_at: epoch },
+                trigger_context: TriggerContext::Epoch { started_at: *epoch },
             })
         }
         Trigger::Timestamp { unix_ts } => {
             require!(
-                clock.unix_timestamp.ge(&unix_ts),
+                clock.unix_timestamp.ge(unix_ts),
                 SablierError::TriggerConditionFailed
             );
             thread.exec_context = Some(ExecContext {
@@ -184,7 +184,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                 execs_since_slot: 0,
                 last_exec_at: clock.slot,
                 trigger_context: TriggerContext::Timestamp {
-                    started_at: unix_ts,
+                    started_at: *unix_ts,
                 },
             })
         }
@@ -213,7 +213,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                     match equality {
                         Equality::GreaterThanOrEqual => {
                             require!(
-                                current_price.price.ge(&limit),
+                                current_price.price.ge(limit),
                                 SablierError::TriggerConditionFailed
                             );
                             thread.exec_context = Some(ExecContext {
@@ -228,7 +228,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                         }
                         Equality::LessThanOrEqual => {
                             require!(
-                                current_price.price.le(&limit),
+                                current_price.price.le(limit),
                                 SablierError::TriggerConditionFailed
                             );
                             thread.exec_context = Some(ExecContext {
@@ -262,8 +262,8 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
     Ok(())
 }
 
-fn next_timestamp(after: i64, schedule: String) -> Option<i64> {
-    Schedule::from_str(&schedule)
+fn next_timestamp(after: i64, schedule: &str) -> Option<i64> {
+    Schedule::from_str(schedule)
         .unwrap()
         .next_after(&DateTime::from_timestamp(after, 0).unwrap())
         .take()
