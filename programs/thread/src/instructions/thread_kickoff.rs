@@ -209,17 +209,32 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                         price_feed_pubkey.eq(account_info.key),
                         SablierError::TriggerConditionFailed
                     );
-                    const STALENESS_THRESHOLD: u64 = 60; // staleness threshold in seconds
-                    let price_feed =
-                        SolanaPriceAccount::account_info_to_feed(account_info).unwrap();
-                    let current_timestamp = Clock::get()?.unix_timestamp;
-                    let current_price = price_feed
-                        .get_price_no_older_than(current_timestamp, STALENESS_THRESHOLD)
-                        .unwrap();
+                    let price;
+                    #[cfg(any(test, feature = "test"))]
+                    {
+                        let mut data: &[u8] = &account_info
+                            .data
+                            .try_borrow_mut()
+                            .map_err(|_| SablierError::TriggerConditionFailed)?;
+                        let oracle_acc = CustomOracle::try_deserialize(&mut data)
+                            .map_err(|_| SablierError::TriggerConditionFailed)?;
+                        price = oracle_acc.price as i64;
+                    }
+                    #[cfg(not(any(test, feature = "test")))]
+                    {
+                        const STALENESS_THRESHOLD: u64 = 60; // staleness threshold in seconds
+                        let price_feed =
+                            SolanaPriceAccount::account_info_to_feed(account_info).unwrap();
+                        let current_timestamp = Clock::get()?.unix_timestamp;
+                        let current_price = price_feed
+                            .get_price_no_older_than(current_timestamp, STALENESS_THRESHOLD)
+                            .unwrap();
+                        price = current_price.price;
+                    }
                     match equality {
                         Equality::GreaterThanOrEqual => {
                             require!(
-                                current_price.price.ge(&limit),
+                                price.ge(&limit),
                                 SablierError::TriggerConditionFailed
                             );
                             thread.exec_context = Some(ExecContext {
@@ -228,13 +243,13 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                                 execs_since_slot: 0,
                                 last_exec_at: clock.slot,
                                 trigger_context: TriggerContext::Pyth {
-                                    price: current_price.price,
+                                    price,
                                 },
                             });
                         }
                         Equality::LessThanOrEqual => {
                             require!(
-                                current_price.price.le(&limit),
+                                price.le(&limit),
                                 SablierError::TriggerConditionFailed
                             );
                             thread.exec_context = Some(ExecContext {
@@ -243,7 +258,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                                 execs_since_slot: 0,
                                 last_exec_at: clock.slot,
                                 trigger_context: TriggerContext::Pyth {
-                                    price: current_price.price,
+                                    price,
                                 },
                             });
                         }
@@ -277,4 +292,14 @@ fn next_timestamp(after: i64, schedule: String) -> Option<i64> {
         ))
         .take()
         .map(|datetime| datetime.timestamp())
+}
+
+#[cfg(any(test, feature = "test"))]
+#[account]
+#[derive(Default, Debug)]
+pub struct CustomOracle {
+    pub price: u64,
+    pub expo: i32,
+    pub conf: u64,
+    pub publish_time: i64,
 }

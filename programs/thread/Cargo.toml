@@ -20,6 +20,7 @@ no-idl = []
 no-log-ix-name = []
 cpi = ["no-entrypoint"]
 default = []
+test = []
 
 [dependencies]
 anchor-lang.workspace = true
