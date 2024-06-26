@@ -76,6 +76,7 @@ pub enum CliCommand {
     // Thread commands
     ThreadCreate {
         id: String,
+        domain: String,
         kickoff_instruction: SerializableInstruction,
         trigger: Trigger,
     },

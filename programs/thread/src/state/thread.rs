@@ -19,6 +19,7 @@ pub struct Thread {
     pub bump: u8,
     /// The cluster clock at the moment the thread was created.
     pub created_at: ClockData,
+    pub domain: Option<Vec<u8>>,
     /// The context of the thread's current execution state.
     pub exec_context: Option<ExecContext>,
     /// The number of lamports to payout to workers per execution.
@@ -41,9 +42,14 @@ pub struct Thread {
 
 impl Thread {
     /// Derive the pubkey of a thread account.
-    pub fn pubkey(authority: Pubkey, id: Vec<u8>) -> Pubkey {
+    pub fn pubkey(authority: Pubkey, id: Vec<u8>, domain: Option<Vec<u8>>) -> Pubkey {
         Pubkey::find_program_address(
-            &[SEED_THREAD, authority.as_ref(), id.as_slice()],
+            &[
+                SEED_THREAD,
+                authority.as_ref(),
+                id.as_slice(),
+                domain.unwrap_or_default().as_slice(),
+            ],
             &crate::ID,
         )
         .0
@@ -69,7 +75,7 @@ pub trait ThreadAccount {
 
 impl ThreadAccount for Account<'_, Thread> {
     fn pubkey(&self) -> Pubkey {
-        Thread::pubkey(self.authority, self.id.clone())
+        Thread::pubkey(self.authority, self.id.clone(), self.domain.clone())
     }
 
     fn realloc_account(&mut self) -> Result<()> {

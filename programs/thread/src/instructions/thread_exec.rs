@@ -42,6 +42,7 @@ pub struct ThreadExec<'info> {
             SEED_THREAD,
             thread.authority.as_ref(),
             thread.id.as_slice(),
+            thread.domain.as_ref().unwrap_or(&Vec::new()).as_slice()
         ],
         bump = thread.bump,
         constraint = !thread.paused @ SablierError::ThreadPaused,
@@ -93,6 +94,7 @@ pub fn handler(ctx: Context<ThreadExec>) -> Result<()> {
             SEED_THREAD,
             thread.authority.as_ref(),
             thread.id.as_slice(),
+            thread.domain.as_ref().unwrap_or(&Vec::new()).as_slice(),
             &[thread.bump],
         ]],
     )?;

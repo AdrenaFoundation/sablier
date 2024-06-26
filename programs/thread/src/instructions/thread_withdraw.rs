@@ -21,6 +21,7 @@ pub struct ThreadWithdraw<'info> {
             SEED_THREAD,
             thread.authority.as_ref(),
             thread.id.as_slice(),
+            thread.domain.as_ref().unwrap_or(&Vec::new()).as_slice()
         ],
         bump = thread.bump,
         has_one = authority,
