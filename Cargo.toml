@@ -22,8 +22,8 @@ documentation = "https://docs.sablier.dev"
 keywords = ["solana"]
 
 [workspace.dependencies]
-anchor-lang = "=0.29.0"
-anchor-spl = "=0.29.0"
+anchor-lang = "0.29.0"
+anchor-spl = "0.29.0"
 base64 = "~0.21"
 serde = "1.0"
 static-pubkey = "1.0.3"
