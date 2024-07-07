@@ -22,8 +22,8 @@ documentation = "https://docs.sablier.dev"
 keywords = ["solana"]
 
 [workspace.dependencies]
-anchor-lang = "0.29.0"
-anchor-spl = "0.29.0"
+anchor-lang = "=0.29.0"
+anchor-spl = "=0.29.0"
 base64 = "~0.21"
 serde = "1.0"
 static-pubkey = "1.0.3"
@@ -60,7 +60,7 @@ termcolor = "1.2.0"
 cargo_metadata = "=0.18.1"
 nom = "~7"
 log = "0.4"
-pyth-sdk-solana = "0.10.0"
+pyth-sdk-solana = { git = "https://github.com/AdrenaDEX/pyth-sdk-rs", branch = "fix-solana-deps" }
 tokio = "1.18.4"
 futures = "0.3.26"
 version = "3.0.0"
