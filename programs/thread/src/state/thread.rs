@@ -1,10 +1,10 @@
-use std::mem::size_of_val;
 use anchor_lang::{prelude::*, AnchorDeserialize, AnchorSerialize};
 use sablier_utils::{
     account::AccountInfoExt,
     thread::{ClockData, SerializableInstruction, Trigger},
     MinSpace, Space,
 };
+use std::mem::size_of_val;
 
 use crate::constants::SEED_THREAD;
 
@@ -73,20 +73,20 @@ pub trait ThreadAccount {
 
 impl Thread {
     pub fn min_space(instructions_number: usize) -> usize {
-        8 
-        + Pubkey::MIN_SPACE                             // authority
-        + u8::MIN_SPACE                                 // bump
-        + ClockData::MIN_SPACE                          // created_at
-        + (1 + 4 + 6)                                  // domain
-        + <Option<ExecContext>>::MIN_SPACE              // exec_context
-        + u64::MIN_SPACE                                // fee
-        + (4 + 32)                                      // id
+        8
+        + Pubkey::MIN_SPACE // authority
+        + u8::MIN_SPACE // bump
+        + ClockData::MIN_SPACE // created_at
+        + (1 + 4 + 6) // domain
+        + <Option<ExecContext>>::MIN_SPACE // exec_context
+        + u64::MIN_SPACE // fee
+        + (4 + 32) // id
         + (4 + SerializableInstruction::MIN_SPACE
-             * instructions_number)          // instructions
-        + <Option<SerializableInstruction>>::MIN_SPACE  // next_instruction
-        + bool::MIN_SPACE                               // paused
-        + u64::MIN_SPACE                                // rate_limit
-        + Trigger::MIN_SPACE                            // trigger
+             * instructions_number) // instructions
+        + <Option<SerializableInstruction>>::MIN_SPACE // next_instruction
+        + bool::MIN_SPACE // paused
+        + u64::MIN_SPACE // rate_limit
+        + Trigger::MIN_SPACE // trigger
     }
 }
 
