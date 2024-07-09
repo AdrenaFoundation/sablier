@@ -1,5 +1,3 @@
-use std::mem::size_of;
-
 use anchor_lang::{
     prelude::*,
     system_program::{transfer, Transfer},
@@ -33,14 +31,7 @@ pub struct ThreadCreate<'info> {
         ],
         bump,
         payer= payer,
-        space = [
-            8,
-            size_of::<Thread>(),
-            id.len(),
-            instructions.try_to_vec()?.len(),
-            trigger.try_to_vec()?.len(),
-            NEXT_INSTRUCTION_SIZE,
-        ].iter().sum()
+        space = Thread::min_space(instructions.len())
     )]
     pub thread: Account<'info, Thread>,
 }
@@ -69,7 +60,6 @@ pub fn handler(
     thread.id = id;
     thread.domain = domain;
     thread.instructions = instructions;
-    thread.name = String::new();
     thread.next_instruction = None;
     thread.paused = false;
     thread.rate_limit = u64::MAX;

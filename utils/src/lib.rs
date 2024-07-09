@@ -1,12 +1,16 @@
 pub mod account;
 pub mod explorer;
 pub mod pubkey;
+pub mod space;
 pub mod thread;
 
 use std::fmt::{Debug, Display, Formatter};
 
 use anchor_lang::{prelude::Pubkey, prelude::*, AnchorDeserialize};
 use base64::{engine::general_purpose::STANDARD, Engine};
+
+pub use sablier_macros::MinSpace;
+pub use space::Space;
 
 /// Crate build information
 #[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug)]
