@@ -121,7 +121,6 @@ pub struct ThreadResponse {
     Serialize,
     Deserialize,
     BorshSchema,
-    MinSpace,
     Clone,
     Debug,
     Hash,
@@ -131,10 +130,8 @@ pub struct SerializableInstruction {
     /// Pubkey of the instruction processor that executes this instruction
     pub program_id: Pubkey,
     /// Metadata for what accounts should be passed to the instruction processor
-    #[max_len(32)]
     pub accounts: Vec<SerializableAccount>,
     /// Opaque data passed to the instruction processor
-    #[max_len(100)]
     pub data: Vec<u8>,
 }
 
@@ -191,7 +188,6 @@ impl TryFrom<Vec<u8>> for SerializableInstruction {
     Serialize,
     Deserialize,
     BorshSchema,
-    MinSpace,
     Clone,
     Debug,
     Hash,

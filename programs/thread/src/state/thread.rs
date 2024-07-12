@@ -4,7 +4,6 @@ use sablier_utils::{
     thread::{ClockData, SerializableInstruction, Trigger},
     MinSpace, Space,
 };
-use std::mem::size_of_val;
 
 use crate::constants::SEED_THREAD;
 
@@ -62,6 +61,8 @@ impl PartialEq for Thread {
 
 impl Eq for Thread {}
 
+const DEFAULT_SERIALIZER_CAPACITY: usize = 1024;
+
 /// Trait for reading and writing to a thread account.
 pub trait ThreadAccount {
     /// Get the pubkey of the thread account.
@@ -72,21 +73,26 @@ pub trait ThreadAccount {
 }
 
 impl Thread {
-    pub fn min_space(instructions_number: usize) -> usize {
-        8
-        + Pubkey::MIN_SPACE // authority
-        + u8::MIN_SPACE // bump
-        + ClockData::MIN_SPACE // created_at
-        + (1 + 4 + 6) // domain
-        + <Option<ExecContext>>::MIN_SPACE // exec_context
-        + u64::MIN_SPACE // fee
-        + (4 + 32) // id
-        + (4 + SerializableInstruction::MIN_SPACE
-             * instructions_number) // instructions
-        + <Option<SerializableInstruction>>::MIN_SPACE // next_instruction
-        + bool::MIN_SPACE // paused
-        + u64::MIN_SPACE // rate_limit
-        + Trigger::MIN_SPACE // trigger
+    pub fn min_space(instructions: &[SerializableInstruction]) -> Result<usize> {
+        let mut buffer = Vec::with_capacity(instructions.len() * DEFAULT_SERIALIZER_CAPACITY);
+        for ins in instructions {
+            ins.serialize(&mut buffer)?;
+        }
+        Ok(
+            8
+            + Pubkey::MIN_SPACE // authority
+            + u8::MIN_SPACE // bump
+            + ClockData::MIN_SPACE // created_at
+            + (1 + 4 + 6) // domain
+            + <Option<ExecContext>>::MIN_SPACE // exec_context
+            + u64::MIN_SPACE // fee
+            + (4 + 32) // id
+            + (4 + buffer.len()) // instructions
+            + (1 + buffer.len() / instructions.len()) // next_instruction
+            + bool::MIN_SPACE // paused
+            + u64::MIN_SPACE // rate_limit
+            + Trigger::MIN_SPACE, // trigger
+        )
     }
 }
 
@@ -97,7 +103,7 @@ impl ThreadAccount for Account<'_, Thread> {
 
     fn realloc_account(&mut self) -> Result<()> {
         // Realloc memory for the thread account
-        let data_len = 8 + size_of_val(self);
+        let data_len = 8 + self.try_to_vec()?.len();
 
         self.realloc(data_len, false)?;
         Ok(())

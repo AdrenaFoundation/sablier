@@ -31,7 +31,7 @@ pub struct ThreadCreate<'info> {
         ],
         bump,
         payer= payer,
-        space = Thread::min_space(instructions.len())
+        space = Thread::min_space(&instructions)?
     )]
     pub thread: Account<'info, Thread>,
 }

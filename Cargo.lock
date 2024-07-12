@@ -3688,7 +3688,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-macros"
-version = "0.1.0"
+version = "1.0.0-alpha.3"
 dependencies = [
  "proc-macro2",
  "quote",
