@@ -61,8 +61,6 @@ impl PartialEq for Thread {
 
 impl Eq for Thread {}
 
-const DEFAULT_SERIALIZER_CAPACITY: usize = 1024;
-
 /// Trait for reading and writing to a thread account.
 pub trait ThreadAccount {
     /// Get the pubkey of the thread account.
@@ -74,10 +72,9 @@ pub trait ThreadAccount {
 
 impl Thread {
     pub fn min_space(instructions: &[SerializableInstruction]) -> Result<usize> {
-        let mut buffer = Vec::with_capacity(instructions.len() * DEFAULT_SERIALIZER_CAPACITY);
-        for ins in instructions {
-            ins.serialize(&mut buffer)?;
-        }
+        let ins_number = instructions.len();
+        let ins_space = instructions.try_to_vec()?.len();
+
         Ok(
             8
             + Pubkey::MIN_SPACE // authority
@@ -87,8 +84,8 @@ impl Thread {
             + <Option<ExecContext>>::MIN_SPACE // exec_context
             + u64::MIN_SPACE // fee
             + (4 + 32) // id
-            + (4 + buffer.len()) // instructions
-            + (1 + buffer.len() / instructions.len()) // next_instruction
+            + (4 + ins_space) // instructions
+            + (1 + ins_space / ins_number) // next_instruction
             + bool::MIN_SPACE // paused
             + u64::MIN_SPACE // rate_limit
             + Trigger::MIN_SPACE, // trigger
