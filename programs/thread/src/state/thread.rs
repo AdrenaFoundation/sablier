@@ -88,7 +88,8 @@ impl Thread {
             + (1 + ins_space / ins_number) // next_instruction
             + bool::MIN_SPACE // paused
             + u64::MIN_SPACE // rate_limit
-            + Trigger::MIN_SPACE, // trigger
+            + Trigger::MIN_SPACE // trigger
+            + 1200, // static padding
         )
     }
 }
