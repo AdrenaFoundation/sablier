@@ -8,7 +8,6 @@ use sablier_utils::{
 use crate::constants::SEED_THREAD;
 
 /// Tracks the current state of a transaction thread on Solana.
-// TODO Wait for the next version of Anchor to implement InitSpace macro
 #[account]
 #[derive(Debug)]
 pub struct Thread {
@@ -88,8 +87,7 @@ impl Thread {
             + (1 + ins_space / ins_number) // next_instruction
             + bool::MIN_SPACE // paused
             + u64::MIN_SPACE // rate_limit
-            + Trigger::MIN_SPACE // trigger
-            + 1200, // static padding
+            + Trigger::MIN_SPACE, // trigger
         )
     }
 }
