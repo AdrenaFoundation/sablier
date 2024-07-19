@@ -7,10 +7,6 @@ pub const SEED_THREAD: &[u8] = b"thread";
 #[constant]
 pub const THREAD_MINIMUM_FEE: u64 = 1000;
 
-/// Static space for next_instruction field.
-#[constant]
-pub const NEXT_INSTRUCTION_SIZE: usize = 1232;
-
 /// The ID of the pool workers must be a member of to collect fees.
 #[constant]
 pub const POOL_ID: u64 = 0;

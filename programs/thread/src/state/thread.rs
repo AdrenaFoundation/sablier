@@ -1,15 +1,13 @@
-use std::mem::size_of;
-
 use anchor_lang::{prelude::*, AnchorDeserialize, AnchorSerialize};
 use sablier_utils::{
     account::AccountInfoExt,
     thread::{ClockData, SerializableInstruction, Trigger},
+    MinSpace, Space,
 };
 
-use crate::constants::{NEXT_INSTRUCTION_SIZE, SEED_THREAD};
+use crate::constants::SEED_THREAD;
 
 /// Tracks the current state of a transaction thread on Solana.
-// TODO Wait for the next version of Anchor to implement InitSpace macro
 #[account]
 #[derive(Debug)]
 pub struct Thread {
@@ -28,8 +26,6 @@ pub struct Thread {
     pub id: Vec<u8>,
     /// The instructions to be executed.
     pub instructions: Vec<SerializableInstruction>,
-    /// The name of the thread.
-    pub name: String,
     /// The next instruction to be executed.
     pub next_instruction: Option<SerializableInstruction>,
     /// Whether or not the thread is currently paused.
@@ -73,6 +69,29 @@ pub trait ThreadAccount {
     fn realloc_account(&mut self) -> Result<()>;
 }
 
+impl Thread {
+    pub fn min_space(instructions: &[SerializableInstruction]) -> Result<usize> {
+        let ins_number = instructions.len();
+        let ins_space = instructions.try_to_vec()?.len();
+
+        Ok(
+            8
+            + Pubkey::MIN_SPACE // authority
+            + u8::MIN_SPACE // bump
+            + ClockData::MIN_SPACE // created_at
+            + (1 + 4 + 6) // domain
+            + <Option<ExecContext>>::MIN_SPACE // exec_context
+            + u64::MIN_SPACE // fee
+            + (4 + 32) // id
+            + (4 + ins_space) // instructions
+            + (1 + ins_space / ins_number) // next_instruction
+            + bool::MIN_SPACE // paused
+            + u64::MIN_SPACE // rate_limit
+            + Trigger::MIN_SPACE, // trigger
+        )
+    }
+}
+
 impl ThreadAccount for Account<'_, Thread> {
     fn pubkey(&self) -> Pubkey {
         Thread::pubkey(self.authority, self.id.clone(), self.domain.clone())
@@ -80,23 +99,15 @@ impl ThreadAccount for Account<'_, Thread> {
 
     fn realloc_account(&mut self) -> Result<()> {
         // Realloc memory for the thread account
-        let data_len = [
-            8,
-            size_of::<Thread>(),
-            self.id.len(),
-            self.instructions.try_to_vec()?.len(),
-            self.trigger.try_to_vec()?.len(),
-            NEXT_INSTRUCTION_SIZE,
-        ]
-        .iter()
-        .sum();
+        let data_len = 8 + self.try_to_vec()?.len();
+
         self.realloc(data_len, false)?;
         Ok(())
     }
 }
 
 /// The execution context of a particular transaction thread.
-#[derive(AnchorDeserialize, AnchorSerialize, InitSpace, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(AnchorDeserialize, AnchorSerialize, MinSpace, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ExecContext {
     /// Index of the next instruction to be executed.
     pub exec_index: u64,
@@ -116,7 +127,7 @@ pub struct ExecContext {
 }
 
 /// The event which allowed a particular transaction thread to be triggered.
-#[derive(AnchorDeserialize, AnchorSerialize, InitSpace, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(AnchorDeserialize, AnchorSerialize, MinSpace, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TriggerContext {
     /// A running hash of the observed account data.
     Account {

@@ -3678,6 +3678,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "sablier-macros"
+version = "1.0.0-alpha.3"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "sablier-utils",
+ "solana-sdk",
+ "syn 2.0.69",
+]
+
+[[package]]
 name = "sablier-network-program"
 version = "1.0.0-alpha.3"
 dependencies = [
@@ -3751,6 +3762,7 @@ version = "1.0.0-alpha.3"
 dependencies = [
  "anchor-lang",
  "base64 0.21.7",
+ "sablier-macros",
  "serde",
  "static-pubkey",
 ]

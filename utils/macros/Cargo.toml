@@ -1,0 +1,25 @@
+[package]
+name = "sablier-macros"
+version.workspace = true
+description = "Tools for building blocks on Solana"
+edition.workspace = true
+license.workspace = true
+homepage.workspace = true
+repository.workspace = true
+documentation.workspace = true
+readme = "./README.md"
+keywords.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { workspace = true, features = ["full"] }
+proc-macro2.workspace = true
+quote.workspace = true
+
+[dev-dependencies]
+sablier-utils.workspace = true
+solana-sdk.workspace = true

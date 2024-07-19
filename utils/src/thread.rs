@@ -1,5 +1,3 @@
-use std::{convert::TryFrom, fmt::Debug, hash::Hash};
-
 use anchor_lang::{
     prelude::borsh::BorshSchema,
     prelude::Pubkey,
@@ -7,14 +5,18 @@ use anchor_lang::{
     solana_program::{self, instruction::Instruction},
     AnchorDeserialize,
 };
+use sablier_macros::MinSpace;
 use serde::{Deserialize, Serialize};
 use static_pubkey::static_pubkey;
+use std::{convert::TryFrom, fmt::Debug, hash::Hash};
 
 /// The stand-in pubkey for delegating a payer address to a worker. All workers are re-imbursed by the user for lamports spent during this delegation.
 pub static PAYER_PUBKEY: Pubkey = static_pubkey!("Sab1ierPayer1111111111111111111111111111111");
 
+extern crate self as sablier_utils;
+
 /// The clock object, representing a specific moment in time recorded by a Solana cluster.
-#[derive(AnchorDeserialize, AnchorSerialize, InitSpace, BorshSchema, Clone, Debug, PartialEq)]
+#[derive(AnchorDeserialize, AnchorSerialize, MinSpace, BorshSchema, Clone, Debug, PartialEq)]
 pub struct ClockData {
     /// The current slot.
     pub slot: u64,
@@ -45,7 +47,7 @@ impl TryFrom<Vec<u8>> for ClockData {
 }
 
 /// The triggering conditions of a thread.
-#[derive(AnchorDeserialize, AnchorSerialize, Debug, Clone, PartialEq)]
+#[derive(AnchorDeserialize, AnchorSerialize, MinSpace, Debug, Clone, PartialEq)]
 pub enum Trigger {
     /// Allows a thread to be kicked off whenever the data of an account changes.
     Account {
@@ -60,6 +62,7 @@ pub enum Trigger {
     /// Allows a thread to be kicked off according to a one-time or recurring schedule.
     Cron {
         /// The schedule in cron syntax. Value must be parsable by the `sablier_cron` package.
+        #[max_len(32)]
         schedule: String,
 
         /// Boolean value indicating whether triggering moments may be skipped if they are missed (e.g. due to network downtime).
@@ -92,7 +95,7 @@ pub enum Trigger {
 
 /// Operators for describing how to compare two values to one another.  
 #[repr(u8)]
-#[derive(AnchorDeserialize, AnchorSerialize, Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(AnchorDeserialize, AnchorSerialize, MinSpace, Clone, Debug, Eq, PartialEq, Hash)]
 pub enum Equality {
     GreaterThanOrEqual,
     LessThanOrEqual,
