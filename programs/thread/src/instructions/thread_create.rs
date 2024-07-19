@@ -50,8 +50,6 @@ pub fn handler(
     let system_program = &ctx.accounts.system_program;
     let thread = &mut ctx.accounts.thread;
 
-    msg!("Thread THEO LEN: {}", Thread::min_space(&instructions)?);
-
     // Initialize the thread
     let bump = ctx.bumps.thread;
     thread.authority = authority.key();
@@ -66,8 +64,6 @@ pub fn handler(
     thread.paused = false;
     thread.rate_limit = u64::MAX;
     thread.trigger = trigger;
-
-    msg!("Thread LEN: {}", thread.try_to_vec()?.len());
 
     // Transfer SOL from payer to the thread.
     transfer(
