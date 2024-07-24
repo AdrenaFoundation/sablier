@@ -31,7 +31,7 @@ sablier-thread-program = { workspace = true, features = ["no-entrypoint"] }
 sablier-webhook-program = { workspace = true, features = ["no-entrypoint"] }
 sablier-utils.workspace = true
 log.workspace = true
-pyth-sdk-solana.workspace = true
+pyth-solana-receiver-sdk.workspace = true
 reqwest.workspace = true
 solana-account-decoder.workspace = true
 solana-client.workspace = true
@@ -42,7 +42,6 @@ solana-program.workspace = true
 solana-sdk.workspace = true
 tokio.workspace = true
 futures.workspace = true
-static-pubkey.workspace = true
 
 [build-dependencies]
 cargo_metadata.workspace = true

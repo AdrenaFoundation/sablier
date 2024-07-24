@@ -5,6 +5,7 @@ use anchor_lang::{
     solana_program::{self, instruction::Instruction},
     AnchorDeserialize,
 };
+use pyth_solana_receiver_sdk::price_update::FeedId;
 use sablier_macros::MinSpace;
 use serde::{Deserialize, Serialize};
 use static_pubkey::static_pubkey;
@@ -84,8 +85,9 @@ pub enum Trigger {
 
     /// Allows a thread to be kicked off according to a Pyth price feed movement.
     Pyth {
-        /// The address of the price feed to monitor.
-        price_feed: Pubkey,
+        /// The price feed id to monitor.
+        #[raw_space(32)]
+        feed_id: FeedId, // TODO implement in the macro
         /// The equality operator (gte or lte) used to compare prices.
         equality: Equality,
         /// The limit price to compare the Pyth feed to.

@@ -27,5 +27,5 @@ chrono = { workspace = true, features = ["alloc"] }
 sablier-cron.workspace = true
 sablier-network-program = { features = ["cpi"], workspace = true }
 sablier-utils.workspace = true
-pyth-sdk-solana.workspace = true
+pyth-solana-receiver-sdk.workspace = true
 version.workspace = true

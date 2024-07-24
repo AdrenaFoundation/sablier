@@ -60,7 +60,7 @@ termcolor = "1.2.0"
 cargo_metadata = "=0.18.1"
 nom = "~7"
 log = "0.4"
-pyth-sdk-solana = { git = "https://github.com/AdrenaDEX/pyth-sdk-rs", branch = "fix-solana-deps" }
+pyth-solana-receiver-sdk = "0.3.1"
 tokio = "1.18.4"
 futures = "0.3.26"
 version = "3.0.0"

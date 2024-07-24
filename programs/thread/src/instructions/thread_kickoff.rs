@@ -6,7 +6,7 @@ use std::{
 
 use anchor_lang::prelude::*;
 use chrono::DateTime;
-use pyth_sdk_solana::state::SolanaPriceAccount;
+use pyth_solana_receiver_sdk::price_update::PriceUpdateV2;
 use sablier_cron::Schedule;
 use sablier_network_program::state::{Worker, WorkerAccount};
 use sablier_utils::thread::Trigger;
@@ -195,7 +195,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
             })
         }
         Trigger::Pyth {
-            price_feed: price_feed_pubkey,
+            feed_id,
             equality,
             limit,
         } => {
@@ -205,17 +205,21 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                     return Err(SablierError::TriggerConditionFailed.into());
                 }
                 Some(account_info) => {
-                    require!(
-                        price_feed_pubkey.eq(account_info.key),
+                    require_keys_eq!(
+                        *account_info.owner,
+                        pyth_solana_receiver_sdk::ID,
                         SablierError::TriggerConditionFailed
                     );
                     const STALENESS_THRESHOLD: u64 = 60; // staleness threshold in seconds
-                    let price_feed =
-                        SolanaPriceAccount::account_info_to_feed(account_info).unwrap();
-                    let current_timestamp = Clock::get()?.unix_timestamp;
-                    let current_price = price_feed
-                        .get_price_no_older_than(current_timestamp, STALENESS_THRESHOLD)
-                        .unwrap();
+                    let price_update =
+                        PriceUpdateV2::try_deserialize(&mut account_info.data.borrow().as_ref())?;
+
+                    let current_price = price_update.get_price_no_older_than(
+                        &Clock::get()?,
+                        STALENESS_THRESHOLD,
+                        feed_id,
+                    )?;
+
                     match equality {
                         Equality::GreaterThanOrEqual => {
                             require!(

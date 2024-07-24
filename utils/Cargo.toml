@@ -19,3 +19,4 @@ base64.workspace = true
 serde = { workspace = true, features = ["derive"] }
 static-pubkey.workspace = true
 sablier-macros = { path = "./macros" }
+pyth-solana-receiver-sdk.workspace = true
