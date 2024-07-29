@@ -15,6 +15,8 @@ use std::{
 };
 use tokio::sync::RwLock;
 
+use crate::utils::get_oracle_key;
+
 #[derive(Default)]
 pub struct ThreadObserver {
     // Map from slot numbers to the sysvar clock data for that slot.
@@ -314,13 +316,14 @@ impl ThreadObserver {
                     drop(w_epoch_threads);
                 }
                 Trigger::Pyth {
-                    price_feed,
+                    feed_id,
                     equality,
                     limit,
                 } => {
                     let mut w_pyth_threads = self.pyth_threads.write().await;
+                    let price_pubkey = get_oracle_key(1, feed_id);
                     w_pyth_threads
-                        .entry(price_feed)
+                        .entry(price_pubkey)
                         .and_modify(|v| {
                             v.insert(PythThread {
                                 thread_pubkey,

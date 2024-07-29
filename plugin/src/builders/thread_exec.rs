@@ -24,6 +24,8 @@ use solana_sdk::{
     transaction::Transaction,
 };
 
+use crate::utils::get_oracle_key;
+
 /// Max byte size of a serialized transaction.
 static TRANSACTION_MESSAGE_SIZE_LIMIT: usize = 1_232;
 
@@ -235,14 +237,17 @@ fn build_kickoff_ix(
             is_writable: false,
         }),
         Trigger::Pyth {
-            price_feed,
+            feed_id,
             equality: _,
             limit: _,
-        } => kickoff_ix.accounts.push(AccountMeta {
-            pubkey: price_feed,
-            is_signer: false,
-            is_writable: false,
-        }),
+        } => {
+            let pubkey = get_oracle_key(1, feed_id);
+            kickoff_ix.accounts.push(AccountMeta {
+                pubkey,
+                is_signer: false,
+                is_writable: false,
+            })
+        }
         _ => {}
     }
 
