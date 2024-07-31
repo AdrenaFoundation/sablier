@@ -321,7 +321,7 @@ impl ThreadObserver {
                     limit,
                 } => {
                     let mut w_pyth_threads = self.pyth_threads.write().await;
-                    let price_pubkey = get_oracle_key(1, feed_id);
+                    let price_pubkey = get_oracle_key(0, feed_id);
                     w_pyth_threads
                         .entry(price_pubkey)
                         .and_modify(|v| {

@@ -241,7 +241,7 @@ fn build_kickoff_ix(
             equality: _,
             limit: _,
         } => {
-            let pubkey = get_oracle_key(1, feed_id);
+            let pubkey = get_oracle_key(0, feed_id);
             kickoff_ix.accounts.push(AccountMeta {
                 pubkey,
                 is_signer: false,
