@@ -10,7 +10,7 @@ use syn::{
 
 mod space;
 
-#[proc_macro_derive(MinSpace, attributes(max_len, raw_space, internal))]
+#[proc_macro_derive(MinSpace, attributes(max_len, raw_space))]
 pub fn derive_min_space(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 

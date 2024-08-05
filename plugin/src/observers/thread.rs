@@ -1,6 +1,6 @@
 use chrono::DateTime;
 use log::info;
-use pyth_sdk_solana::PriceFeed;
+use pyth_solana_receiver_sdk::price_update::PriceFeedMessage;
 use sablier_cron::Schedule;
 use sablier_thread_program::state::{Equality, Trigger, TriggerContext, VersionedThread};
 use solana_geyser_plugin_interface::geyser_plugin_interface::{
@@ -14,6 +14,8 @@ use std::{
     sync::{atomic::AtomicU64, Arc},
 };
 use tokio::sync::RwLock;
+
+use crate::utils::get_oracle_key;
 
 #[derive(Default)]
 pub struct ThreadObserver {
@@ -165,29 +167,21 @@ impl ThreadObserver {
     pub async fn observe_price_feed(
         self: Arc<Self>,
         account_pubkey: Pubkey,
-        price_feed: PriceFeed,
+        price_feed: PriceFeedMessage,
     ) -> PluginResult<()> {
         let r_pyth_threads = self.pyth_threads.read().await;
         if let Some(pyth_threads) = r_pyth_threads.get(&account_pubkey) {
             for pyth_thread in pyth_threads {
                 match pyth_thread.equality {
                     Equality::GreaterThanOrEqual => {
-                        if price_feed
-                            .get_price_unchecked()
-                            .price
-                            .ge(&pyth_thread.limit)
-                        {
+                        if price_feed.price.ge(&pyth_thread.limit) {
                             let mut w_now_threads = self.now_threads.write().await;
                             w_now_threads.insert(pyth_thread.thread_pubkey);
                             drop(w_now_threads);
                         }
                     }
                     Equality::LessThanOrEqual => {
-                        if price_feed
-                            .get_price_unchecked()
-                            .price
-                            .le(&pyth_thread.limit)
-                        {
+                        if price_feed.price.le(&pyth_thread.limit) {
                             let mut w_now_threads = self.now_threads.write().await;
                             w_now_threads.insert(pyth_thread.thread_pubkey);
                             drop(w_now_threads);
@@ -322,13 +316,14 @@ impl ThreadObserver {
                     drop(w_epoch_threads);
                 }
                 Trigger::Pyth {
-                    price_feed,
+                    feed_id,
                     equality,
                     limit,
                 } => {
                     let mut w_pyth_threads = self.pyth_threads.write().await;
+                    let price_pubkey = get_oracle_key(0, feed_id);
                     w_pyth_threads
-                        .entry(price_feed)
+                        .entry(price_pubkey)
                         .and_modify(|v| {
                             v.insert(PythThread {
                                 thread_pubkey,

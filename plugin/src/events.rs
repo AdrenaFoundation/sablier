@@ -1,24 +1,18 @@
-use anchor_lang::{prelude::AccountInfo, AccountDeserialize, Discriminator};
+use anchor_lang::{AccountDeserialize, Discriminator};
 use bincode::deserialize;
-use pyth_sdk_solana::{state::SolanaPriceAccount, PriceFeed};
+use pyth_solana_receiver_sdk::price_update::{PriceFeedMessage, PriceUpdateV2};
 use sablier_thread_program::state::{Thread, VersionedThread};
 use sablier_webhook_program::state::Webhook;
 use solana_geyser_plugin_interface::geyser_plugin_interface::{
     GeyserPluginError, ReplicaAccountInfo,
 };
 use solana_program::{clock::Clock, pubkey::Pubkey, sysvar};
-use static_pubkey::static_pubkey;
-
-static PYTH_ORACLE_PROGRAM_ID_MAINNET: Pubkey =
-    static_pubkey!("FsJ3A3u2vn5cTVofAjvy6y5kwABJAqYWpe4975bi2epH");
-static PYTH_ORACLE_PROGRAM_ID_DEVNET: Pubkey =
-    static_pubkey!("gSbePebfvPy7tRqimPoVecS2UsBvYv46ynrzWocc92s");
 
 #[derive(Debug)]
 pub enum AccountUpdateEvent {
     Clock { clock: Clock },
     Thread { thread: VersionedThread },
-    PriceFeed { price_feed: PriceFeed },
+    PriceFeed { price_feed: PriceFeedMessage },
     Webhook { webhook: Webhook },
 }
 
@@ -57,26 +51,17 @@ impl TryFrom<&mut ReplicaAccountInfo<'_>> for AccountUpdateEvent {
         }
 
         // If the account belongs to Pyth, attempt to parse it.
-        if owner_pubkey.eq(&PYTH_ORACLE_PROGRAM_ID_MAINNET)
-            || owner_pubkey.eq(&PYTH_ORACLE_PROGRAM_ID_DEVNET)
-        {
-            let data = &mut account_info.data.to_vec();
-            let acc_info = AccountInfo::new(
-                &account_pubkey,
-                false,
-                false,
-                &mut account_info.lamports,
-                data,
-                &owner_pubkey,
-                account_info.executable,
-                account_info.rent_epoch,
-            );
-            let price_feed = SolanaPriceAccount::account_info_to_feed(&acc_info).map_err(|_| {
-                GeyserPluginError::AccountsUpdateError {
-                    msg: "Failed to parse Pyth price account".into(),
-                }
-            })?;
-            return Ok(AccountUpdateEvent::PriceFeed { price_feed });
+        if owner_pubkey.eq(&pyth_solana_receiver_sdk::ID) {
+            let price_account =
+                PriceUpdateV2::try_deserialize(&mut account_info.data).map_err(|_| {
+                    GeyserPluginError::AccountsUpdateError {
+                        msg: "Failed to parse Pyth price account".into(),
+                    }
+                })?;
+
+            return Ok(AccountUpdateEvent::PriceFeed {
+                price_feed: price_account.price_message,
+            });
         }
 
         // If the account belongs to the webhook program, parse in
