@@ -11,8 +11,11 @@ use sablier_utils::account::AccountInfoExt;
 #[instruction(settings: ThreadSettings)]
 pub struct ThreadUpdate<'info> {
     /// The authority (owner) of the thread.
-    #[account(mut)]
     pub authority: Signer<'info>,
+
+    /// The payer of the reallocation.
+    #[account(mut)]
+    pub payer: Signer<'info>,
 
     /// The Solana system program
     pub system_program: Program<'info, System>,
@@ -34,7 +37,7 @@ pub struct ThreadUpdate<'info> {
 
 pub fn handler(ctx: Context<ThreadUpdate>, settings: ThreadSettings) -> Result<()> {
     // Get accounts
-    let authority = &ctx.accounts.authority;
+    let payer = &ctx.accounts.payer;
     let thread = &mut ctx.accounts.thread;
     let system_program = &ctx.accounts.system_program;
 
@@ -91,7 +94,7 @@ pub fn handler(ctx: Context<ThreadUpdate>, settings: ThreadSettings) -> Result<(
             CpiContext::new(
                 system_program.to_account_info(),
                 Transfer {
-                    from: authority.to_account_info(),
+                    from: payer.to_account_info(),
                     to: thread.to_account_info(),
                 },
             ),

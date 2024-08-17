@@ -151,6 +151,7 @@ pub fn update(
     let ix = Instruction {
         program_id: sablier_thread_program::ID,
         accounts: sablier_thread_program::accounts::ThreadUpdate {
+            payer: client.payer_pubkey(),
             authority: client.payer_pubkey(),
             system_program: system_program::ID,
             thread: thread_pubkey,
