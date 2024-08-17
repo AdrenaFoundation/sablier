@@ -79,7 +79,7 @@ impl Thread {
             + Pubkey::MIN_SPACE // authority
             + u8::MIN_SPACE // bump
             + ClockData::MIN_SPACE // created_at
-            + (1 + 4 + 6) // domain
+            + (1 + 4 + 32) // domain
             + <Option<ExecContext>>::MIN_SPACE // exec_context
             + u64::MIN_SPACE // fee
             + (4 + 32) // id
