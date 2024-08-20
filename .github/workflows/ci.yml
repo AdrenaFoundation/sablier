@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  SOLANA_CLI_VERSION: 1.18.12
+  SOLANA_CLI_VERSION: 1.18.22
   ANCHOR_CLI_VERSION: 0.29.0
 
 jobs:
@@ -58,7 +58,7 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          
+
       - name: Run cargo fmt
         run: cargo fmt --all -- --check
 
