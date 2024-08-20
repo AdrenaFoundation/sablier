@@ -216,7 +216,8 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                     //     PriceUpdateV2::try_deserialize(&mut account_info.data.borrow().as_ref())?;
 
                     let data: &[u8] = &account_info.data.borrow()[8..];
-                    let price_update: PriceUpdateV2 = AnchorDeserialize::try_from_slice(data)?;
+                    let price_update: PriceUpdateV2 = AnchorDeserialize::try_from_slice(data)
+                        .map_err(|_| SablierError::InvalidOracleAccount)?;
 
                     let current_price = price_update.get_price_no_older_than(
                         &Clock::get()?,
