@@ -43,7 +43,4 @@ pub enum SablierError {
     /// Thrown if the user attempts to withdraw SOL that would put a thread below it's minimum rent threshold.
     #[msg("Withdrawing this amount would leave the thread with less than the minimum required SOL for rent exemption")]
     WithdrawalTooLarge,
-
-    #[msg("Oracle account is invalid")]
-    InvalidOracleAccount,
 }
