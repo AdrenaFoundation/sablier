@@ -1,5 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_lang::AccountDeserialize;
 use chrono::DateTime;
 use pyth_solana_receiver_sdk::price_update::PriceUpdateV2;
 use sablier_cron::Schedule;
