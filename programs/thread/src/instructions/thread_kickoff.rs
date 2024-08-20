@@ -1,14 +1,15 @@
+use std::{
+    collections::hash_map::DefaultHasher,
+    hash::{Hash, Hasher},
+    str::FromStr,
+};
+
 use anchor_lang::prelude::*;
 use chrono::DateTime;
 use pyth_solana_receiver_sdk::price_update::PriceUpdateV2;
 use sablier_cron::Schedule;
 use sablier_network_program::state::{Worker, WorkerAccount};
 use sablier_utils::thread::Trigger;
-use std::{
-    collections::hash_map::DefaultHasher,
-    hash::{Hash, Hasher},
-    str::FromStr,
-};
 
 use crate::{constants::*, errors::*, state::*};
 
@@ -210,20 +211,8 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                         SablierError::TriggerConditionFailed
                     );
                     const STALENESS_THRESHOLD: u64 = 60; // staleness threshold in seconds
-
-                    // Do not work idk why
-                    // let price_update =
-                    //     PriceUpdateV2::try_deserialize(&mut account_info.data.borrow().as_ref())?;
-
-                    let data: &[u8] = &account_info.data.borrow()[8..];
-                    let price_update_maybe: std::result::Result<PriceUpdateV2, std::io::Error> =
-                        AnchorDeserialize::try_from_slice(data);
-
-                    if price_update_maybe.is_err() {
-                        return Err(SablierError::InvalidOracleAccount.into());
-                    }
-
-                    let price_update = price_update_maybe.unwrap();
+                    let price_update =
+                        PriceUpdateV2::try_deserialize(&mut account_info.data.borrow().as_ref())?;
 
                     let current_price = price_update.get_price_no_older_than(
                         &Clock::get()?,
