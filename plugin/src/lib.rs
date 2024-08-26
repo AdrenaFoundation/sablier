@@ -5,17 +5,12 @@ pub mod config {
 use solana_geyser_plugin_interface::geyser_plugin_interface::GeyserPlugin;
 
 mod builders;
-
+mod error;
 mod events;
-
 mod executors;
-
 mod observers;
-
 mod plugin;
-
 mod pool_position;
-
 mod utils;
 
 pub use plugin::SablierPlugin;

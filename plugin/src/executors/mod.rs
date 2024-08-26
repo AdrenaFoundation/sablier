@@ -1,16 +1,7 @@
 pub mod tx;
 pub mod webhook;
 
-use std::{
-    fmt::Debug,
-    sync::{
-        atomic::{AtomicBool, Ordering},
-        Arc,
-    },
-};
-
 use anchor_lang::{prelude::Pubkey, AccountDeserialize};
-use async_trait::async_trait;
 use log::info;
 use solana_client::{
     client_error::{ClientError, ClientErrorKind, Result as ClientResult},
@@ -18,6 +9,13 @@ use solana_client::{
 };
 use solana_geyser_plugin_interface::geyser_plugin_interface::Result as PluginResult;
 use solana_sdk::commitment_config::CommitmentConfig;
+use std::{
+    fmt::Debug,
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
+};
 use tokio::runtime::Runtime;
 use tx::TxExecutor;
 use webhook::WebhookExecutor;
@@ -67,7 +65,6 @@ impl Executors {
 
         // Acquire lock.
         if self
-            .clone()
             .lock
             .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)
             .is_err()
@@ -81,7 +78,7 @@ impl Executors {
         }
 
         // Process the slot on the observers.
-        let executable_threads = observers.thread.clone().process_slot(slot).await?;
+        let executable_threads = observers.thread.clone().process_slot(slot).await;
 
         // Process the slot in the transaction executor.
         self.tx
@@ -95,7 +92,7 @@ impl Executors {
             .await?;
 
         // Process webhook requests.
-        let executable_webhooks = observers.webhook.clone().process_slot(slot).await?;
+        let executable_webhooks = observers.webhook.clone().process_slot(slot).await;
         log::info!("Executable webhooks: {:?}", executable_webhooks);
         self.webhook
             .clone()
@@ -103,9 +100,7 @@ impl Executors {
             .await?;
 
         // Release the lock.
-        self.clone()
-            .lock
-            .store(false, std::sync::atomic::Ordering::Relaxed);
+        self.lock.store(false, std::sync::atomic::Ordering::Relaxed);
         info!(
             "processed_slot: {} duration: {:?} status: processed",
             slot,
@@ -121,12 +116,10 @@ impl Debug for Executors {
     }
 }
 
-#[async_trait]
 pub trait AccountGet {
     async fn get<T: AccountDeserialize>(&self, pubkey: &Pubkey) -> ClientResult<T>;
 }
 
-#[async_trait]
 impl AccountGet for RpcClient {
     async fn get<T: AccountDeserialize>(&self, pubkey: &Pubkey) -> ClientResult<T> {
         let data = self.get_account_data(pubkey).await?;

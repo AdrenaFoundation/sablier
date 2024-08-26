@@ -474,7 +474,6 @@ impl TxExecutor {
         w_executable_threads
             .entry(thread_pubkey)
             .and_modify(|metadata| metadata.simulation_failures += 1);
-        drop(w_executable_threads);
     }
 
     pub async fn dedupe_tx(
@@ -493,7 +492,6 @@ impl TxExecutor {
                 ));
             }
         }
-        drop(r_transaction_history);
         Ok(())
     }
 

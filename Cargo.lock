@@ -3795,7 +3795,6 @@ name = "sablier_plugin"
 version = "1.0.0-alpha.3"
 dependencies = [
  "anchor-lang",
- "async-trait",
  "bincode",
  "cargo_metadata",
  "chrono",
@@ -3818,6 +3817,7 @@ dependencies = [
  "solana-program",
  "solana-quic-client",
  "solana-sdk",
+ "thiserror",
  "tokio",
 ]
 
