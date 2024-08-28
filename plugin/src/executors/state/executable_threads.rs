@@ -57,7 +57,7 @@ impl ExecutableThreads {
     ) {
         let mut w_state = self.0.write().await;
 
-        for (pubkey, _) in executed_threads {
+        for pubkey in executed_threads.keys() {
             w_state.remove(pubkey);
         }
     }

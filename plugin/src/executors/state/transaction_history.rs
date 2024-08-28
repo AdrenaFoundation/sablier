@@ -74,13 +74,13 @@ impl TransactionHistory {
     ) {
         let mut w_state = self.0.write().await;
         for pubkey in successful_threads {
-            w_state.remove(&pubkey);
+            w_state.remove(pubkey);
         }
         for pubkey in failed_threads {
-            w_state.remove(&pubkey);
+            w_state.remove(pubkey);
         }
         for (pubkey, _) in retriable_threads {
-            w_state.remove(&pubkey);
+            w_state.remove(pubkey);
         }
         info!("transaction_history: {:?}", *w_state);
     }
