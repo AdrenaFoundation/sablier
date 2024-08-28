@@ -1,18 +1,15 @@
-use solana_sdk::pubkey::Pubkey;
 use std::{
     collections::{HashMap, HashSet},
     ops::Deref,
 };
+
+use solana_sdk::pubkey::Pubkey;
 use tokio::sync::RwLock;
 
-use crate::observers::thread::ThreadObserver;
-
-use super::FromState;
-
 #[derive(Default)]
-pub struct CronState(RwLock<HashMap<i64, HashSet<Pubkey>>>);
+pub struct CronThreads(RwLock<HashMap<i64, HashSet<Pubkey>>>);
 
-impl CronState {
+impl CronThreads {
     pub async fn add(&self, timestamp: i64, thread_key: Pubkey) {
         let mut w_state = self.0.write().await;
 
@@ -25,16 +22,10 @@ impl CronState {
     }
 }
 
-impl Deref for CronState {
+impl Deref for CronThreads {
     type Target = RwLock<HashMap<i64, HashSet<Pubkey>>>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
-    }
-}
-
-impl FromState<ThreadObserver> for CronState {
-    fn from(state: &ThreadObserver) -> &Self {
-        &state.cron_threads
     }
 }

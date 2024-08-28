@@ -1,13 +1,14 @@
-use sablier_webhook_program::state::Webhook;
-use solana_program::pubkey::Pubkey;
 use std::{collections::HashSet, fmt::Debug, sync::Arc};
 
-use super::state::WebhookState;
+use sablier_webhook_program::state::Webhook;
+use solana_program::pubkey::Pubkey;
+
+use super::state::Webhooks;
 
 #[derive(Default)]
 pub struct WebhookObserver {
     // The set of webhook that can be processed.
-    pub webhooks: WebhookState,
+    pub webhooks: Webhooks,
 }
 
 impl WebhookObserver {

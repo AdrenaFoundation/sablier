@@ -1,15 +1,12 @@
-use solana_sdk::pubkey::Pubkey;
 use std::{collections::HashSet, ops::Deref};
+
+use solana_sdk::pubkey::Pubkey;
 use tokio::sync::RwLock;
 
-use crate::observers::webhook::WebhookObserver;
-
-use super::FromState;
-
 #[derive(Default)]
-pub struct WebhookState(RwLock<HashSet<Pubkey>>);
+pub struct Webhooks(RwLock<HashSet<Pubkey>>);
 
-impl WebhookState {
+impl Webhooks {
     pub async fn add(&self, webhook: Pubkey) {
         let mut w_state = self.0.write().await;
 
@@ -17,16 +14,10 @@ impl WebhookState {
     }
 }
 
-impl Deref for WebhookState {
+impl Deref for Webhooks {
     type Target = RwLock<HashSet<Pubkey>>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
-    }
-}
-
-impl FromState<WebhookObserver> for WebhookState {
-    fn from(state: &WebhookObserver) -> &Self {
-        &state.webhooks
     }
 }

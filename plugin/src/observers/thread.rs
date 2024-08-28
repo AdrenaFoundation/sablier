@@ -1,9 +1,3 @@
-use chrono::DateTime;
-use log::info;
-use pyth_solana_receiver_sdk::price_update::PriceFeedMessage;
-use sablier_cron::Schedule;
-use sablier_thread_program::state::{Equality, Trigger, TriggerContext, VersionedThread};
-use solana_program::{clock::Clock, pubkey::Pubkey};
 use std::{
     collections::HashSet,
     fmt::Debug,
@@ -11,43 +5,50 @@ use std::{
     sync::{atomic::AtomicU64, Arc},
 };
 
+use chrono::DateTime;
+use log::info;
+use pyth_solana_receiver_sdk::price_update::PriceFeedMessage;
+use sablier_cron::Schedule;
+use sablier_thread_program::state::{Equality, Trigger, TriggerContext, VersionedThread};
+use solana_program::{clock::Clock, pubkey::Pubkey};
+
 use crate::{error::PluginError, observers::state::PythThread, utils::get_oracle_key};
 
 use super::state::{
-    AccountState, ClockState, CronState, EpochState, NowState, PythState, SlotState,
-    UpdatedAccountState,
+    AccountThreads, Clocks, CronThreads, EpochThreads, NowThreads, PythThreads, SlotThreads,
+    UpdatedAccounts,
 };
 
 #[derive(Default)]
 pub struct ThreadObserver {
     // Map from slot numbers to the sysvar clock data for that slot.
-    pub clocks: ClockState,
+    pub clocks: Clocks,
 
     // Integer tracking the current epoch.
     pub current_epoch: AtomicU64,
 
     // The set of threads with an account trigger.
     // Map from account pubkeys to the set of threads listening for an account update.
-    pub account_threads: AccountState,
+    pub account_threads: AccountThreads,
 
     // The set of threads with a cron trigger.
     // Map from unix timestamps to the list of threads scheduled for that moment.
-    pub cron_threads: CronState,
+    pub cron_threads: CronThreads,
 
     // The set of threads with a now trigger.
-    pub now_threads: NowState,
+    pub now_threads: NowThreads,
 
     // The set of threads with a slot trigger.
-    pub slot_threads: SlotState,
+    pub slot_threads: SlotThreads,
 
     // The set of threads with an epoch trigger.
-    pub epoch_threads: EpochState,
+    pub epoch_threads: EpochThreads,
 
     // The set of threads with a pyth trigger.
-    pub pyth_threads: PythState,
+    pub pyth_threads: PythThreads,
 
     // The set of accounts that have updated.
-    pub updated_accounts: UpdatedAccountState,
+    pub updated_accounts: UpdatedAccounts,
 }
 
 impl ThreadObserver {

@@ -15,16 +15,3 @@ pub use now::*;
 pub use pyth::*;
 pub use slot::*;
 pub use webhook::*;
-
-use super::thread::ThreadObserver;
-use std::sync::atomic::AtomicU64;
-
-pub trait FromState<S> {
-    fn from(state: &S) -> &Self;
-}
-
-impl FromState<ThreadObserver> for AtomicU64 {
-    fn from(state: &ThreadObserver) -> &Self {
-        &state.current_epoch
-    }
-}

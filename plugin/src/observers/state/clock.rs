@@ -1,15 +1,12 @@
-use solana_sdk::clock::Clock;
 use std::{collections::HashMap, ops::Deref};
+
+use solana_sdk::clock::Clock;
 use tokio::sync::RwLock;
 
-use crate::observers::thread::ThreadObserver;
-
-use super::FromState;
-
 #[derive(Default)]
-pub struct ClockState(RwLock<HashMap<u64, Clock>>);
+pub struct Clocks(RwLock<HashMap<u64, Clock>>);
 
-impl ClockState {
+impl Clocks {
     /// Drop old clocks.
     pub async fn cleanup(&self, current_slot: u64) {
         let mut w_state = self.0.write().await;
@@ -22,16 +19,10 @@ impl ClockState {
     }
 }
 
-impl Deref for ClockState {
+impl Deref for Clocks {
     type Target = RwLock<HashMap<u64, Clock>>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
-    }
-}
-
-impl FromState<ThreadObserver> for ClockState {
-    fn from(state: &ThreadObserver) -> &Self {
-        &state.clocks
     }
 }

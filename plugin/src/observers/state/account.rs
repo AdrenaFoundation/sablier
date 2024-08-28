@@ -1,18 +1,15 @@
-use solana_sdk::pubkey::Pubkey;
 use std::{
     collections::{HashMap, HashSet},
     ops::Deref,
 };
+
+use solana_sdk::pubkey::Pubkey;
 use tokio::sync::RwLock;
 
-use crate::observers::thread::ThreadObserver;
-
-use super::FromState;
-
 #[derive(Default)]
-pub struct AccountState(RwLock<HashMap<Pubkey, HashSet<Pubkey>>>);
+pub struct AccountThreads(RwLock<HashMap<Pubkey, HashSet<Pubkey>>>);
 
-impl AccountState {
+impl AccountThreads {
     pub async fn add(&self, address: Pubkey, thread_key: Pubkey) {
         let mut w_state = self.0.write().await;
         w_state
@@ -30,7 +27,7 @@ impl AccountState {
     }
 }
 
-impl Deref for AccountState {
+impl Deref for AccountThreads {
     type Target = RwLock<HashMap<Pubkey, HashSet<Pubkey>>>;
 
     fn deref(&self) -> &Self::Target {
@@ -38,16 +35,10 @@ impl Deref for AccountState {
     }
 }
 
-impl FromState<ThreadObserver> for AccountState {
-    fn from(state: &ThreadObserver) -> &Self {
-        &state.account_threads
-    }
-}
-
 #[derive(Default)]
-pub struct UpdatedAccountState(RwLock<HashSet<Pubkey>>);
+pub struct UpdatedAccounts(RwLock<HashSet<Pubkey>>);
 
-impl UpdatedAccountState {
+impl UpdatedAccounts {
     pub async fn add(&self, account: Pubkey) {
         let mut w_state = self.0.write().await;
 
@@ -55,16 +46,10 @@ impl UpdatedAccountState {
     }
 }
 
-impl Deref for UpdatedAccountState {
+impl Deref for UpdatedAccounts {
     type Target = RwLock<HashSet<Pubkey>>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
-    }
-}
-
-impl FromState<ThreadObserver> for UpdatedAccountState {
-    fn from(state: &ThreadObserver) -> &Self {
-        &state.updated_accounts
     }
 }

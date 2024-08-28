@@ -6,14 +6,10 @@ use std::{
 use solana_sdk::pubkey::Pubkey;
 use tokio::sync::RwLock;
 
-use crate::observers::thread::ThreadObserver;
-
-use super::FromState;
-
 #[derive(Default)]
-pub struct SlotState(RwLock<HashMap<u64, HashSet<Pubkey>>>);
+pub struct SlotThreads(RwLock<HashMap<u64, HashSet<Pubkey>>>);
 
-impl SlotState {
+impl SlotThreads {
     pub async fn add(&self, slot: u64, thread_key: Pubkey) {
         let mut w_state = self.0.write().await;
 
@@ -26,16 +22,10 @@ impl SlotState {
     }
 }
 
-impl Deref for SlotState {
+impl Deref for SlotThreads {
     type Target = RwLock<HashMap<u64, HashSet<Pubkey>>>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
-    }
-}
-
-impl FromState<ThreadObserver> for SlotState {
-    fn from(state: &ThreadObserver) -> &Self {
-        &state.slot_threads
     }
 }
