@@ -43,31 +43,3 @@ impl RotationHistory {
         status.is_err()
     }
 }
-
-/*
-        let r_rotation_history = self.rotation_history.read().await;
-        log::info!("Rotation history {:?}", r_rotation_history);
-        let should_attempt = if r_rotation_history.is_some() {
-            let rotation_history = r_rotation_history.as_ref().unwrap();
-            if slot
-                > rotation_history
-                    .sent_slot
-                    .checked_add(ROTATION_CONFIRMATION_PERIOD)
-                    .unwrap()
-            {
-                if let Ok(Some(status)) = client
-                    .get_signature_status(&rotation_history.signature)
-                    .await
-                {
-                    status.is_err()
-                } else {
-                    true
-                }
-            } else {
-                false
-            }
-        } else {
-            true
-        };
-
-*/
