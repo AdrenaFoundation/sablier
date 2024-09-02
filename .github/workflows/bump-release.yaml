@@ -85,7 +85,7 @@ jobs:
         run: |
           chmod +x ./scripts/ci/create-tarball.sh
           chmod +x ./scripts/build-all.sh
-          ./scripts/ci/create-tarball.sh --target ${{ matrix.target }}
+          ./scripts/ci/create-tarball.sh
 
       - name: Upload tarball
         uses: actions/upload-artifact@v4
