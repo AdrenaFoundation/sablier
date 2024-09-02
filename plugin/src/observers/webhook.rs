@@ -1,14 +1,14 @@
 use std::{collections::HashSet, fmt::Debug, sync::Arc};
 
 use sablier_webhook_program::state::Webhook;
-use solana_geyser_plugin_interface::geyser_plugin_interface::Result as PluginResult;
 use solana_program::pubkey::Pubkey;
-use tokio::sync::RwLock;
+
+use super::state::Webhooks;
 
 #[derive(Default)]
 pub struct WebhookObserver {
     // The set of webhook that can be processed.
-    pub webhooks: RwLock<HashSet<Pubkey>>,
+    pub webhooks: Webhooks,
 }
 
 impl WebhookObserver {
@@ -16,21 +16,18 @@ impl WebhookObserver {
         Self::default()
     }
 
-    pub async fn observe_webhook(
-        self: Arc<Self>,
-        _webhook: Webhook,
-        webhook_pubkey: Pubkey,
-    ) -> PluginResult<()> {
-        let mut w_webhooks = self.webhooks.write().await;
-        w_webhooks.insert(webhook_pubkey);
-        Ok(())
+    pub async fn observe_webhook(self: Arc<Self>, _webhook: Webhook, webhook_pubkey: Pubkey) {
+        self.webhooks.add(webhook_pubkey).await;
     }
 
-    pub async fn process_slot(self: Arc<Self>, _slot: u64) -> PluginResult<Vec<Pubkey>> {
+    pub async fn process_slot(self: Arc<Self>, _slot: u64) -> HashSet<Pubkey> {
+        let mut executable_threads = HashSet::new();
+
         let mut w_webhooks = self.webhooks.write().await;
-        let executable_webhooks = w_webhooks.clone().into_iter().collect();
-        w_webhooks.clear();
-        Ok(executable_webhooks)
+
+        executable_threads.extend(w_webhooks.drain());
+
+        executable_threads
     }
 }
 

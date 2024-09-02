@@ -2,14 +2,15 @@ use std::{fmt::Debug, sync::Arc};
 
 use log::info;
 use solana_geyser_plugin_interface::geyser_plugin_interface::{
-    GeyserPlugin, ReplicaAccountInfo, ReplicaAccountInfoVersions, Result as PluginResult,
-    SlotStatus,
+    GeyserPlugin, ReplicaAccountInfoVersions, Result as PluginResult, SlotStatus,
 };
-use solana_program::pubkey::Pubkey;
 use tokio::runtime::{Builder, Runtime};
 
 use crate::{
-    config::PluginConfig, events::AccountUpdateEvent, executors::Executors, observers::Observers,
+    config::PluginConfig,
+    events::{AccountUpdate, AccountUpdateEvent},
+    executors::Executors,
+    observers::Observers,
 };
 
 pub struct SablierPlugin {
@@ -49,8 +50,6 @@ impl GeyserPlugin for SablierPlugin {
         Ok(())
     }
 
-    fn on_unload(&mut self) {}
-
     fn update_account(
         &self,
         account: ReplicaAccountInfoVersions,
@@ -58,37 +57,7 @@ impl GeyserPlugin for SablierPlugin {
         is_startup: bool,
     ) -> PluginResult<()> {
         // Parse account info.
-        let account_info = &mut match account {
-            ReplicaAccountInfoVersions::V0_0_1(account_info) => ReplicaAccountInfo {
-                pubkey: account_info.pubkey,
-                lamports: account_info.lamports,
-                owner: account_info.owner,
-                executable: account_info.executable,
-                rent_epoch: account_info.rent_epoch,
-                data: account_info.data,
-                write_version: account_info.write_version,
-            },
-            ReplicaAccountInfoVersions::V0_0_2(account_info) => ReplicaAccountInfo {
-                pubkey: account_info.pubkey,
-                lamports: account_info.lamports,
-                owner: account_info.owner,
-                executable: account_info.executable,
-                rent_epoch: account_info.rent_epoch,
-                data: account_info.data,
-                write_version: account_info.write_version,
-            },
-            ReplicaAccountInfoVersions::V0_0_3(account_info) => ReplicaAccountInfo {
-                pubkey: account_info.pubkey,
-                lamports: account_info.lamports,
-                owner: account_info.owner,
-                executable: account_info.executable,
-                rent_epoch: account_info.rent_epoch,
-                data: account_info.data,
-                write_version: account_info.write_version,
-            },
-        };
-        let account_pubkey = Pubkey::try_from(account_info.pubkey).unwrap();
-        let event = AccountUpdateEvent::try_from(account_info);
+        let account_update = AccountUpdate::from(account);
 
         // Process event on tokio task.
         self.inner.clone().spawn(|inner| async move {
@@ -99,28 +68,22 @@ impl GeyserPlugin for SablierPlugin {
                     .observers
                     .thread
                     .clone()
-                    .observe_account(account_pubkey, slot)
-                    .await?;
+                    .observe_account(account_update.key, slot)
+                    .await;
             }
 
-            // Parse and process specific update events.
-            if let Ok(event) = event {
+            if let Some(event) = account_update.event {
+                // Process specific update events.
                 match event {
                     AccountUpdateEvent::Clock { clock } => {
-                        inner
-                            .observers
-                            .thread
-                            .clone()
-                            .observe_clock(clock)
-                            .await
-                            .ok();
+                        inner.observers.thread.clone().observe_clock(clock).await;
                     }
                     AccountUpdateEvent::Thread { thread } => {
                         inner
                             .observers
                             .thread
                             .clone()
-                            .observe_thread(thread, account_pubkey, slot)
+                            .observe_thread(thread, account_update.key, slot)
                             .await
                             .ok();
                     }
@@ -129,21 +92,20 @@ impl GeyserPlugin for SablierPlugin {
                             .observers
                             .webhook
                             .clone()
-                            .observe_webhook(webhook, account_pubkey)
-                            .await
-                            .ok();
+                            .observe_webhook(webhook, account_update.key)
+                            .await;
                     }
                     AccountUpdateEvent::PriceFeed { price_feed } => {
                         inner
                             .observers
                             .thread
                             .clone()
-                            .observe_price_feed(account_pubkey, price_feed)
-                            .await
-                            .ok();
+                            .observe_price_feed(account_update.key, price_feed)
+                            .await;
                     }
                 }
             }
+
             Ok(())
         });
         Ok(())
@@ -171,29 +133,6 @@ impl GeyserPlugin for SablierPlugin {
             Ok(())
         });
         Ok(())
-    }
-
-    fn notify_transaction(
-        &self,
-        _transaction: solana_geyser_plugin_interface::geyser_plugin_interface::ReplicaTransactionInfoVersions,
-        _slot: u64,
-    ) -> PluginResult<()> {
-        Ok(())
-    }
-
-    fn notify_block_metadata(
-        &self,
-        _blockinfo: solana_geyser_plugin_interface::geyser_plugin_interface::ReplicaBlockInfoVersions,
-    ) -> PluginResult<()> {
-        Ok(())
-    }
-
-    fn account_data_notifications_enabled(&self) -> bool {
-        true
-    }
-
-    fn transaction_notifications_enabled(&self) -> bool {
-        false
     }
 }
 

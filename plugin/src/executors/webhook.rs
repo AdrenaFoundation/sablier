@@ -1,4 +1,4 @@
-use std::{fmt::Debug, sync::Arc};
+use std::{collections::HashSet, fmt::Debug, sync::Arc};
 
 use anchor_lang::prelude::Pubkey;
 use log::info;
@@ -26,7 +26,7 @@ impl WebhookExecutor {
     pub async fn execute_webhooks(
         self: Arc<Self>,
         client: Arc<RpcClient>,
-        pubkeys: Vec<Pubkey>,
+        pubkeys: HashSet<Pubkey>,
     ) -> PluginResult<()> {
         // self.spawn(|this| async move {
         //     let url = http_request.clone().request.url;

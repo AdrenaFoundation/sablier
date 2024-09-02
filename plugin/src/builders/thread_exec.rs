@@ -11,9 +11,6 @@ use solana_client::{
     rpc_config::{RpcSimulateTransactionAccountsConfig, RpcSimulateTransactionConfig},
     rpc_custom_error::JSON_RPC_SERVER_ERROR_MIN_CONTEXT_SLOT_NOT_REACHED,
 };
-use solana_geyser_plugin_interface::geyser_plugin_interface::{
-    GeyserPluginError, Result as PluginResult,
-};
 use solana_program::{
     instruction::{AccountMeta, Instruction},
     pubkey::Pubkey,
@@ -24,7 +21,7 @@ use solana_sdk::{
     transaction::Transaction,
 };
 
-use crate::utils::get_oracle_key;
+use crate::{error::PluginError, utils::get_oracle_key};
 
 /// Max byte size of a serialized transaction.
 static TRANSACTION_MESSAGE_SIZE_LIMIT: usize = 1_232;
@@ -42,10 +39,10 @@ pub async fn build_thread_exec_tx(
     thread: VersionedThread,
     thread_pubkey: Pubkey,
     worker_id: u64,
-) -> PluginResult<Option<Transaction>> {
+) -> Result<Option<Transaction>, PluginError> {
     // Grab the thread and relevant data.
     let now = std::time::Instant::now();
-    let blockhash = client.get_latest_blockhash().await.unwrap();
+    let blockhash = client.get_latest_blockhash().await?;
     let signatory_pubkey = payer.pubkey();
     let worker_pubkey = Worker::pubkey(worker_id);
 
@@ -108,9 +105,7 @@ pub async fn build_thread_exec_tx(
                 ) = err.kind
                 {
                     if code == JSON_RPC_SERVER_ERROR_MIN_CONTEXT_SLOT_NOT_REACHED {
-                        return Err(GeyserPluginError::Custom(
-                            "RPC client has not reached min context slot".into(),
-                        ));
+                        return Err(PluginError::MinContextSlotNotReached);
                     }
                 }
                 break;
@@ -284,7 +279,7 @@ fn build_exec_ix(
         ));
 
         // Inject the worker pubkey as the dynamic "payer" account.
-        for acc in next_instruction.clone().accounts {
+        for acc in next_instruction.accounts {
             let acc_pubkey = if acc.pubkey == PAYER_PUBKEY {
                 signatory_pubkey
             } else {
