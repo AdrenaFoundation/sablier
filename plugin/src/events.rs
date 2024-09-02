@@ -44,30 +44,32 @@ fn parse_event(
     owner: Pubkey,
     mut data: &[u8],
 ) -> Result<Option<AccountUpdateEvent>, PluginError> {
-    let event = if key == sysvar::clock::ID {
-        Some(AccountUpdateEvent::Clock {
+    if key == sysvar::clock::ID {
+        return Ok(Some(AccountUpdateEvent::Clock {
             clock: bincode::deserialize::<Clock>(data)?,
-        })
-    } else if owner == sablier_thread_program::ID && data.len() > 8 {
+        }));
+    }
+
+    if owner == sablier_thread_program::ID && data.len() > 8 {
         let d = &data[..8];
         if d == Thread::discriminator() {
-            Some(AccountUpdateEvent::Thread {
+            return Ok(Some(AccountUpdateEvent::Thread {
                 thread: VersionedThread::V1(Thread::try_deserialize(&mut data)?),
-            })
-        } else {
-            None
+            }));
         }
-    } else if owner == pyth_solana_receiver_sdk::ID {
-        Some(AccountUpdateEvent::PriceFeed {
-            price_feed: PriceUpdateV2::try_deserialize(&mut data)?.price_message,
-        })
-    } else if owner == sablier_webhook_program::ID && data.len() > 8 {
-        Some(AccountUpdateEvent::Webhook {
-            webhook: Webhook::try_deserialize(&mut data)?,
-        })
-    } else {
-        None
-    };
+    }
 
-    Ok(event)
+    if owner == pyth_solana_receiver_sdk::ID {
+        return Ok(Some(AccountUpdateEvent::PriceFeed {
+            price_feed: PriceUpdateV2::try_deserialize(&mut data)?.price_message,
+        }));
+    }
+
+    if owner == sablier_webhook_program::ID && data.len() > 8 {
+        return Ok(Some(AccountUpdateEvent::Webhook {
+            webhook: Webhook::try_deserialize(&mut data)?,
+        }));
+    }
+
+    Ok(None)
 }
