@@ -3670,7 +3670,7 @@ checksum = "f3cb5ba0dc43242ce17de99c180e96db90b235b8a9fdc9543c96d2209116bd9f"
 
 [[package]]
 name = "sablier-cli"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -3704,7 +3704,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-cron"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "chrono",
  "nom",
@@ -3712,7 +3712,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-macros"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3721,7 +3721,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-network-program"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -3731,7 +3731,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-plugin-utils"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -3740,7 +3740,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-relayer"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "actix-cors",
  "actix-web",
@@ -3759,7 +3759,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-relayer-api"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "bincode",
  "serde",
@@ -3768,7 +3768,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-sdk"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "anchor-lang",
  "sablier-thread-program",
@@ -3776,7 +3776,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-thread-program"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "anchor-lang",
  "chrono",
@@ -3789,7 +3789,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-utils"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "anchor-lang",
  "base64 0.21.7",
@@ -3802,7 +3802,7 @@ dependencies = [
 
 [[package]]
 name = "sablier-webhook-program"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "anchor-lang",
  "serde",
@@ -3810,7 +3810,7 @@ dependencies = [
 
 [[package]]
 name = "sablier_plugin"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "anchor-lang",
  "bincode",
