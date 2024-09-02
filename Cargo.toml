@@ -49,6 +49,7 @@ rustc_version = "0.4"
 sablier-cron = { path = "./cron", version = "=1.0.1" }
 sablier-network-program = { path = "./programs/network", version = "=1.0.1" }
 sablier-plugin-utils = { path = "./plugin/utils", version = "=1.0.1" }
+sablier-macros = { path = "./utils/macros", version = "=1.0.1" }
 sablier-relayer-api = { path = "./relayer/api", version = "=1.0.1" }
 sablier-thread-program = { path = "./programs/thread", version = "=1.0.1" }
 sablier-utils = { path = "./utils", version = "=1.0.1" }

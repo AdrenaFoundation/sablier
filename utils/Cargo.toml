@@ -18,7 +18,7 @@ anchor-lang.workspace = true
 base64.workspace = true
 serde = { workspace = true, features = ["derive"] }
 static-pubkey.workspace = true
-sablier-macros = { path = "./macros" }
+sablier-macros.workspace = true
 pyth-solana-receiver-sdk.workspace = true
 
 [dev-dependencies]
