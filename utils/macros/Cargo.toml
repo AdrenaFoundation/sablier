@@ -19,7 +19,3 @@ proc-macro = true
 syn = { workspace = true, features = ["full"] }
 proc-macro2.workspace = true
 quote.workspace = true
-
-[dev-dependencies]
-sablier-utils.workspace = true
-solana-sdk.workspace = true

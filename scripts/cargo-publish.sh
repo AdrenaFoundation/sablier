@@ -3,6 +3,8 @@
 # Publish shared libs
 cargo publish -p sablier-cron
 sleep 25
+cargo publish -p sablier-macros
+sleep 25
 cargo publish -p sablier-utils
 sleep 25
 cargo publish -p sablier-relayer-api

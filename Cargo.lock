@@ -3716,8 +3716,6 @@ version = "1.0.0"
 dependencies = [
  "proc-macro2",
  "quote",
- "sablier-utils",
- "solana-sdk",
  "syn 2.0.58",
 ]
 
@@ -3798,6 +3796,7 @@ dependencies = [
  "pyth-solana-receiver-sdk",
  "sablier-macros",
  "serde",
+ "solana-sdk",
  "static-pubkey",
 ]
 
