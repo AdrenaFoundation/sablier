@@ -2,7 +2,6 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::{parse::Parse, Ident, LitInt};
 
-#[derive(Debug)]
 pub enum Value {
     Lit(LitInt),
     Ident(Ident),

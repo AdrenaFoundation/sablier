@@ -8,7 +8,6 @@ use syn::{
 
 use super::Value;
 
-#[derive(Debug)]
 pub struct Arg {
     pub is_raw: bool,
     pub value: Value,
@@ -42,7 +41,7 @@ impl Parse for Arg {
     }
 }
 
-#[derive(Default, Debug)]
+#[derive(Default)]
 pub struct Args(pub Vec<Arg>);
 
 impl Deref for Args {
