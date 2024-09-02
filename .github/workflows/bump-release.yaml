@@ -75,7 +75,8 @@ jobs:
         uses: baptiste0928/cargo-install@v3
         with:
           crate: anchor-cli
-          args: --git https://github.com/coral-xyz/anchor --tag ${{ env.ANCHOR_VERSION }}
+          git: https://github.com/coral-xyz/anchor
+          tag: ${{ env.ANCHOR_VERSION }}
 
       - uses: Swatinem/rust-cache@v2
         with:
