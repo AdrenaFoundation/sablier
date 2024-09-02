@@ -91,7 +91,7 @@ jobs:
         with:
           if-no-files-found: error
           name: release_build
-          path: clockwork-geyser-plugin-release-*
+          path: sablier-geyser-plugin-release-*
 
 
   release:
