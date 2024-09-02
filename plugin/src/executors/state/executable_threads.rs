@@ -19,7 +19,7 @@ static THREAD_TIMEOUT_WINDOW: u64 = 24;
 static EXPONENTIAL_BACKOFF_CONSTANT: u32 = 2;
 
 #[derive(Default)]
-pub struct ExecutableThreads(RwLock<HashMap<Pubkey, ExecutableThreadMetadata>>);
+pub struct ExecutableThreads(RwLock<HashMap<Pubkey, ExecutableThreadMetadata>>, AtomicU64);
 
 impl ExecutableThreads {
     pub async fn increment_simulation_failure(&self, thread_pubkey: Pubkey) {
@@ -68,12 +68,7 @@ impl ExecutableThreads {
         w_state.remove(thread);
     }
 
-    pub async fn rebase_threads(
-        &self,
-        slot: u64,
-        threads: &HashSet<Pubkey>,
-        dropped_threads: &AtomicU64,
-    ) {
+    pub async fn rebase_threads(&self, slot: u64, threads: &HashSet<Pubkey>) {
         // Index the provided threads as executable.
         let mut w_state = self.0.write().await;
         threads.iter().for_each(|pubkey| {
@@ -89,7 +84,7 @@ impl ExecutableThreads {
         // Drop threads that cross the simulation failure threshold.
         w_state.retain(|_thread_pubkey, metadata| {
             if metadata.simulation_failures > MAX_THREAD_SIMULATION_FAILURES {
-                dropped_threads.fetch_add(1, Ordering::Relaxed);
+                self.1.fetch_add(1, Ordering::Relaxed);
                 false
             } else {
                 true
@@ -97,7 +92,7 @@ impl ExecutableThreads {
         });
         info!(
             "dropped_threads: {:?} executable_threads: {:?}",
-            dropped_threads.load(Ordering::Relaxed),
+            self.1.load(Ordering::Relaxed),
             *w_state
         );
     }

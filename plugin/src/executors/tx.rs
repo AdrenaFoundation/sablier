@@ -1,7 +1,7 @@
 use std::{
     collections::{HashMap, HashSet},
     fmt::Debug,
-    sync::{atomic::AtomicU64, Arc},
+    sync::Arc,
 };
 
 use bincode::serialize;
@@ -39,7 +39,6 @@ pub struct TxExecutor {
     pub executable_threads: ExecutableThreads,
     pub transaction_history: TransactionHistory,
     pub rotation_history: RotationHistory,
-    pub dropped_threads: AtomicU64,
     pub keypair: Keypair,
 }
 
@@ -63,7 +62,6 @@ impl TxExecutor {
             executable_threads: ExecutableThreads::default(),
             transaction_history: TransactionHistory::default(),
             rotation_history: RotationHistory::default(),
-            dropped_threads: AtomicU64::new(0),
             keypair: read_or_new_keypair(config.keypath),
         }
     }
@@ -76,7 +74,7 @@ impl TxExecutor {
         runtime: Arc<Runtime>,
     ) -> PluginResult<()> {
         self.executable_threads
-            .rebase_threads(slot, &thread_pubkeys, &self.dropped_threads)
+            .rebase_threads(slot, &thread_pubkeys)
             .await;
 
         // Process retries.
