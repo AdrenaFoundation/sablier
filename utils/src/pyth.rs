@@ -136,7 +136,7 @@ impl anchor_lang::AccountDeserialize for PriceUpdateV2 {
             return Err(anchor_lang::error::ErrorCode::AccountDiscriminatorNotFound.into());
         }
         let given_disc = &buf[..8];
-        if &[34, 241, 35, 99, 157, 126, 244, 205] != given_disc {
+        if [34, 241, 35, 99, 157, 126, 244, 205] != given_disc {
             return Err(anchor_lang::error::Error::from(
                 anchor_lang::error::AnchorError {
                     error_name: anchor_lang::error::ErrorCode::AccountDiscriminatorMismatch.name(),
@@ -164,4 +164,23 @@ pub fn get_oracle_key(shard_id: u16, feed_id: FeedId) -> Pubkey {
     let (pubkey, _) =
         Pubkey::find_program_address(&[&shard_id.to_be_bytes(), &feed_id], &PYTH_PUSH_ORACLE_ID);
     pubkey
+}
+
+#[cfg(test)]
+mod tests {
+    use base64::Engine;
+
+    use super::*;
+
+    #[test]
+    fn test_price_update_v2() {
+        let data = base64::engine::general_purpose::STANDARD.decode("IvEjY51+9M1gMUcENA3t3zcf1CRyFI8kjp0abRpesqw6zYt/1dayQwHvDYtv2izrpB2hXUCV0do5Kg0vjtDGx7wPTPrIwoC1bdYkWB4DAAAAPA/bAAAAAAD4////rbTWZgAAAACttNZmAAAAAOx1oSEDAAAAtpvRAAAAAADMB0YTAAAAAAA=").unwrap();
+
+        let price_update = PriceUpdateV2::try_deserialize(&mut data.as_slice()).unwrap();
+
+        assert_eq!(
+            price_update.write_authority,
+            key!("7UVimffxr9ow1uXYxsr4LHAcV58mLzhmwaeKvJ1pjLiE")
+        );
+    }
 }
