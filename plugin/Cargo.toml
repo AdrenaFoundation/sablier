@@ -30,7 +30,6 @@ sablier-thread-program = { workspace = true, features = ["no-entrypoint"] }
 sablier-webhook-program = { workspace = true, features = ["no-entrypoint"] }
 sablier-utils.workspace = true
 log.workspace = true
-pyth-solana-receiver-sdk.workspace = true
 reqwest.workspace = true
 solana-account-decoder.workspace = true
 solana-client.workspace = true

@@ -4,7 +4,7 @@ use anchor_lang::{InstructionData, ToAccountMetas};
 use log::info;
 use sablier_network_program::state::Worker;
 use sablier_thread_program::state::{Trigger, VersionedThread};
-use sablier_utils::thread::PAYER_PUBKEY;
+use sablier_utils::{pyth::get_oracle_key, thread::PAYER_PUBKEY};
 use solana_account_decoder::UiAccountEncoding;
 use solana_client::{
     nonblocking::rpc_client::RpcClient,
@@ -21,7 +21,7 @@ use solana_sdk::{
     transaction::Transaction,
 };
 
-use crate::{error::PluginError, utils::get_oracle_key};
+use crate::error::PluginError;
 
 /// Max byte size of a serialized transaction.
 static TRANSACTION_MESSAGE_SIZE_LIMIT: usize = 1_232;

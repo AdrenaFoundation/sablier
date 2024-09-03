@@ -5,11 +5,12 @@ use anchor_lang::{
     solana_program::{self, instruction::Instruction},
     AnchorDeserialize,
 };
-use pyth_solana_receiver_sdk::price_update::FeedId;
 use sablier_macros::MinSpace;
 use serde::{Deserialize, Serialize};
 use static_pubkey::static_pubkey;
 use std::{convert::TryFrom, fmt::Debug, hash::Hash};
+
+use crate::pyth::FeedId;
 
 /// The stand-in pubkey for delegating a payer address to a worker. All workers are re-imbursed by the user for lamports spent during this delegation.
 pub static PAYER_PUBKEY: Pubkey = static_pubkey!("Sab1ierPayer1111111111111111111111111111111");

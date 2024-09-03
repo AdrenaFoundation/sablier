@@ -7,12 +7,12 @@ use std::{
 
 use chrono::DateTime;
 use log::info;
-use pyth_solana_receiver_sdk::price_update::PriceFeedMessage;
 use sablier_cron::Schedule;
 use sablier_thread_program::state::{Equality, Trigger, TriggerContext, VersionedThread};
+use sablier_utils::pyth::{get_oracle_key, PriceFeedMessage};
 use solana_program::{clock::Clock, pubkey::Pubkey};
 
-use crate::{error::PluginError, observers::state::PythThread, utils::get_oracle_key};
+use crate::{error::PluginError, observers::state::PythThread};
 
 use super::state::{
     AccountThreads, Clocks, CronThreads, EpochThreads, NowThreads, PythThreads, SlotThreads,

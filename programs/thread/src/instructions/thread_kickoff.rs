@@ -6,10 +6,12 @@ use std::{
 
 use anchor_lang::prelude::*;
 use chrono::DateTime;
-use pyth_solana_receiver_sdk::price_update::PriceUpdateV2;
 use sablier_cron::Schedule;
 use sablier_network_program::state::{Worker, WorkerAccount};
-use sablier_utils::thread::Trigger;
+use sablier_utils::{
+    pyth::{self, PriceUpdateV2},
+    thread::Trigger,
+};
 
 use crate::{constants::*, errors::*, state::*};
 
@@ -207,7 +209,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                 Some(account_info) => {
                     require_keys_eq!(
                         *account_info.owner,
-                        pyth_solana_receiver_sdk::ID,
+                        pyth::ID,
                         SablierError::TriggerConditionFailed
                     );
                     const STALENESS_THRESHOLD: u64 = 60; // staleness threshold in seconds

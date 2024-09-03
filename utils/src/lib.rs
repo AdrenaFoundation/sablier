@@ -1,6 +1,7 @@
 pub mod account;
 pub mod explorer;
 pub mod pubkey;
+pub mod pyth;
 pub mod space;
 pub mod thread;
 
