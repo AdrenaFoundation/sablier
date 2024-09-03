@@ -1,6 +1,6 @@
 use anchor_lang::{AccountDeserialize, Discriminator};
-use pyth_solana_receiver_sdk::price_update::{PriceFeedMessage, PriceUpdateV2};
 use sablier_thread_program::state::{Thread, VersionedThread};
+use sablier_utils::pyth::{self, PriceFeedMessage, PriceUpdateV2};
 use sablier_webhook_program::state::Webhook;
 use solana_geyser_plugin_interface::geyser_plugin_interface::ReplicaAccountInfoVersions;
 use solana_sdk::{clock::Clock, pubkey::Pubkey, sysvar};
@@ -59,7 +59,7 @@ fn parse_event(
         }
     }
 
-    if owner == pyth_solana_receiver_sdk::ID {
+    if owner == pyth::ID {
         return Ok(Some(AccountUpdateEvent::PriceFeed {
             price_feed: PriceUpdateV2::try_deserialize(&mut data)?.price_message,
         }));

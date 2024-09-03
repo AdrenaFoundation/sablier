@@ -16,10 +16,11 @@ name = "sablier_utils"
 [dependencies]
 anchor-lang.workspace = true
 base64.workspace = true
+borsh.workspace = true
 serde = { workspace = true, features = ["derive"] }
 static-pubkey.workspace = true
 sablier-macros.workspace = true
-pyth-solana-receiver-sdk.workspace = true
+solana-program.workspace = true
 
 [dev-dependencies]
 solana-sdk.workspace = true
