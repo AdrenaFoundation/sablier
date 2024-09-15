@@ -199,7 +199,7 @@ pub fn handler(ctx: Context<ThreadExec>) -> Result<()> {
     }
 
     // If the worker is in the pool, debit from the thread account and payout to the worker's fee account.
-    if pool.clone().into_inner().workers.contains(&worker.key()) {
+    if pool.workers.contains(&worker.key()) {
         thread.sub_lamports(thread.fee)?;
         fee.add_lamports(thread.fee)?;
     }
