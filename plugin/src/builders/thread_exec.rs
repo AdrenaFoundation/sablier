@@ -11,13 +11,14 @@ use solana_client::{
     rpc_config::{RpcSimulateTransactionAccountsConfig, RpcSimulateTransactionConfig},
     rpc_custom_error::JSON_RPC_SERVER_ERROR_MIN_CONTEXT_SLOT_NOT_REACHED,
 };
-use solana_program::{
+use solana_sdk::{
+    account::Account,
+    commitment_config::CommitmentConfig,
+    compute_budget::ComputeBudgetInstruction,
     instruction::{AccountMeta, Instruction},
     pubkey::Pubkey,
-};
-use solana_sdk::{
-    account::Account, commitment_config::CommitmentConfig,
-    compute_budget::ComputeBudgetInstruction, signature::Keypair, signer::Signer,
+    signature::Keypair,
+    signer::Signer,
     transaction::Transaction,
 };
 
@@ -77,6 +78,7 @@ pub async fn build_thread_exec_tx(
 
         // Exit early if the transaction exceeds the size limit.
         if sim_tx.message_data().len() > TRANSACTION_MESSAGE_SIZE_LIMIT {
+            info!("The transaction is too big to be send in one shot.");
             break;
         }
 

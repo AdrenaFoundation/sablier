@@ -10,7 +10,7 @@ use log::info;
 use sablier_cron::Schedule;
 use sablier_thread_program::state::{Equality, Trigger, TriggerContext, VersionedThread};
 use sablier_utils::pyth::{get_oracle_key, PriceFeedMessage};
-use solana_program::{clock::Clock, pubkey::Pubkey};
+use solana_sdk::{clock::Clock, pubkey::Pubkey};
 
 use crate::{error::PluginError, observers::state::PythThread};
 

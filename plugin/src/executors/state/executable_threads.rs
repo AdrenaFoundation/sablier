@@ -10,7 +10,7 @@ use tokio::sync::RwLock;
 use crate::{executors::tx::ExecutableThreadMetadata, pool_position::PoolPosition};
 
 /// Number of times to retry a thread simulation.
-static MAX_THREAD_SIMULATION_FAILURES: u32 = 5;
+static MAX_THREAD_SIMULATION_FAILURES: u32 = 10;
 
 /// Number of slots to wait before trying to execute a thread while not in the pool.
 static THREAD_TIMEOUT_WINDOW: u64 = 24;
@@ -51,6 +51,7 @@ impl ExecutableThreads {
                 .collect()
         }
     }
+
     pub async fn remove_executed_threads(
         &self,
         executed_threads: &HashMap<Pubkey, (Signature, u64)>,
@@ -82,8 +83,9 @@ impl ExecutableThreads {
         });
 
         // Drop threads that cross the simulation failure threshold.
-        w_state.retain(|_thread_pubkey, metadata| {
+        w_state.retain(|thread_pubkey, metadata| {
             if metadata.simulation_failures > MAX_THREAD_SIMULATION_FAILURES {
+                info!("Dropped thread: {thread_pubkey}");
                 self.1.fetch_add(1, Ordering::Relaxed);
                 false
             } else {

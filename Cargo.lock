@@ -3773,7 +3773,6 @@ dependencies = [
  "solana-client",
  "solana-geyser-plugin-interface",
  "solana-logger",
- "solana-program",
  "solana-quic-client",
  "solana-sdk",
  "thiserror",

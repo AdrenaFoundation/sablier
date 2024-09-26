@@ -1,4 +1,4 @@
-use {solana_program::pubkey::Pubkey, std::fmt::Debug};
+use {solana_sdk::pubkey::Pubkey, std::fmt::Debug};
 
 #[derive(Clone, Debug, Default)]
 pub struct PoolPosition {
