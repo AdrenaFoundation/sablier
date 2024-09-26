@@ -14,10 +14,10 @@ use solana_client::{
     tpu_client::TpuClientConfig,
 };
 use solana_geyser_plugin_interface::geyser_plugin_interface::Result as PluginResult;
-use solana_program::pubkey::Pubkey;
 use solana_quic_client::{QuicConfig, QuicConnectionManager, QuicPool};
 use solana_sdk::{
     commitment_config::CommitmentConfig,
+    pubkey::Pubkey,
     signature::{Keypair, Signature},
     transaction::Transaction,
 };

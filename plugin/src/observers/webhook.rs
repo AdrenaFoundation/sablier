@@ -1,7 +1,7 @@
 use std::{collections::HashSet, fmt::Debug, sync::Arc};
 
 use sablier_webhook_program::state::Webhook;
-use solana_program::pubkey::Pubkey;
+use solana_sdk::pubkey::Pubkey;
 
 use super::state::Webhooks;
 

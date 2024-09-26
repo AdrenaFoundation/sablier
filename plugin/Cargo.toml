@@ -36,7 +36,6 @@ solana-client.workspace = true
 solana-quic-client.workspace = true
 solana-geyser-plugin-interface.workspace = true
 solana-logger.workspace = true
-solana-program.workspace = true
 solana-sdk.workspace = true
 tokio.workspace = true
 futures.workspace = true
