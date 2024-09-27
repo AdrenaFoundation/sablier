@@ -1,16 +1,13 @@
 pub mod state;
 pub mod thread;
-pub mod webhook;
 
 use std::{fmt::Debug, sync::Arc};
 
 use thread::ThreadObserver;
-use webhook::WebhookObserver;
 
 #[derive(Default)]
 pub struct Observers {
     pub thread: Arc<ThreadObserver>,
-    pub webhook: Arc<WebhookObserver>,
 }
 
 impl Observers {

@@ -345,7 +345,6 @@ fn start_test_validator(
     cmd.arg("-r")
         .bpf_program(config, sablier_network_program::ID, "network")
         .bpf_program(config, sablier_thread_program::ID, "thread")
-        .bpf_program(config, sablier_webhook_program::ID, "webhook")
         .network_url(network_url)
         .clone_addresses(clone_addresses)
         .add_programs_with_path(program_infos)

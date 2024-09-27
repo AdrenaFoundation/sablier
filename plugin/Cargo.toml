@@ -25,12 +25,9 @@ chrono = { workspace = true, features = ["alloc"] }
 sablier-cron.workspace = true
 sablier-network-program = { workspace = true, features = ["no-entrypoint"] }
 sablier-plugin-utils.workspace = true
-sablier-relayer-api.workspace = true
 sablier-thread-program = { workspace = true, features = ["no-entrypoint"] }
-sablier-webhook-program = { workspace = true, features = ["no-entrypoint"] }
 sablier-utils.workspace = true
 log.workspace = true
-reqwest.workspace = true
 solana-account-decoder.workspace = true
 solana-client.workspace = true
 solana-quic-client.workspace = true

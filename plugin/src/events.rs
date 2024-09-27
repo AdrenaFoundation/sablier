@@ -1,7 +1,6 @@
 use anchor_lang::{AccountDeserialize, Discriminator};
 use sablier_thread_program::state::{Thread, VersionedThread};
 use sablier_utils::pyth::{self, PriceFeedMessage, PriceUpdateV2};
-use sablier_webhook_program::state::Webhook;
 use solana_geyser_plugin_interface::geyser_plugin_interface::ReplicaAccountInfoVersions;
 use solana_sdk::{clock::Clock, pubkey::Pubkey, sysvar};
 
@@ -16,9 +15,8 @@ pub struct AccountUpdate {
 #[derive(Debug)]
 pub enum AccountUpdateEvent {
     Clock { clock: Clock },
-    Thread { thread: VersionedThread },
+    Thread { thread: Box<VersionedThread> },
     PriceFeed { price_feed: PriceFeedMessage },
-    Webhook { webhook: Webhook },
 }
 
 impl<'a> From<ReplicaAccountInfoVersions<'a>> for AccountUpdate {
@@ -54,7 +52,7 @@ fn parse_event(
         let d = &data[..8];
         if d == Thread::discriminator() {
             return Ok(Some(AccountUpdateEvent::Thread {
-                thread: VersionedThread::V1(Thread::try_deserialize(&mut data)?),
+                thread: Box::new(VersionedThread::V1(Thread::try_deserialize(&mut data)?)),
             }));
         }
     }
@@ -62,12 +60,6 @@ fn parse_event(
     if owner == pyth::ID {
         return Ok(Some(AccountUpdateEvent::PriceFeed {
             price_feed: PriceUpdateV2::try_deserialize(&mut data)?.price_message,
-        }));
-    }
-
-    if owner == sablier_webhook_program::ID && data.len() > 8 {
-        return Ok(Some(AccountUpdateEvent::Webhook {
-            webhook: Webhook::try_deserialize(&mut data)?,
         }));
     }
 

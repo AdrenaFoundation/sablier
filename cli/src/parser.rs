@@ -2,7 +2,6 @@ use std::{convert::TryFrom, fs, path::PathBuf, str::FromStr};
 
 use clap::ArgMatches;
 use sablier_thread_program::state::{SerializableAccount, SerializableInstruction, Trigger};
-use sablier_webhook_program::state::HttpMethod;
 use serde::{Deserialize as JsonDeserialize, Serialize as JsonSerialize};
 use solana_sdk::{
     pubkey::Pubkey,
@@ -24,10 +23,8 @@ impl TryFrom<&ArgMatches> for CliCommand {
             Some(("initialize", matches)) => parse_initialize_command(matches),
             Some(("localnet", matches)) => parse_bpf_command(matches),
             Some(("pool", matches)) => parse_pool_command(matches),
-            Some(("secret", matches)) => parse_secret_command(matches),
             Some(("thread", matches)) => parse_thread_command(matches),
             Some(("registry", matches)) => parse_registry_command(matches),
-            Some(("webhook", matches)) => parse_webhook_command(matches),
             Some(("worker", matches)) => parse_worker_command(matches),
             _ => Err(CliError::CommandNotRecognized(
                 matches.subcommand().unwrap().0.into(),
@@ -166,30 +163,6 @@ fn parse_pool_command(matches: &ArgMatches) -> Result<CliCommand, CliError> {
     }
 }
 
-fn parse_secret_command(matches: &ArgMatches) -> Result<CliCommand, CliError> {
-    match matches.subcommand() {
-        Some(("approve", matches)) => Ok(CliCommand::SecretApprove {
-            name: parse_string("name", matches)?,
-            delegate: parse_pubkey("delegate", matches)?,
-        }),
-        Some(("get", matches)) => Ok(CliCommand::SecretGet {
-            name: parse_string("name", matches)?,
-        }),
-        Some(("list", _matches)) => Ok(CliCommand::SecretList {}),
-        Some(("create", matches)) => Ok(CliCommand::SecretCreate {
-            name: parse_string("name", matches)?,
-            word: parse_string("word", matches)?,
-        }),
-        Some(("revoke", matches)) => Ok(CliCommand::SecretRevoke {
-            name: parse_string("name", matches)?,
-            delegate: parse_pubkey("delegate", matches)?,
-        }),
-        _ => Err(CliError::CommandNotRecognized(
-            matches.subcommand().unwrap().0.into(),
-        )),
-    }
-}
-
 fn parse_thread_command(matches: &ArgMatches) -> Result<CliCommand, CliError> {
     match matches.subcommand() {
         Some(("crate-info", _)) => Ok(CliCommand::ThreadCrateInfo {}),
@@ -230,23 +203,6 @@ fn parse_registry_command(matches: &ArgMatches) -> Result<CliCommand, CliError> 
     match matches.subcommand() {
         Some(("get", _)) => Ok(CliCommand::RegistryGet {}),
         Some(("unlock", _)) => Ok(CliCommand::RegistryUnlock {}),
-        _ => Err(CliError::CommandNotRecognized(
-            matches.subcommand().unwrap().0.into(),
-        )),
-    }
-}
-
-fn parse_webhook_command(matches: &ArgMatches) -> Result<CliCommand, CliError> {
-    match matches.subcommand() {
-        Some(("get", matches)) => Ok(CliCommand::WebhookGet {
-            id: parse_string("id", matches)?.into_bytes(),
-        }),
-        Some(("create", matches)) => Ok(CliCommand::WebhookCreate {
-            body: parse_string("body", matches)?.into_bytes(),
-            id: parse_string("id", matches)?.into_bytes(),
-            method: parse_http_method("method", matches)?,
-            url: parse_string("url", matches)?,
-        }),
         _ => Err(CliError::CommandNotRecognized(
             matches.subcommand().unwrap().0.into(),
         )),
@@ -305,11 +261,6 @@ fn parse_instruction_file(
 
 fn parse_keypair_file(arg: &str, matches: &ArgMatches) -> Result<Keypair, CliError> {
     read_keypair_file(parse_string(arg, matches)?)
-        .map_err(|_err| CliError::BadParameter(arg.into()))
-}
-
-fn parse_http_method(arg: &str, matches: &ArgMatches) -> Result<HttpMethod, CliError> {
-    HttpMethod::from_str(parse_string(arg, matches)?.as_str())
         .map_err(|_err| CliError::BadParameter(arg.into()))
 }
 
