@@ -93,6 +93,9 @@ pub enum Trigger {
         /// The limit price to compare the Pyth feed to.
         limit: i64,
     },
+
+    /// Allows a thread to be kicked off according to a period seconds number.
+    Periodic { delay: u64 },
 }
 
 /// Operators for describing how to compare two values to one another.  

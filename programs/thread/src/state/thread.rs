@@ -164,6 +164,12 @@ pub enum TriggerContext {
 
     /// The trigger context for threads with a "pyth" trigger.
     Pyth { price: i64 },
+
+    /// The trigger context for threads with a periodic timestamp trigger.
+    Periodic {
+        /// The threshold moment the schedule was waiting for.
+        started_at: i64,
+    },
 }
 
 /// The properties of threads which are updatable.
