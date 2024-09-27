@@ -1,6 +1,5 @@
 use clap::{crate_version, Arg, ArgGroup, Command};
 use sablier_thread_program::state::{SerializableInstruction, Trigger};
-use sablier_webhook_program::state::HttpMethod;
 use solana_sdk::{pubkey::Pubkey, signature::Keypair};
 
 use crate::parser::ProgramInfo;
@@ -105,35 +104,6 @@ pub enum CliCommand {
     // Registry
     RegistryGet,
     RegistryUnlock,
-
-    // Secrets
-    SecretApprove {
-        name: String,
-        delegate: Pubkey,
-    },
-    SecretCreate {
-        name: String,
-        word: String,
-    },
-    SecretGet {
-        name: String,
-    },
-    SecretList {},
-    SecretRevoke {
-        name: String,
-        delegate: Pubkey,
-    },
-
-    // Webhook
-    WebhookCreate {
-        body: Vec<u8>,
-        id: Vec<u8>,
-        method: HttpMethod,
-        url: String,
-    },
-    WebhookGet {
-        id: Vec<u8>,
-    },
 
     // Worker commands
     WorkerCreate {

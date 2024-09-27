@@ -20,11 +20,9 @@ bzip2.workspace = true
 clap = { workspace = true, features = ["derive", "cargo"] }
 sablier-cron.workspace = true
 sablier-network-program = { workspace = true, features = ["no-entrypoint"] }
-sablier-relayer-api.workspace = true
 sablier-plugin-utils.workspace = true
 sablier-thread-program = { workspace = true, features = ["no-entrypoint"] }
 sablier-utils.workspace = true
-sablier-webhook-program = { workspace = true, features = ["no-entrypoint"] }
 chrono = { workspace = true, features = ["alloc"] }
 dirs-next.workspace = true
 indicatif.workspace = true

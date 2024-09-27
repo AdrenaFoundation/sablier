@@ -6,9 +6,7 @@ mod initialize;
 mod localnet;
 mod pool;
 mod registry;
-mod secret;
 mod thread;
-mod webhook;
 mod worker;
 
 use anyhow::Result;
@@ -91,11 +89,6 @@ pub fn process(matches: &ArgMatches) -> Result<(), CliError> {
         CliCommand::PoolGet { id } => pool::get(&client, id),
         CliCommand::PoolList {} => pool::list(&client),
         CliCommand::PoolUpdate { id, size } => pool::update(&client, id, size),
-        CliCommand::SecretApprove { name, delegate } => secret::approve(&client, name, delegate),
-        CliCommand::SecretRevoke { name, delegate } => secret::revoke(&client, name, delegate),
-        CliCommand::SecretCreate { name, word } => secret::create(&client, name, word),
-        CliCommand::SecretGet { name } => secret::get(&client, name),
-        CliCommand::SecretList {} => secret::list(&client),
         CliCommand::ThreadCrateInfo {} => thread::crate_info(&client),
         CliCommand::ThreadCreate {
             id,
@@ -118,13 +111,6 @@ pub fn process(matches: &ArgMatches) -> Result<(), CliError> {
         } => thread::update(&client, id, rate_limit, schedule),
         CliCommand::RegistryGet => registry::get(&client),
         CliCommand::RegistryUnlock => registry::unlock(&client),
-        CliCommand::WebhookCreate {
-            body,
-            id,
-            method,
-            url,
-        } => webhook::create(&client, body, id, method, url),
-        CliCommand::WebhookGet { id } => webhook::get(&client, id),
         CliCommand::WorkerCreate { signatory } => worker::create(&client, signatory, false),
         CliCommand::WorkerGet { id } => worker::get(&client, id),
         CliCommand::WorkerUpdate { id, signatory } => worker::update(&client, id, signatory),

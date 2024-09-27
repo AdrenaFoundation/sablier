@@ -83,17 +83,9 @@ impl GeyserPlugin for SablierPlugin {
                             .observers
                             .thread
                             .clone()
-                            .observe_thread(thread, account_update.key, slot)
+                            .observe_thread(*thread, account_update.key, slot)
                             .await
                             .ok();
-                    }
-                    AccountUpdateEvent::Webhook { webhook } => {
-                        inner
-                            .observers
-                            .webhook
-                            .clone()
-                            .observe_webhook(webhook, account_update.key)
-                            .await;
                     }
                     AccountUpdateEvent::PriceFeed { price_feed } => {
                         inner
