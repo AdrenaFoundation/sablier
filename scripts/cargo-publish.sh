@@ -7,8 +7,6 @@ cargo publish -p sablier-macros
 sleep 25
 cargo publish -p sablier-utils
 sleep 25
-cargo publish -p sablier-relayer-api
-sleep 25
 cargo publish -p sablier-plugin-utils
 sleep 25
 
@@ -16,8 +14,6 @@ sleep 25
 cargo publish -p sablier-network-program
 sleep 25
 cargo publish -p sablier-thread-program
-sleep 25
-cargo publish -p sablier-webhook-program
 sleep 25
 
 # Publish SDK
