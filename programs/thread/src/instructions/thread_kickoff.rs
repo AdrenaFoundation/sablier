@@ -268,7 +268,7 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
             };
 
             // Verify the current timestamp is greater than or equal to the threshold timestamp.
-            let threshold_timestamp = (reference_timestamp as u64 + *delay) as i64;
+            let threshold_timestamp = reference_timestamp + *delay as i64;
 
             msg!(
                 "Threshold timestamp: {}, clock timestamp: {}",

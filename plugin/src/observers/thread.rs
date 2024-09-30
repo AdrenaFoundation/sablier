@@ -238,7 +238,7 @@ impl ThreadObserver {
                         },
                     };
 
-                    let next_moment = (reference_timestamp as u64 + delay) as i64;
+                    let next_moment = reference_timestamp + delay as i64;
                     self.cron_threads.add(next_moment, thread_pubkey).await;
                 }
             }
