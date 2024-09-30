@@ -134,7 +134,6 @@ esac
 
   cp -fv "target/deploy/sablier_network_program.so" "$installDir/lib"
   cp -fv "target/deploy/sablier_thread_program.so" "$installDir/lib"
-  cp -fv "target/deploy/sablier_webhook_program.so" "$installDir/lib"
 )
 
 # Success message
