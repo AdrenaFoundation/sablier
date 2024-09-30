@@ -257,6 +257,40 @@ pub fn handler(ctx: Context<ThreadKickoff>) -> Result<()> {
                 }
             }
         }
+        Trigger::Periodic { delay } => {
+            // Get the reference timestamp for calculating the thread's scheduled target timestamp.
+            let reference_timestamp = match thread.exec_context {
+                None => thread.created_at.unix_timestamp,
+                Some(exec_context) => match exec_context.trigger_context {
+                    TriggerContext::Periodic { started_at } => started_at,
+                    _ => return Err(SablierError::InvalidThreadState.into()),
+                },
+            };
+
+            // Verify the current timestamp is greater than or equal to the threshold timestamp.
+            let threshold_timestamp = reference_timestamp + *delay as i64;
+
+            msg!(
+                "Threshold timestamp: {}, clock timestamp: {}",
+                threshold_timestamp,
+                clock.unix_timestamp
+            );
+            require!(
+                clock.unix_timestamp.ge(&threshold_timestamp),
+                SablierError::TriggerConditionFailed
+            );
+
+            // Set the exec context.
+            thread.exec_context = Some(ExecContext {
+                exec_index: 0,
+                execs_since_reimbursement: 0,
+                execs_since_slot: 0,
+                last_exec_at: clock.slot,
+                trigger_context: TriggerContext::Periodic {
+                    started_at: threshold_timestamp,
+                },
+            });
+        }
     }
 
     // If we make it here, the trigger is active. Update the next instruction and be done.

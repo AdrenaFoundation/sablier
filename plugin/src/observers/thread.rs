@@ -228,6 +228,19 @@ impl ThreadObserver {
                     let price_pubkey = get_oracle_key(0, feed_id);
                     self.pyth_threads.add(price_pubkey, pyth_thread).await;
                 }
+                Trigger::Periodic { delay } => {
+                    // Find a reference timestamp for calculating the thread's upcoming target time.
+                    let reference_timestamp = match thread.exec_context() {
+                        None => thread.created_at().unix_timestamp,
+                        Some(exec_context) => match exec_context.trigger_context {
+                            TriggerContext::Periodic { started_at } => started_at,
+                            _ => return Err(PluginError::InvalidExecContext),
+                        },
+                    };
+
+                    let next_moment = reference_timestamp + delay as i64;
+                    self.cron_threads.add(next_moment, thread_pubkey).await;
+                }
             }
         }
 
