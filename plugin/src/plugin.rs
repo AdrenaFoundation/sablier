@@ -173,15 +173,14 @@ impl SablierPlugin {
 
         let accounts = rpc_client.get_program_accounts(&program_id)?;
 
-        accounts
+        Ok(accounts
             .into_iter()
             .filter_map(|(pubkey, account)| {
                 VersionedThread::try_deserialize(&account.data)
                     .ok()
                     .map(|thread| (pubkey, thread))
             })
-            .collect::<Vec<_>>()
-            .pipe(Ok)
+            .collect())
     }
 }
 
