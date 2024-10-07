@@ -82,7 +82,7 @@ impl GeyserPlugin for SablierPlugin {
                 let thread_pdas = rpc_client
                     .get_program_accounts_with_config(&program_id, config)
                     .await
-                    .map_err(|e| PluginError::from(e))?;
+                    .map_err(PluginError::from)?;
 
                 let versioned_thread_pdas: Vec<(Pubkey, VersionedThread)> = thread_pdas
                     .into_iter()

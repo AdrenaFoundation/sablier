@@ -18,6 +18,7 @@ pub struct ThreadDelete<'info> {
     pub close_to: SystemAccount<'info>,
 
     /// The thread to be deleted.
+    /// CHECKS: made during the instruction processing
     #[account(mut)]
     pub thread: UncheckedAccount<'info>,
     // #[account(
