@@ -28,6 +28,8 @@ impl Debug for SablierPlugin {
     }
 }
 
+static LOCAL_RPC_URL: &str = "http://127.0.0.1:8899";
+
 #[derive(Debug)]
 pub struct Inner {
     pub config: PluginConfig,
@@ -170,7 +172,7 @@ impl SablierPlugin {
     /// Goal of this is to catch up on any existing threads that were created before the plugin was loaded.
     fn fetch_existing_threads(&self) -> PluginResult<Vec<(Pubkey, VersionedThread)>> {
         // Using localhost will use the RPC client from the validator.
-        let rpc_client = RpcClient::new("http://localhost:8899");
+        let rpc_client = RpcClient::new(LOCAL_RPC_URL.to_string());
         let program_id = sablier_thread_program::ID;
 
         let accounts = rpc_client
