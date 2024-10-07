@@ -1,9 +1,13 @@
 use std::{fmt::Debug, sync::Arc};
 
+use anchor_lang::AccountDeserialize;
 use log::info;
+use sablier_thread_program::state::VersionedThread;
+use solana_client::rpc_client::RpcClient;
 use solana_geyser_plugin_interface::geyser_plugin_interface::{
     GeyserPlugin, ReplicaAccountInfoVersions, Result as PluginResult, SlotStatus,
 };
+use solana_sdk::pubkey::Pubkey;
 use tokio::runtime::{Builder, Runtime};
 
 use crate::{
@@ -47,6 +51,24 @@ impl GeyserPlugin for SablierPlugin {
         info!("Loading snapshot...");
         let config = PluginConfig::read_from(config_file)?;
         *self = SablierPlugin::new_from_config(config);
+
+        info!("Fetch existing Thread pdas...");
+        let existing_thread_pdas = self.fetch_existing_threads()?;
+
+        info!("Add fetched Thread pdas to observers...");
+        let observers = self.inner.observers.clone();
+        self.inner.clone().spawn(move |inner| async move {
+            for (pubkey, thread) in existing_thread_pdas {
+                observers
+                    .thread
+                    .clone()
+                    .observe_thread(thread, pubkey, 0)
+                    .await
+                    .ok();
+            }
+            Ok(())
+        });
+
         Ok(())
     }
 
@@ -141,6 +163,25 @@ impl SablierPlugin {
                 runtime,
             }),
         }
+    }
+
+    /// Fetch existing threads from the chain, and return them as a list of (pubkey, thread) pairs.
+    /// Goal of this is to catch up on any existing threads that were created before the plugin was loaded.
+    fn fetch_existing_threads(&self) -> PluginResult<Vec<(Pubkey, VersionedThread)>> {
+        let rpc_client = RpcClient::new(self.inner.config.rpc_url.clone());
+        let program_id = sablier_thread_program::ID;
+
+        let accounts = rpc_client.get_program_accounts(&program_id)?;
+
+        accounts
+            .into_iter()
+            .filter_map(|(pubkey, account)| {
+                VersionedThread::try_deserialize(&account.data)
+                    .ok()
+                    .map(|thread| (pubkey, thread))
+            })
+            .collect::<Vec<_>>()
+            .pipe(Ok)
     }
 }
 

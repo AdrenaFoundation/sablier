@@ -17,6 +17,9 @@ pub struct PluginConfig {
     pub thread_count: usize,
     pub transaction_timeout_threshold: u64,
     pub worker_id: u64,
+    pub rpc_url: String,
+    pub rpc_ws_url: String,
+    pub keypair: String,
 }
 
 impl Default for PluginConfig {
@@ -27,6 +30,9 @@ impl Default for PluginConfig {
             transaction_timeout_threshold: DEFAULT_TRANSACTION_TIMEOUT_THRESHOLD,
             thread_count: DEFAULT_THREAD_COUNT,
             worker_id: 0,
+            rpc_url: "".to_string(),
+            rpc_ws_url: "".to_string(),
+            keypair: "".to_string(),
         }
     }
 }
