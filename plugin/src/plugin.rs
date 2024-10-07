@@ -12,6 +12,7 @@ use tokio::runtime::{Builder, Runtime};
 
 use crate::{
     config::PluginConfig,
+    error::PluginError,
     events::{AccountUpdate, AccountUpdateEvent},
     executors::Executors,
     observers::Observers,
@@ -171,12 +172,14 @@ impl SablierPlugin {
         let rpc_client = RpcClient::new(self.inner.config.rpc_url.clone());
         let program_id = sablier_thread_program::ID;
 
-        let accounts = rpc_client.get_program_accounts(&program_id)?;
+        let accounts = rpc_client
+            .get_program_accounts(&program_id)
+            .map_err(|e| PluginError::from(e))?;
 
         Ok(accounts
             .into_iter()
             .filter_map(|(pubkey, account)| {
-                VersionedThread::try_deserialize(&account.data)
+                VersionedThread::try_deserialize(&mut account.data.as_slice())
                     .ok()
                     .map(|thread| (pubkey, thread))
             })
