@@ -169,7 +169,8 @@ impl SablierPlugin {
     /// Fetch existing threads from the chain, and return them as a list of (pubkey, thread) pairs.
     /// Goal of this is to catch up on any existing threads that were created before the plugin was loaded.
     fn fetch_existing_threads(&self) -> PluginResult<Vec<(Pubkey, VersionedThread)>> {
-        let rpc_client = RpcClient::new(self.inner.config.rpc_url.clone());
+        // Using localhost will use the RPC client from the validator.
+        let rpc_client = RpcClient::new("http://localhost:8899");
         let program_id = sablier_thread_program::ID;
 
         let accounts = rpc_client
