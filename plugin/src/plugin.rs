@@ -3,7 +3,6 @@ use std::{fmt::Debug, sync::Arc};
 use anchor_lang::AccountDeserialize;
 use log::info;
 use sablier_thread_program::state::VersionedThread;
-use solana_client::rpc_client::RpcClient;
 use solana_geyser_plugin_interface::geyser_plugin_interface::{
     GeyserPlugin, ReplicaAccountInfoVersions, Result as PluginResult, SlotStatus,
 };
@@ -27,8 +26,6 @@ impl Debug for SablierPlugin {
         write!(f, "inner: {:?}", self.inner)
     }
 }
-
-static LOCAL_RPC_URL: &str = "http://127.0.0.1:8899";
 
 #[derive(Debug)]
 pub struct Inner {
@@ -55,22 +52,42 @@ impl GeyserPlugin for SablierPlugin {
         let config = PluginConfig::read_from(config_file)?;
         *self = SablierPlugin::new_from_config(config);
 
-        info!("Fetch existing Thread pdas...");
-        let existing_thread_pdas = self.fetch_existing_threads()?;
+        // Fetch existing threads from the chain, and return them as a list of (pubkey, thread) pairs.
+        // Goal of this is to catch up on any existing threads that were created before the plugin was loaded.
+        {
+            info!("Loading previously existing Threads..");
+            let observers = self.inner.observers.clone();
+            self.inner.clone().spawn(|inner| async move {
+                info!("Fetch existing Thread pdas...");
+                let rpc_client = &inner.executors.client;
+                let program_id = sablier_thread_program::ID;
 
-        info!("Add fetched Thread pdas to observers...");
-        let observers = self.inner.observers.clone();
-        self.inner.clone().spawn(move |inner| async move {
-            for (pubkey, thread) in existing_thread_pdas {
-                observers
-                    .thread
-                    .clone()
-                    .observe_thread(thread, pubkey, 0)
+                let accounts = rpc_client
+                    .get_program_accounts(&program_id)
                     .await
-                    .ok();
-            }
-            Ok(())
-        });
+                    .map_err(|e| PluginError::from(e))?;
+
+                let existing_thread_pdas: Vec<(Pubkey, VersionedThread)> = accounts
+                    .into_iter()
+                    .filter_map(|(pubkey, account)| {
+                        VersionedThread::try_deserialize(&mut account.data.as_slice())
+                            .ok()
+                            .map(|thread| (pubkey, thread))
+                    })
+                    .collect();
+
+                info!("Add fetched Thread pdas to observers...");
+                for (pubkey, thread) in existing_thread_pdas {
+                    observers
+                        .thread
+                        .clone()
+                        .observe_thread(thread, pubkey, 0)
+                        .await
+                        .ok();
+                }
+                Ok(())
+            });
+        }
 
         Ok(())
     }
@@ -166,27 +183,6 @@ impl SablierPlugin {
                 runtime,
             }),
         }
-    }
-
-    /// Fetch existing threads from the chain, and return them as a list of (pubkey, thread) pairs.
-    /// Goal of this is to catch up on any existing threads that were created before the plugin was loaded.
-    fn fetch_existing_threads(&self) -> PluginResult<Vec<(Pubkey, VersionedThread)>> {
-        // Using localhost will use the RPC client from the validator.
-        let rpc_client = RpcClient::new(LOCAL_RPC_URL.to_string());
-        let program_id = sablier_thread_program::ID;
-
-        let accounts = rpc_client
-            .get_program_accounts(&program_id)
-            .map_err(|e| PluginError::from(e))?;
-
-        Ok(accounts
-            .into_iter()
-            .filter_map(|(pubkey, account)| {
-                VersionedThread::try_deserialize(&mut account.data.as_slice())
-                    .ok()
-                    .map(|thread| (pubkey, thread))
-            })
-            .collect())
     }
 }
 
