@@ -52,7 +52,6 @@ impl GeyserPlugin for SablierPlugin {
         let config = PluginConfig::read_from(config_file)?;
         *self = SablierPlugin::new_from_config(config);
 
-        // Fetch existing threads from the chain, and return them as a list of (pubkey, thread) pairs.
         // Goal of this is to catch up on any existing threads that were created before the plugin was loaded.
         {
             info!("Loading previously existing Threads..");
