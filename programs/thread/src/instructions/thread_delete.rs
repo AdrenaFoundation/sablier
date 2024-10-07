@@ -1,5 +1,5 @@
 use {
-    crate::state::*,
+    crate::{constants::SEED_THREAD, state::*},
     anchor_lang::{prelude::*, solana_program::system_program},
     sablier_network_program::errors::SablierError,
 };
@@ -63,18 +63,36 @@ pub fn handler(ctx: Context<ThreadDelete>) -> Result<()> {
 
         // Verify the account provided
         let thread_account = &ctx.accounts.thread;
+        {
+            // Verify the account is initialized
+            require!(
+                thread_account.owner != &system_program::ID && thread_account.lamports() > 0,
+                SablierError::InvalidThreadAccount
+            );
 
-        // Verify the account is initialized
-        require!(
-            thread_account.owner != &system_program::ID && thread_account.lamports() > 0,
-            SablierError::InvalidThreadAccount
-        );
+            // Verify the account is owned by the program
+            require!(
+                thread_account.owner == &crate::ID,
+                SablierError::InvalidThreadAccount
+            );
 
-        // Verify the account is owned by the program
-        require!(
-            thread_account.owner == &crate::ID,
-            SablierError::InvalidThreadAccount
-        );
+            // Verify the seed derivation
+            let default_vec = Vec::new();
+            let thread_bump = thread.bump.to_le_bytes();
+            let seed = [
+                SEED_THREAD,
+                thread.authority.as_ref(),
+                thread.id.as_slice(),
+                thread.domain.as_ref().unwrap_or(&default_vec).as_slice(),
+                thread_bump.as_ref(),
+            ];
+            let expected_thread_key = Pubkey::create_program_address(&seed, &crate::ID)
+                .map_err(|_| SablierError::InvalidThreadAccount)?;
+            require!(
+                expected_thread_key == *thread_key,
+                SablierError::InvalidThreadAccount
+            );
+        }
     }
 
     // Transfer lamports out (implicit close)
