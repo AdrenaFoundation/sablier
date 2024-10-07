@@ -22,4 +22,10 @@ pub enum SablierError {
 
     #[msg("The worker cannot rotate into the pool right now")]
     PoolFull,
+
+    #[msg("The provided authority does not match the thread's authority")]
+    InvalidThreadAuthority,
+
+    #[msg("The provided thread account is not a valid Thread account")]
+    InvalidThreadAccount,
 }
