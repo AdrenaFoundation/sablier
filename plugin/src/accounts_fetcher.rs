@@ -9,7 +9,7 @@ use solana_sdk::signature::Keypair;
 
 use crate::{error::PluginError, observers::Observers};
 
-pub async fn load_all_accounts(observers: Arc<Observers>) -> Result<(), PluginError> {
+pub async fn fetch_and_observe_thread_pdas(observers: Arc<Observers>) -> Result<(), PluginError> {
     let client =
         anchor_client::Client::new(anchor_client::Cluster::Localnet, Arc::new(Keypair::new()));
     let accounts = client

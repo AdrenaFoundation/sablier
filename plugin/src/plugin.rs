@@ -10,7 +10,7 @@ use tokio::{
 };
 
 use crate::{
-    accounts_fetcher::load_all_accounts,
+    accounts_fetcher::fetch_and_observe_thread_pdas,
     config::PluginConfig,
     events::{AccountUpdate, AccountUpdateEvent},
     executors::Executors,
@@ -54,7 +54,7 @@ impl GeyserPlugin for SablierPlugin {
 
         let observers = self.inner.observers.clone();
         spawn(async move {
-            if let Err(err) = load_all_accounts(observers).await {
+            if let Err(err) = fetch_and_observe_thread_pdas(observers).await {
                 log::error!("Error while fetching past threads: {err}");
             }
         });
