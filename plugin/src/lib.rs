@@ -4,6 +4,7 @@ pub mod config {
 
 use solana_geyser_plugin_interface::geyser_plugin_interface::GeyserPlugin;
 
+mod accounts_fetcher;
 mod builders;
 mod error;
 mod events;

@@ -22,6 +22,7 @@ documentation = "https://docs.sablier.dev"
 keywords = ["solana"]
 
 [workspace.dependencies]
+anchor-client = "=0.29.0"
 anchor-lang = "=0.29.0"
 anchor-spl = "=0.29.0"
 anyhow = "1.0"

@@ -182,6 +182,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "anchor-client"
+version = "0.29.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb48c4a7911038da546dc752655a29fa49f6bd50ebc1edca218bac8da1012acd"
+dependencies = [
+ "anchor-lang",
+ "anyhow",
+ "futures",
+ "regex",
+ "serde",
+ "solana-account-decoder",
+ "solana-client",
+ "solana-sdk",
+ "thiserror",
+ "tokio",
+ "url",
+]
+
+[[package]]
 name = "anchor-derive-accounts"
 version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3423,6 +3442,7 @@ dependencies = [
 name = "sablier_plugin"
 version = "1.1.0"
 dependencies = [
+ "anchor-client",
  "anchor-lang",
  "bincode",
  "cargo_metadata",

@@ -4,9 +4,13 @@ use log::info;
 use solana_geyser_plugin_interface::geyser_plugin_interface::{
     GeyserPlugin, ReplicaAccountInfoVersions, Result as PluginResult, SlotStatus,
 };
-use tokio::runtime::{Builder, Runtime};
+use tokio::{
+    runtime::{Builder, Runtime},
+    spawn,
+};
 
 use crate::{
+    accounts_fetcher::load_all_accounts,
     config::PluginConfig,
     events::{AccountUpdate, AccountUpdateEvent},
     executors::Executors,
@@ -47,6 +51,14 @@ impl GeyserPlugin for SablierPlugin {
         info!("Loading snapshot...");
         let config = PluginConfig::read_from(config_file)?;
         *self = SablierPlugin::new_from_config(config);
+
+        let observers = self.inner.observers.clone();
+        spawn(async move {
+            if let Err(err) = load_all_accounts(observers).await {
+                log::error!("{err}");
+            }
+        });
+
         Ok(())
     }
 

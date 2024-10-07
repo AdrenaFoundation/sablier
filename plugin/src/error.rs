@@ -10,6 +10,8 @@ pub enum PluginError {
     BinCodeError(#[from] bincode::Error),
     #[error("Cannot parse the account: {0}")]
     AnchorError(#[from] anchor_lang::error::Error),
+    #[error(transparent)]
+    AnchorClientError(#[from] anchor_client::ClientError),
     #[error("Solana client error: {0}")]
     SolanaClientError(#[from] ClientError),
     #[error("The pubkey cannot be deserialized: {0}")]
