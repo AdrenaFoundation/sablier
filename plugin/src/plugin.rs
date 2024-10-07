@@ -55,7 +55,7 @@ impl GeyserPlugin for SablierPlugin {
         let observers = self.inner.observers.clone();
         spawn(async move {
             if let Err(err) = load_all_accounts(observers).await {
-                log::error!("{err}");
+                log::error!("Error while fetching past threads: {err}");
             }
         });
 
