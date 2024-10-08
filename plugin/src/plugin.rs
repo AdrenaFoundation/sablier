@@ -53,7 +53,7 @@ impl GeyserPlugin for SablierPlugin {
             env!("GEYSER_INTERFACE_VERSION"),
             env!("RUSTC_VERSION")
         );
-        info!("Loading snapshot...");
+        info!("Loading snapshot... 8----");
         let config = PluginConfig::read_from(config_file)?;
         *self = SablierPlugin::new_from_config(config);
 
