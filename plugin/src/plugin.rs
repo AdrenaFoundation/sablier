@@ -53,7 +53,7 @@ impl GeyserPlugin for SablierPlugin {
             env!("GEYSER_INTERFACE_VERSION"),
             env!("RUSTC_VERSION")
         );
-        info!("Loading snapshot... 8----");
+        info!("Loading snapshot...");
         let config = PluginConfig::read_from(config_file)?;
         *self = SablierPlugin::new_from_config(config);
 
@@ -83,6 +83,7 @@ impl GeyserPlugin for SablierPlugin {
                     .get_program_accounts_with_config(&program_id, config)
                     .await
                     .map_err(PluginError::from)?;
+                info!("  - Fetched {} Thread PDAs", thread_pdas.len());
 
                 let versioned_thread_pdas: Vec<(Pubkey, VersionedThread)> = thread_pdas
                     .into_iter()
@@ -92,8 +93,9 @@ impl GeyserPlugin for SablierPlugin {
                             .map(|thread| (pubkey, thread))
                     })
                     .collect();
+                info!("  - after deserialization: {} Thread PDAs left", versioned_thread_pdas.len());
 
-                info!("Add fetched Thread pdas to observers...");
+                info!("Adding {} fetched Thread pdas to observers...", versioned_thread_pdas.len());
                 for (pubkey, thread) in versioned_thread_pdas {
                     observers
                         .thread
