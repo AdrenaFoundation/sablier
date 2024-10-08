@@ -1,13 +1,22 @@
 use std::{fmt::Debug, sync::Arc};
 
+use anchor_lang::{AccountDeserialize, Discriminator};
 use log::info;
+use sablier_thread_program::state::{Thread, VersionedThread};
+use solana_account_decoder::UiAccountEncoding;
+use solana_client::{
+    rpc_config::{RpcAccountInfoConfig, RpcProgramAccountsConfig},
+    rpc_filter::{Memcmp, RpcFilterType},
+};
 use solana_geyser_plugin_interface::geyser_plugin_interface::{
     GeyserPlugin, ReplicaAccountInfoVersions, Result as PluginResult, SlotStatus,
 };
+use solana_sdk::pubkey::Pubkey;
 use tokio::runtime::{Builder, Runtime};
 
 use crate::{
     config::PluginConfig,
+    error::PluginError,
     events::{AccountUpdate, AccountUpdateEvent},
     executors::Executors,
     observers::Observers,
@@ -47,6 +56,56 @@ impl GeyserPlugin for SablierPlugin {
         info!("Loading snapshot...");
         let config = PluginConfig::read_from(config_file)?;
         *self = SablierPlugin::new_from_config(config);
+
+        // Goal of this is to catch up on any existing threads that were created before the plugin was loaded.
+        {
+            info!("Loading previously existing Threads..");
+            let observers = self.inner.observers.clone();
+            self.inner.clone().spawn(|inner| async move {
+                info!("Fetch existing Thread pdas...");
+                let rpc_client = &inner.executors.client;
+                let program_id = sablier_thread_program::ID;
+
+                // Filter to retrieve only Thread PDAs
+                let account_type_filter =
+                    RpcFilterType::Memcmp(Memcmp::new_base58_encoded(0, &Thread::discriminator()));
+                let config = RpcProgramAccountsConfig {
+                    filters: Some([vec![account_type_filter]].concat()),
+                    account_config: RpcAccountInfoConfig {
+                        encoding: Some(UiAccountEncoding::Base64),
+                        ..RpcAccountInfoConfig::default()
+                    },
+                    ..RpcProgramAccountsConfig::default()
+                };
+
+                // Fetch Thread pdas
+                let thread_pdas = rpc_client
+                    .get_program_accounts_with_config(&program_id, config)
+                    .await
+                    .map_err(PluginError::from)?;
+
+                let versioned_thread_pdas: Vec<(Pubkey, VersionedThread)> = thread_pdas
+                    .into_iter()
+                    .filter_map(|(pubkey, account)| {
+                        VersionedThread::try_deserialize(&mut account.data.as_slice())
+                            .ok()
+                            .map(|thread| (pubkey, thread))
+                    })
+                    .collect();
+
+                info!("Add fetched Thread pdas to observers...");
+                for (pubkey, thread) in versioned_thread_pdas {
+                    observers
+                        .thread
+                        .clone()
+                        .observe_thread(thread, pubkey, 0)
+                        .await
+                        .ok();
+                }
+                Ok(())
+            });
+        }
+
         Ok(())
     }
 
