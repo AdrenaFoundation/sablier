@@ -204,5 +204,28 @@ pub fn handler(ctx: Context<ThreadExec>) -> Result<()> {
         fee.add_lamports(thread.fee)?;
     }
 
+    let exec_ctx = &mut thread.exec_context.unwrap();
+
+    // Update execution context for Cron and Periodic triggers
+    // This ensures the next execution is scheduled based on the actual execution time,
+    // rather than the theoretical scheduled time, preventing drift in long-running threads
+    match thread.trigger {
+        Trigger::Cron { skippable, .. } => {
+            if skippable {
+                exec_ctx.last_exec_at = clock.slot;
+                exec_ctx.trigger_context = TriggerContext::Cron {
+                    started_at: clock.unix_timestamp,
+                };
+            }
+        }
+        Trigger::Periodic { .. } => {
+            exec_ctx.last_exec_at = clock.slot;
+            exec_ctx.trigger_context = TriggerContext::Periodic {
+                started_at: clock.unix_timestamp,
+            };
+        }
+        _ => (),
+    }
+
     Ok(())
 }
