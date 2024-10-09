@@ -63,13 +63,12 @@ impl GeyserPlugin for SablierPlugin {
             let observers = self.inner.observers.clone();
             self.inner.clone().spawn(|inner| async move {
                 info!("Fetch existing Thread pdas...");
-                let rpc_client = &inner.executors.client;
+                let client = inner.executors.client.clone();
                 let program_id = sablier_thread_program::ID;
 
                 // Filter to retrieve only Thread PDAs
                 let account_type_filter =
                     RpcFilterType::Memcmp(Memcmp::new_base58_encoded(0, &Thread::discriminator()));
-                info!("here");
                 let config = RpcProgramAccountsConfig {
                     filters: Some([vec![account_type_filter]].concat()),
                     account_config: RpcAccountInfoConfig {
@@ -78,9 +77,9 @@ impl GeyserPlugin for SablierPlugin {
                     },
                     ..RpcProgramAccountsConfig::default()
                 };
-                info!("here2");
+
                 // Fetch Thread pdas
-                let thread_pdas = rpc_client
+                let thread_pdas = client
                     .get_program_accounts_with_config(&program_id, config)
                     .await
                     .map_err(|err| {
