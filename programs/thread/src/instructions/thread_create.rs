@@ -30,7 +30,7 @@ pub struct ThreadCreate<'info> {
             domain.as_ref().unwrap_or(&Vec::new()).as_slice()
         ],
         bump,
-        payer= payer,
+        payer = payer,
         space = Thread::min_space(&instructions)?
     )]
     pub thread: Account<'info, Thread>,
