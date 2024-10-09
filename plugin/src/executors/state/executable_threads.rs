@@ -10,7 +10,7 @@ use tokio::sync::RwLock;
 use crate::{executors::tx::ExecutableThreadMetadata, pool_position::PoolPosition};
 
 /// Number of times to retry a thread simulation.
-static MAX_THREAD_SIMULATION_FAILURES: u32 = 10;
+static MAX_THREAD_SIMULATION_FAILURES: u32 = 5;
 
 /// Number of slots to wait before trying to execute a thread while not in the pool.
 static THREAD_TIMEOUT_WINDOW: u64 = 24;
