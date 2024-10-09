@@ -59,7 +59,7 @@ impl GeyserPlugin for SablierPlugin {
 
         // Goal of this is to catch up on any existing threads that were created before the plugin was loaded.
         {
-            info!("Loading previously existing Threads..");
+            info!("Loading previously existing Threads...");
             let observers = self.inner.observers.clone();
             self.inner.clone().spawn(|inner| async move {
                 info!("Fetch existing Thread pdas...");
@@ -69,6 +69,7 @@ impl GeyserPlugin for SablierPlugin {
                 // Filter to retrieve only Thread PDAs
                 let account_type_filter =
                     RpcFilterType::Memcmp(Memcmp::new_base58_encoded(0, &Thread::discriminator()));
+                info!("here");
                 let config = RpcProgramAccountsConfig {
                     filters: Some([vec![account_type_filter]].concat()),
                     account_config: RpcAccountInfoConfig {
@@ -77,7 +78,7 @@ impl GeyserPlugin for SablierPlugin {
                     },
                     ..RpcProgramAccountsConfig::default()
                 };
-
+                info!("here2");
                 // Fetch Thread pdas
                 let thread_pdas = rpc_client
                     .get_program_accounts_with_config(&program_id, config)
@@ -93,10 +94,17 @@ impl GeyserPlugin for SablierPlugin {
                             .map(|thread| (pubkey, thread))
                     })
                     .collect();
-                info!("  - after deserialization: {} Thread PDAs left", versioned_thread_pdas.len());
+                info!(
+                    "  - after deserialization: {} Thread PDAs left",
+                    versioned_thread_pdas.len()
+                );
 
-                info!("Adding {} fetched Thread pdas to observers...", versioned_thread_pdas.len());
+                info!(
+                    "Adding {} fetched Thread pdas to observers...",
+                    versioned_thread_pdas.len()
+                );
                 for (pubkey, thread) in versioned_thread_pdas {
+                    info!("here3");
                     observers
                         .thread
                         .clone()
