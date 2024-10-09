@@ -43,4 +43,12 @@ pub enum SablierError {
     /// Thrown if the user attempts to withdraw SOL that would put a thread below it's minimum rent threshold.
     #[msg("Withdrawing this amount would leave the thread with less than the minimum required SOL for rent exemption")]
     WithdrawalTooLarge,
+
+    /// Thrown if the provided authority does not match the thread's authority.
+    #[msg("The provided authority does not match the thread's authority")]
+    InvalidThreadAuthority,
+
+    /// Thrown if the provided account is not a valid Thread account.
+    #[msg("The provided thread account is not a valid Thread account")]
+    InvalidThreadAccount,
 }
