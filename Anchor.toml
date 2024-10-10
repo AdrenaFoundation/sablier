@@ -9,22 +9,18 @@ skip-lint = false
 [programs.devnet]
 sablier_network_program = "H6CTDj7ewA6PT1jGt2WTnkhWb2RwwuoQkAsgzRuSsnaV"
 sablier_thread_program = "sabGLGXfBiUCkwtprPMtatG6tCNxhcWWs1hjQAvDqEE"
-sablier_webhook_program = "ARqVfCUQeS3cr7NXg18kHvDmCw57amv1yHEGu9rsvVeN"
 
 [programs.localnet]
 sablier_network_program = "H6CTDj7ewA6PT1jGt2WTnkhWb2RwwuoQkAsgzRuSsnaV"
 sablier_thread_program = "sabGLGXfBiUCkwtprPMtatG6tCNxhcWWs1hjQAvDqEE"
-sablier_webhook_program = "ARqVfCUQeS3cr7NXg18kHvDmCw57amv1yHEGu9rsvVeN"
 
 [programs.mainnet]
 sablier_network_program = "H6CTDj7ewA6PT1jGt2WTnkhWb2RwwuoQkAsgzRuSsnaV"
 sablier_thread_program = "sabGLGXfBiUCkwtprPMtatG6tCNxhcWWs1hjQAvDqEE"
-sablier_webhook_program = "ARqVfCUQeS3cr7NXg18kHvDmCw57amv1yHEGu9rsvVeN"
 
 [programs.testnet]
 sablier_network_program = "H6CTDj7ewA6PT1jGt2WTnkhWb2RwwuoQkAsgzRuSsnaV"
 sablier_thread_program = "sabGLGXfBiUCkwtprPMtatG6tCNxhcWWs1hjQAvDqEE"
-sablier_webhook_program = "ARqVfCUQeS3cr7NXg18kHvDmCw57amv1yHEGu9rsvVeN"
 
 [provider]
 cluster = "Localnet"
