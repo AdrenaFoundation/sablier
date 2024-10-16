@@ -36,6 +36,8 @@ clap = { version = "4.5" }
 dirs-next = "2.0.0"
 futures = "0.3"
 indicatif = "0.17"
+litesvm = "0.2"
+litesvm-token = "0.2"
 log = "0.4"
 nom = "~7"
 proc-macro2 = "1.0"
