@@ -97,4 +97,12 @@ pub mod thread_program {
     pub fn thread_withdraw(ctx: Context<ThreadWithdraw>, amount: u64) -> Result<()> {
         thread_withdraw::handler(ctx, amount)
     }
+
+    pub fn thread_reset_next(ctx: Context<ThreadResetNext>, timestamp: i64) -> Result<()> {
+        thread_reset_next::handler(ctx, timestamp)
+    }
+
+    pub fn thread_delete_bypass(ctx: Context<ThreadDeleteBypass>) -> Result<()> {
+        thread_delete_bypass::handler(ctx)
+    }
 }
