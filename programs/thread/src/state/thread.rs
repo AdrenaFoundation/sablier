@@ -5,7 +5,7 @@ use sablier_utils::{
     MinSpace, Space,
 };
 
-use crate::constants::SEED_THREAD;
+use crate::constants::{NEXT_INSTRUCTION_SIZE, SEED_THREAD};
 
 /// Tracks the current state of a transaction thread on Solana.
 #[account]
@@ -72,11 +72,6 @@ pub trait ThreadAccount {
 impl Thread {
     pub fn min_space(instructions: &[SerializableInstruction]) -> Result<usize> {
         let ins_space = instructions.try_to_vec()?.len();
-        let max_ins_size = instructions
-            .iter()
-            .map(|ins| ins.try_to_vec().map(|v| v.len()).unwrap_or(0))
-            .max()
-            .unwrap_or(0);
 
         Ok(
             8
@@ -88,7 +83,7 @@ impl Thread {
             + u64::MIN_SPACE // fee
             + (4 + 32) // id
             + (4 + ins_space) // instructions
-            + (1 + max_ins_size) // next_instruction
+            + (1 + NEXT_INSTRUCTION_SIZE) // next_instruction
             + bool::MIN_SPACE // paused
             + u64::MIN_SPACE // rate_limit
             + Trigger::MIN_SPACE, // trigger
