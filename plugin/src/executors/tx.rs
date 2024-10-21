@@ -1,7 +1,8 @@
 use std::{
     collections::{HashMap, HashSet},
     fmt::Debug,
-    sync::Arc,
+    io::Write,
+    sync::{Arc, RwLock},
 };
 
 use bincode::serialize;
@@ -37,6 +38,8 @@ use super::{
 pub struct TxExecutor {
     pub config: PluginConfig,
     pub executable_threads: ExecutableThreads,
+    // Temporary state for blacklisted threads (from old positions that were deleted and SLTP cleanups call not working)
+    pub blacklisted_threads: RwLock<HashSet<Pubkey>>,
     pub transaction_history: TransactionHistory,
     pub rotation_history: RotationHistory,
     pub keypair: Keypair,
@@ -60,6 +63,7 @@ impl TxExecutor {
         Self {
             config: config.clone(),
             executable_threads: ExecutableThreads::default(),
+            blacklisted_threads: RwLock::new(HashSet::new()),
             transaction_history: TransactionHistory::default(),
             rotation_history: RotationHistory::default(),
             keypair: read_or_new_keypair(config.keypath),
@@ -73,6 +77,10 @@ impl TxExecutor {
         slot: u64,
         runtime: Arc<Runtime>,
     ) -> PluginResult<()> {
+        info!(
+            "blacklisted_threads: {:?}",
+            self.blacklisted_threads.read().unwrap().len()
+        );
         self.executable_threads
             .rebase_threads(slot, &thread_pubkeys)
             .await;
@@ -301,7 +309,15 @@ impl TxExecutor {
             }
         }
 
-        if let Ok(tx) = crate::builders::build_thread_exec_tx(
+        // check if the thread is blacklisted
+        if self
+            .blacklisted_threads
+            .read()
+            .unwrap()
+            .contains(&thread_pubkey)
+        {
+            return None;
+        } else if let Ok((tx, blacklisted)) = crate::builders::build_thread_exec_tx(
             client.clone(),
             &self.keypair,
             due_slot,
@@ -311,7 +327,13 @@ impl TxExecutor {
         )
         .await
         {
-            if let Some(tx) = tx {
+            if let Some(blacklisted) = blacklisted {
+                self.blacklisted_threads
+                    .write()
+                    .unwrap()
+                    .insert(blacklisted);
+                None
+            } else if let Some(tx) = tx {
                 if !self
                     .transaction_history
                     .is_duplicate_tx(observed_slot, thread_pubkey, &tx)

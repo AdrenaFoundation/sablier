@@ -1,4 +1,5 @@
-use std::sync::Arc;
+use std::collections::HashSet;
+use std::sync::{Arc, Mutex, RwLock};
 
 use anchor_lang::{InstructionData, ToAccountMetas};
 use log::info;
@@ -33,6 +34,9 @@ static TRANSACTION_COMPUTE_UNIT_LIMIT: u32 = 1_400_000;
 /// The buffer amount to add to transactions' compute units in case on-chain PDA derivations take more CUs than used in simulation.
 static TRANSACTION_COMPUTE_UNIT_BUFFER: u32 = 1000;
 
+pub const INSTRUCTION_ERROR_REENTRANCY_NOT_ALLOWED: i64 = 4615034;
+pub const INSTRUCTION_ERROR_ANCHOR_ACCOUNT_OWNED_BY_WRONG_PROGRAM: i64 = 3007;
+
 pub async fn build_thread_exec_tx(
     client: Arc<RpcClient>,
     payer: &Keypair,
@@ -40,7 +44,7 @@ pub async fn build_thread_exec_tx(
     thread: VersionedThread,
     thread_pubkey: Pubkey,
     worker_id: u64,
-) -> Result<Option<Transaction>, PluginError> {
+) -> Result<(Option<Transaction>, /* Blacklisted */ Option<Pubkey>), PluginError> {
     // Grab the thread and relevant data.
     let now = std::time::Instant::now();
     let blockhash = client.get_latest_blockhash().await?;
@@ -102,10 +106,25 @@ pub async fn build_thread_exec_tx(
         {
             // If there was a simulation error, stop packing and exit now.
             Err(err) => {
+                // Check for specific error and blacklist the thread
                 if let solana_client::client_error::ClientErrorKind::RpcError(
                     solana_client::rpc_request::RpcError::RpcResponseError { code, .. },
                 ) = err.kind
                 {
+                    if code == INSTRUCTION_ERROR_REENTRANCY_NOT_ALLOWED {
+                        info!(
+                            "INSTRUCTION_ERROR_REENTRANCY_NOT_ALLOWED, blacklisting thread: {}",
+                            thread_pubkey
+                        );
+                        return Ok((None, Some(thread_pubkey)));
+                    }
+                    if code == INSTRUCTION_ERROR_ANCHOR_ACCOUNT_OWNED_BY_WRONG_PROGRAM {
+                        info!(
+                            "INSTRUCTION_ERROR_ANCHOR_ACCOUNT_OWNED_BY_WRONG_PROGRAM, blacklisting thread: {}",
+                            thread_pubkey
+                        );
+                        return Ok((None, Some(thread_pubkey)));
+                    }
                     if code == JSON_RPC_SERVER_ERROR_MIN_CONTEXT_SLOT_NOT_REACHED {
                         return Err(PluginError::MinContextSlotNotReached);
                     }
@@ -172,7 +191,7 @@ pub async fn build_thread_exec_tx(
     // If there were no successful instructions, then exit early. There is nothing to do.
     // Alternatively, exit early if only the kickoff instruction (and no execs) succeeded.
     if successful_ixs.is_empty() {
-        return Ok(None);
+        return Ok((None, None));
     }
 
     // Set the transaction's compute unit limit to be exactly the amount that was used in simulation.
@@ -199,7 +218,7 @@ pub async fn build_thread_exec_tx(
         units_consumed,
         tx.signatures[0]
     );
-    Ok(Some(tx))
+    Ok((Some(tx), None))
 }
 
 fn build_kickoff_ix(
