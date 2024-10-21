@@ -95,7 +95,7 @@ impl ExecutableThreads {
         info!(
             "dropped_threads: {:?} executable_threads: {:?}",
             self.1.load(Ordering::Relaxed),
-            *w_state
+            *w_state,
         );
     }
 
