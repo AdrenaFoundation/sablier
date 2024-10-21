@@ -14,3 +14,7 @@ pub const POOL_ID: u64 = 0;
 /// The number of lamports to reimburse the worker with after they've submitted a transaction's worth of exec instructions.
 #[constant]
 pub const TRANSACTION_BASE_FEE_REIMBURSEMENT: u64 = 5_000;
+
+/// Static space for next_instruction field.
+#[constant]
+pub const NEXT_INSTRUCTION_SIZE: usize = 1232;
