@@ -199,4 +199,8 @@ pub mod network_program {
     pub fn unstake_process(ctx: Context<UnstakeProcess>) -> Result<ThreadResponse> {
         jobs::process_unstakes::unstake_process::handler(ctx)
     }
+
+    pub fn delegation_fix(ctx: Context<DelegationFix>) -> Result<()> {
+        instructions::delegation_fix::handler(ctx)
+    }
 }

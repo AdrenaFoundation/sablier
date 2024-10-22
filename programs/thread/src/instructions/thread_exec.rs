@@ -171,6 +171,8 @@ pub fn handler(ctx: Context<ThreadExec>) -> Result<()> {
         );
     } else {
         thread.next_instruction = next_instruction;
+        // Realloc the thread account if the thread is bigger than expected
+        thread.realloc_account()?;
     }
 
     // Update the exec context.
