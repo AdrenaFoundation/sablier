@@ -39,7 +39,7 @@ pub struct DelegationFix<'info> {
 
     #[account(
         mut,
-        close = authority,
+        // close = authority,
         seeds = [
             SEED_DELEGATION,
             worker.key().as_ref(),
@@ -52,7 +52,7 @@ pub struct DelegationFix<'info> {
 
     #[account(
         mut,
-        close = authority,
+        // close = authority,
         associated_token::authority = delegation_1,
         associated_token::mint = mint,
     )]
@@ -83,7 +83,8 @@ pub fn handler(ctx: Context<DelegationFix>) -> Result<()> {
     let token_program = &ctx.accounts.token_program;
     let worker = &mut ctx.accounts.worker;
 
-    // Transfer tokens from authority tokens to delegation
+    // anchor_spl::token::close_account(ctx)
+    // // Transfer tokens from authority tokens to delegation
     let bump = ctx.bumps.delegation_1;
     transfer(
         CpiContext::new_with_signer(
