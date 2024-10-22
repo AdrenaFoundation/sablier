@@ -23,7 +23,6 @@ pub struct DelegationFix<'info> {
             delegation_0.id.to_be_bytes().as_ref()
         ],
         bump,
-        has_one = authority,
     )]
     pub delegation_0: Account<'info, Delegation>,
 
