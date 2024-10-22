@@ -17,5 +17,11 @@ name = "sablier_sdk"
 anchor-lang.workspace = true
 sablier-thread-program = { workspace = true, features = ["cpi"] }
 
+[dev-dependencies]
+sablier-network-program = { workspace = true, features = ["cpi"] }
+litesvm.workspace = true
+litesvm-token.workspace = true
+solana-sdk.workspace = true
+
 [features]
 default = []

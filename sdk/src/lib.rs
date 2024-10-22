@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod litesvm;
+
 pub use sablier_thread_program::errors;
 pub use sablier_thread_program::program::ThreadProgram;
 pub use sablier_thread_program::ID;
