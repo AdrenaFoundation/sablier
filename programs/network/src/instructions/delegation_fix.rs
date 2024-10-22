@@ -75,6 +75,8 @@ pub struct DelegationFix<'info> {
 
 pub fn handler(ctx: Context<DelegationFix>) -> Result<()> {
     // Get accounts.
+    let authority = &ctx.accounts.authority;
+    let delegation_0 = &mut ctx.accounts.delegation_0;
     let delegation_1 = &ctx.accounts.delegation_1;
     let delegation_tokens_0 = &ctx.accounts.delegation_tokens_0;
     let delegation_tokens_1 = &ctx.accounts.delegation_tokens_1;
@@ -101,6 +103,7 @@ pub fn handler(ctx: Context<DelegationFix>) -> Result<()> {
         delegation_tokens_1.amount,
     )?;
 
+    delegation_0.authority = authority.key();
     worker.total_delegations = 1;
 
     Ok(())
